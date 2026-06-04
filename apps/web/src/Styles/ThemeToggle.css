@@ -1,0 +1,13 @@
+/* ======== THEME TOGGLE ======== */
+.af-theme-toggle { background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; }
+.af-theme-track { position: relative; width: 52px; height: 28px; border-radius: 14px; display: flex; align-items: center; transition: background 0.4s ease; overflow: hidden; }
+.af-theme-toggle.dark .af-theme-track { background: linear-gradient(135deg, #1e293b, #334155); }
+.af-theme-toggle.light .af-theme-track { background: linear-gradient(135deg, #60a5fa, #93c5fd); }
+.af-theme-knob { position: absolute; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.af-theme-toggle.dark .af-theme-knob { left: 3px; background: #334155; }
+.af-theme-toggle.light .af-theme-knob { left: 27px; background: #fbbf24; }
+.af-theme-sun, .af-theme-moon { position: absolute; font-size: 12px; transition: all 0.3s; }
+.af-theme-toggle.dark .af-theme-sun { opacity: 0; transform: scale(0); }
+.af-theme-toggle.dark .af-theme-moon { opacity: 1; transform: scale(1); color: #93c5fd; }
+.af-theme-toggle.light .af-theme-sun { opacity: 1; transform: scale(1); color: white; }
+.af-theme-toggle.light .af-theme-moon { opacity: 0; transform: scale(0); }

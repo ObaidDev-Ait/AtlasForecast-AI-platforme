@@ -1,0 +1,655 @@
+/* CSS pour la page de paiement AtlasForecast */
+
+/* Variables CSS personnalisées */
+:root {
+    --checkout-primary: #3b82f6;
+    --checkout-primary-hover: #2563eb;
+    --checkout-secondary: #64748b;
+    --checkout-secondary-hover: #475569;
+    --checkout-success: #10b981;
+    --checkout-error: #ef4444;
+    --checkout-warning: #f59e0b;
+    --checkout-info: #06b6d4;
+
+    --checkout-bg: rgba(15, 23, 42, 0.95);
+    --checkout-card-bg: rgba(30, 41, 59, 0.95);
+    --checkout-border: rgba(148, 163, 184, 0.2);
+    --checkout-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    --checkout-text-primary: #f8fafc;
+    --checkout-text-secondary: #cbd5e1;
+    --checkout-text-muted: #94a3b8;
+
+    --checkout-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mode clair */
+[data-theme="light"] {
+    --checkout-bg: rgba(248, 250, 252, 0.95);
+    --checkout-card-bg: rgba(255, 255, 255, 0.95);
+    --checkout-border: rgba(148, 163, 184, 0.3);
+    --checkout-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+    --checkout-text-primary: #0f172a;
+    --checkout-text-secondary: #334155;
+    --checkout-text-muted: #64748b;
+}
+
+/* Conteneur principal de paiement */
+.checkout-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* En-tête de paiement */
+.checkout-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    max-width: 500px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-top .brand-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--checkout-text-primary);
+    text-decoration: none;
+    transition: var(--checkout-transition);
+}
+
+.header-top .brand-link:hover {
+    color: var(--checkout-primary);
+    transform: translateY(-2px);
+}
+
+.header-top .brand-link i {
+    font-size: 2rem;
+    color: var(--checkout-primary);
+}
+
+.checkout-header .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--checkout-text-primary);
+    text-decoration: none;
+    margin-bottom: 2rem;
+    transition: var(--checkout-transition);
+}
+
+.checkout-header .brand-link:hover {
+    transform: translateY(-2px);
+    color: var(--checkout-primary);
+}
+
+.checkout-header .brand-link i {
+    font-size: 2rem;
+    color: var(--checkout-primary);
+}
+
+.checkout-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--checkout-text-primary);
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--checkout-primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.checkout-header p {
+    font-size: 1.125rem;
+    color: var(--checkout-text-secondary);
+    line-height: 1.6;
+}
+
+/* Contenu de paiement */
+.checkout-content {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Carte de paiement */
+.checkout-card {
+    background: var(--checkout-card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--checkout-border);
+    border-radius: 1.5rem;
+    padding: 3rem 2rem;
+    box-shadow: var(--checkout-shadow);
+    transition: var(--checkout-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.checkout-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--checkout-primary), #8b5cf6, #ec4899);
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.checkout-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.35);
+}
+
+/* Informations du plan */
+.plan-info {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 1rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.plan-info h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--checkout-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.plan-info .plan-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--checkout-primary);
+    margin-bottom: 0.5rem;
+}
+
+.plan-info .plan-period {
+    font-size: 1rem;
+    color: var(--checkout-text-secondary);
+    font-weight: 500;
+}
+
+/* Sélecteur de méthode de paiement */
+.payment-methods {
+    margin-bottom: 2.5rem;
+}
+
+.payment-methods h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--checkout-text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.method-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.method-option {
+    position: relative;
+    cursor: pointer;
+    transition: var(--checkout-transition);
+}
+
+.method-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.method-option .method-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 2px solid var(--checkout-border);
+    border-radius: 1rem;
+    background: rgba(100, 116, 139, 0.1);
+    transition: var(--checkout-transition);
+}
+
+.method-option input[type="radio"]:checked + .method-card {
+    border-color: var(--checkout-primary);
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+}
+
+.method-option .method-card:hover {
+    border-color: var(--checkout-primary);
+    transform: translateY(-2px);
+}
+
+.method-option .method-icon {
+    font-size: 2.5rem;
+    color: var(--checkout-text-secondary);
+    transition: var(--checkout-transition);
+}
+
+.method-option input[type="radio"]:checked + .method-card .method-icon {
+    color: var(--checkout-primary);
+}
+
+.method-option .method-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--checkout-text-primary);
+    text-align: center;
+}
+
+.method-option .method-description {
+    font-size: 0.875rem;
+    color: var(--checkout-text-muted);
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* Formulaire de paiement par carte */
+.card-form {
+    display: none;
+    animation: formSlideIn 0.5s ease-out;
+}
+
+.card-form.active {
+    display: block;
+}
+
+@keyframes formSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-form h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--checkout-text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--checkout-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--checkout-border);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--checkout-text-primary);
+    font-size: 1rem;
+    transition: var(--checkout-transition);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--checkout-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--checkout-text-muted);
+}
+
+/* Stripe Elements */
+.stripe-element {
+    padding: 1rem;
+    border: 1px solid var(--checkout-border);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    transition: var(--checkout-transition);
+}
+
+.stripe-element:focus-within {
+    border-color: var(--checkout-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.stripe-element .StripeElement {
+    min-height: 20px;
+}
+
+.stripe-error {
+    color: var(--checkout-error);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+    padding: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Formulaire PayPal */
+.paypal-form {
+    display: none;
+    text-align: center;
+    animation: formSlideIn 0.5s ease-out;
+}
+
+.paypal-form.active {
+    display: block;
+}
+
+.paypal-form h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--checkout-text-primary);
+    margin-bottom: 1rem;
+}
+
+.paypal-form p {
+    font-size: 1rem;
+    color: var(--checkout-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+#paypal-button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+/* Bouton de paiement */
+.pay-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--checkout-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.pay-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.pay-button:hover::before {
+    left: 100%;
+}
+
+.pay-button.card-pay {
+    background: linear-gradient(135deg, var(--checkout-primary), #8b5cf6);
+    color: white;
+    box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+}
+
+.pay-button.card-pay:hover {
+    background: linear-gradient(135deg, var(--checkout-primary-hover), #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+}
+
+.pay-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pay-button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Informations de sécurité */
+.security-info {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 1rem;
+    text-align: center;
+}
+
+.security-info h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--checkout-success);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.security-info p {
+    font-size: 0.875rem;
+    color: var(--checkout-text-secondary);
+    line-height: 1.5;
+}
+
+/* Messages d'erreur et de succès */
+.message-container {
+    margin-top: 1.5rem;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message i {
+    font-size: 1.125rem;
+}
+
+.message-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--checkout-error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.message-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--checkout-success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 1rem;
+    }
+
+    .checkout-header h1 {
+        font-size: 2rem;
+    }
+
+    .checkout-card {
+        padding: 2rem 1.5rem;
+        margin: 0 1rem;
+    }
+
+    .header-top {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .method-options {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .plan-info .plan-price {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .checkout-card {
+        padding: 1.5rem 1rem;
+        border-radius: 1rem;
+    }
+
+    .plan-info {
+        padding: 1rem;
+    }
+
+    .plan-info .plan-price {
+        font-size: 1.75rem;
+    }
+
+    .pay-button {
+        padding: 1rem 1.5rem;
+        font-size: 1.125rem;
+    }
+}
+
+/* Animations d'entrée */
+.checkout-card {
+    animation: cardSlideIn 0.6s ease-out;
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.checkout-header {
+    animation: headerSlideIn 0.8s ease-out;
+}
+
+@keyframes headerSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus et accessibilité */
+.pay-button:focus,
+.method-option input[type="radio"]:focus + .method-card {
+    outline: 2px solid var(--checkout-primary);
+    outline-offset: 2px;
+}
+
+.pay-button:focus:not(:focus-visible),
+.method-option input[type="radio"]:focus:not(:focus-visible) + .method-card {
+    outline: none;
+}
+
+/* Transitions fluides pour tous les éléments interactifs */
+.checkout-card *,
+.pay-button,
+.method-option,
+.checkout-header .brand-link {
+    transition: var(--checkout-transition);
+}
+
+/* États de chargement */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+

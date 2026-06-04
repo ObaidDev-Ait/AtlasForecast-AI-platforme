@@ -1,0 +1,228 @@
+/* ========================================
+   VILLES DU MONDE - STYLES CSS
+   ======================================== */
+
+.world-cities {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+    position: relative;
+}
+
+.world-cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    align-items: stretch;
+}
+
+.world-city-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(20px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.world-city-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.world-city-card:hover::before {
+    opacity: 1;
+}
+
+.world-city-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.world-city-card .city-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.world-city-card .city-flag {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.world-city-card .city-info {
+    flex: 1;
+}
+
+.world-city-card .city-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.25rem 0;
+}
+
+.world-city-card .city-country {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-weight: 500;
+    display: block;
+}
+
+.world-city-card .city-region {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: block;
+}
+
+.world-city-card .city-weather {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    margin-top: 1rem;
+}
+
+.world-city-card .weather-icon {
+    font-size: 2.5rem;
+    color: #fbbf24;
+    margin-bottom: 0.5rem;
+}
+
+.world-city-card .temperature {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+}
+
+.world-city-card .condition {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 0.75rem;
+}
+
+.world-city-card .weather-details {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.world-city-card .weather-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.world-city-card .weather-details i {
+    font-size: 0.7rem;
+    color: #3b82f6;
+}
+
+/* Amélioration des cartes de villes du Maroc */
+.city-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.city-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Amélioration des cartes pour qu'elles ressemblent aux villes du Maroc */
+.world-city-card .city-header {
+    margin-bottom: 1rem;
+}
+
+.world-city-card .city-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.25rem 0;
+}
+
+.world-city-card .city-country {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.125rem;
+}
+
+.world-city-card .city-region {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: block;
+}
+
+/* Responsive pour les villes du monde */
+@media (max-width: 768px) {
+    .world-cities-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .world-city-card {
+        padding: 1rem;
+        min-height: 180px;
+    }
+    
+    .world-city-card .city-name {
+        font-size: 1.1rem;
+    }
+    
+    .world-city-card .temperature {
+        font-size: 1.5rem;
+    }
+    
+    .world-city-card .weather-icon {
+        font-size: 2rem;
+    }
+    
+    .world-city-card .weather-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .world-city-card {
+        padding: 0.75rem;
+        min-height: 160px;
+    }
+    
+    .world-city-card .city-name {
+        font-size: 1rem;
+    }
+    
+    .world-city-card .temperature {
+        font-size: 1.3rem;
+    }
+    
+    .world-city-card .weather-icon {
+        font-size: 1.8rem;
+    }
+}

@@ -1,0 +1,1493 @@
+/* ========================================
+   LOGIN - Styles professionnels avec animations et effets néon
+   ======================================== */
+
+/* ========================================
+   1. ANIMATIONS ET KEYFRAMES
+   ======================================== */
+
+@keyframes neonPulse {
+    0%, 100% { 
+        text-shadow: 0 0 6px rgba(59, 130, 246, 0.6), 0 0 14px rgba(59, 130, 246, 0.35);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% { 
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.95), 0 0 26px rgba(59, 130, 246, 0.6);
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+    }
+}
+
+@keyframes neonGlow {
+    0%, 100% { 
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.5);
+    }
+}
+
+@keyframes neonLine {
+    0% { 
+        width: 0;
+        opacity: 0;
+    }
+    50% { 
+        opacity: 1;
+    }
+    100% { 
+        width: 100%;
+        opacity: 1;
+    }
+}
+
+@keyframes neonBreath {
+    0%, 100% { 
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08), 0 12px 34px rgba(59, 130, 246, 0.18);
+    }
+    50% { 
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14), 0 16px 44px rgba(59, 130, 246, 0.28);
+    }
+}
+
+@keyframes floatY {
+    0%, 100% { 
+        transform: translateY(0) rotate(0deg);
+    }
+    50% { 
+        transform: translateY(-20px) rotate(180deg);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes neonText {
+    0%, 100% { 
+        text-shadow: 0 0 4px rgba(59, 130, 246, 0.18);
+    }
+    50% { 
+        text-shadow: 0 0 14px rgba(59, 130, 246, 0.8);
+    }
+}
+
+/* ========================================
+   2. DISPOSITION HORIZONTALE
+   ======================================== */
+
+.horizontal-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 80vh;
+    align-items: start;
+}
+
+.form-column {
+    animation: slideInUp 0.8s ease-out;
+}
+
+.info-column {
+    animation: slideInUp 0.8s ease-out 0.2s both;
+}
+
+/* ========================================
+   3. STYLES DU FORMULAIRE PRINCIPAL
+   ======================================== */
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.form-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #93c5fd, #3b82f6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    animation: neonPulse 3s ease-in-out infinite;
+}
+
+.form-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* Ligne néon sous le titre */
+.form-header::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #60a5fa, #93c5fd, #3b82f6);
+    border-radius: 2px;
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
+    animation: neonLine 1.5s ease-out 0.5s forwards;
+}
+
+.form-card {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    border-radius: 24px;
+    padding: 2.5rem;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(59, 130, 246, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInScale 0.6s ease-out 0.3s both;
+}
+
+/* Particules flottantes en arrière-plan */
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, transparent 70%);
+    animation: floatY 20s linear infinite;
+    pointer-events: none;
+}
+
+/* ========================================
+   4. COLONNE D'INFORMATIONS
+   ======================================== */
+
+.info-card {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+    border-radius: 24px;
+    padding: 2.5rem;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(59, 130, 246, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+.info-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60a5fa, #93c5fd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.info-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* ========================================
+   5. SECTIONS D'INFORMATIONS
+   ======================================== */
+
+.security-info,
+.quick-links,
+.account-links {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.5));
+    border-radius: 16px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.security-info h3,
+.quick-links h3,
+.account-links h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    color: #e5f2ff;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.security-info h3 i,
+.quick-links h3 i,
+.account-links h3 i {
+    color: #60a5fa;
+    text-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+    animation: neonText 4s ease-in-out infinite;
+}
+
+.security-info ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+
+.security-info li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin: 0.8rem 0;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.security-info li:hover {
+    color: var(--text-primary);
+    transform: translateX(5px);
+}
+
+.security-info li i {
+    color: #60a5fa;
+    text-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
+    animation: neonText 4.5s ease-in-out infinite;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   6. GRILLE DE LIENS
+   ======================================== */
+
+.links-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.quick-link,
+.account-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-link::before,
+.account-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.quick-link:hover::before,
+.account-link:hover::before {
+    left: 100%;
+}
+
+.quick-link:hover,
+.account-link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.quick-link i,
+.account-link i {
+    color: #60a5fa;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.quick-link:hover i,
+.account-link:hover i {
+    transform: scale(1.2);
+}
+
+.quick-link span,
+.account-link span {
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   7. CHAMPS DE FORMULAIRE
+   ======================================== */
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 
+        0 0 0 4px rgba(96, 165, 250, 0.1),
+        0 0 20px rgba(96, 165, 250, 0.3);
+    transform: translateY(-2px);
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Animation d'entrée pour chaque champ */
+.form-group:nth-child(1) { animation: slideInUp 0.6s ease-out 0.4s both; }
+.form-group:nth-child(2) { animation: slideInUp 0.6s ease-out 0.5s both; }
+
+/* ========================================
+   8. CHAMP MOT DE PASSE
+   ======================================== */
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    padding-right: 3.5rem;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    color: #60a5fa;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+    border-color: #60a5fa;
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.password-toggle:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* ========================================
+   9. OPTIONS ET CHECKBOX
+   ======================================== */
+
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.checkbox-label:hover {
+    color: var(--text-primary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #60a5fa;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.forgot-password::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #60a5fa, #93c5fd);
+    transition: width 0.3s ease;
+}
+
+.forgot-password:hover::after {
+    width: 100%;
+}
+
+.forgot-password:hover {
+    color: #93c5fd;
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+/* ========================================
+   10. BOUTON DE SOUMISSION
+   ======================================== */
+
+.form-submit {
+    width: 100%;
+    padding: 1.2rem 2rem;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: neonGlow 2s ease-in-out infinite;
+}
+
+.form-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.form-submit:hover::before {
+    left: 100%;
+}
+
+.form-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+}
+
+.form-submit:active {
+    transform: translateY(-1px);
+}
+
+.form-submit i {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* ========================================
+   11. SÉPARATEUR
+   ======================================== */
+
+.form-separator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    color: var(--text-secondary);
+    justify-content: center;
+    position: relative;
+}
+
+.form-separator::before,
+.form-separator::after {
+    content: '';
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+    flex: 1;
+    border-radius: 1px;
+}
+
+.form-separator span {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    font-weight: 600;
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+/* ========================================
+   12. CONNEXION SOCIALE
+   ======================================== */
+
+.social-login {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    height: 56px;
+    padding: 0 1.5rem;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.social-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.social-btn:hover::before {
+    left: 100%;
+}
+
+.social-btn:hover {
+    transform: translateY(-3px);
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.social-btn:active {
+    transform: translateY(-1px);
+}
+
+.social-btn i {
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+}
+
+.social-btn:hover i {
+    transform: scale(1.2);
+}
+
+.google-btn i { color: #ea4335; }
+.facebook-btn i { color: #1877f2; }
+.twitter-btn i { color: #1da1f2; }
+
+/* ========================================
+   13. FOOTER ET LIENS
+   ======================================== */
+
+.form-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.4));
+    border-radius: 20px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.form-footer p {
+    margin: 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.form-footer a {
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.form-footer a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #60a5fa, #93c5fd);
+    transition: width 0.3s ease;
+}
+
+.form-footer a:hover::after {
+    width: 100%;
+}
+
+.form-footer a:hover {
+    color: #93c5fd;
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+/* ========================================
+   14. RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1200px) {
+    .horizontal-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .info-column {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .horizontal-container {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+    
+    .form-card,
+    .info-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+    }
+    
+    .info-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .social-login {
+        grid-template-columns: 1fr;
+    }
+    
+    .links-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-card,
+    .info-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .form-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .info-header h2 {
+        font-size: 1.6rem;
+    }
+    
+    .form-submit {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
+   15. ANIMATIONS D'ENTRÉE
+   ======================================== */
+
+.form-column > *,
+.info-column > * {
+    opacity: 0;
+    animation: slideInUp 0.8s ease-out forwards;
+}
+
+.form-column > *:nth-child(1) { animation-delay: 0.1s; }
+.form-column > *:nth-child(2) { animation-delay: 0.2s; }
+
+.info-column > *:nth-child(1) { animation-delay: 0.3s; }
+.info-column > *:nth-child(2) { animation-delay: 0.4s; }
+.info-column > *:nth-child(3) { animation-delay: 0.5s; }
+.info-column > *:nth-child(4) { animation-delay: 0.6s; }
+
+/* ========================================
+   16. EFFETS DE SURVOL AVANCÉS
+   ======================================== */
+
+.form-card:hover,
+.info-card:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(59, 130, 246, 0.2),
+        0 0 30px rgba(59, 130, 246, 0.1);
+}
+
+.social-btn:hover {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+}
+
+/* ========================================
+   17. ÉTATS DE FOCUS AMÉLIORÉS
+   ======================================== */
+
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+    color: #60a5fa;
+    transform: translateY(-25px) scale(0.85);
+}
+
+/* ========================================
+   18. LOADING STATES
+   ======================================== */
+
+.form-submit.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.form-submit.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   ANIMATIONS DES PHRASES ET TEXTES
+   ======================================== */
+
+/* Titres animés */
+.animated-title {
+    animation: titleGlow 3s ease-in-out infinite;
+    position: relative;
+}
+
+.animated-title::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(96, 165, 250, 0.1), transparent);
+    transform: translateX(-100%);
+    animation: titleShine 4s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(96, 165, 250, 0.8), 0 0 30px rgba(96, 165, 250, 0.4);
+    }
+}
+
+@keyframes titleShine {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Descriptions animées */
+.animated-description {
+    animation: descriptionFloat 4s ease-in-out infinite;
+    position: relative;
+}
+
+.animated-description::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #60a5fa, #93c5fd);
+    transform: translateX(-50%);
+    animation: descriptionUnderline 3s ease-in-out infinite;
+}
+
+@keyframes descriptionFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes descriptionUnderline {
+    0%, 100% {
+        width: 0;
+        opacity: 0;
+    }
+    50% {
+        width: 100%;
+        opacity: 1;
+    }
+}
+
+/* Footer copyright animé */
+.footer-copyright {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.copyright-text {
+    animation: copyrightPulse 4s ease-in-out infinite;
+}
+
+.separator {
+    color: #60a5fa;
+    font-weight: bold;
+    animation: separatorBlink 2s ease-in-out infinite;
+}
+
+.creator-text {
+    background: linear-gradient(45deg, #60a5fa, #93c5fd, #3b82f6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+    animation: creatorGlow 5s ease-in-out infinite;
+    position: relative;
+}
+
+.creator-text::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transform: translateX(-100%);
+    animation: creatorShine 6s ease-in-out infinite;
+}
+
+@keyframes copyrightPulse {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes separatorBlink {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+    }
+}
+
+@keyframes creatorGlow {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(96, 165, 250, 0.3);
+    }
+    50% {
+        text-shadow: 0 0 15px rgba(96, 165, 250, 0.6), 0 0 25px rgba(96, 165, 250, 0.3);
+    }
+}
+
+@keyframes creatorShine {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Animation d'entrée pour les titres et descriptions */
+.form-header .animated-title {
+    animation: titleGlow 3s ease-in-out infinite, slideInDown 1s ease-out 0.2s both;
+}
+
+.form-header .animated-description {
+    animation: descriptionFloat 4s ease-in-out infinite, slideInUp 1s ease-out 0.4s both;
+}
+
+.info-header .animated-title {
+    animation: titleGlow 3s ease-in-out infinite, slideInRight 1s ease-out 0.3s both;
+}
+
+.info-header .animated-description {
+    animation: descriptionFloat 4s ease-in-out infinite, slideInLeft 1s ease-out 0.5s both;
+}
+
+/* Animations d'entrée supplémentaires */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive pour les animations */
+@media (max-width: 768px) {
+    .animated-title {
+        animation: titleGlow 3s ease-in-out infinite;
+    }
+    
+    .animated-description {
+        animation: descriptionFloat 4s ease-in-out infinite;
+    }
+    
+    .footer-copyright {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .creator-text::before {
+        animation: none;
+    }
+}
+
+/* ========================================
+   ANIMATIONS SPECTACULAIRES DES ICÔNES SOCIALES
+   ======================================== */
+
+/* Container des icônes sociales */
+.footer-social {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.footer-social a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.footer-social a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.footer-social a::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent);
+    transform: translate(-50%, -50%);
+    transition: all 0.4s ease;
+    border-radius: 50%;
+}
+
+/* Effets de survol généraux */
+.footer-social a:hover {
+    transform: translateY(-5px) scale(1.1);
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.footer-social a:hover::before {
+    transform: translateX(100%);
+}
+
+.footer-social a:hover::after {
+    width: 100px;
+    height: 100px;
+}
+
+/* Animations spécifiques pour chaque réseau social */
+.footer-social a[href*="facebook"] {
+    animation: facebookPulse 4s ease-in-out infinite;
+}
+
+.footer-social a[href*="facebook"]:hover {
+    background: linear-gradient(145deg, rgba(24, 119, 242, 0.2), rgba(24, 119, 242, 0.1));
+    border-color: #1877f2;
+    box-shadow: 0 10px 25px rgba(24, 119, 242, 0.4);
+}
+
+.footer-social a[href*="whatsapp"] {
+    animation: whatsappBounce 4s ease-in-out infinite;
+}
+
+.footer-social a[href*="whatsapp"]:hover {
+    background: linear-gradient(145deg, rgba(37, 211, 102, 0.2), rgba(37, 211, 102, 0.1));
+    border-color: #25d366;
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+}
+
+.footer-social a[href*="instagram"] {
+    animation: instagramRotate 4s ease-in-out infinite;
+}
+
+.footer-social a[href*="instagram"]:hover {
+    background: linear-gradient(145deg, rgba(228, 64, 95, 0.2), rgba(228, 64, 95, 0.1));
+    border-color: #e4405f;
+    box-shadow: 0 10px 25px rgba(228, 64, 95, 0.4);
+}
+
+.footer-social a[href*="linkedin"] {
+    animation: linkedinSlide 4s ease-in-out infinite;
+}
+
+.footer-social a[href*="linkedin"]:hover {
+    background: linear-gradient(145deg, rgba(0, 119, 181, 0.2), rgba(0, 119, 181, 0.1));
+    border-color: #0077b5;
+    box-shadow: 0 10px 25px rgba(0, 119, 181, 0.4);
+}
+
+.footer-social a[href*="github"] {
+    animation: githubFloat 4s ease-in-out infinite;
+}
+
+.footer-social a[href*="github"]:hover {
+    background: linear-gradient(145deg, rgba(51, 51, 51, 0.2), rgba(51, 51, 51, 0.1));
+    border-color: #333;
+    box-shadow: 0 10px 25px rgba(51, 51, 51, 0.4);
+}
+
+/* Icônes avec animations */
+.footer-social i {
+    font-size: 1.5rem;
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.footer-social a:hover i {
+    transform: scale(1.2) rotate(5deg);
+    filter: drop-shadow(0 0 10px currentColor);
+}
+
+/* Particules flottantes autour des icônes */
+.footer-social a::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    animation: particleFloat 6s ease-in-out infinite;
+}
+
+/* Keyframes pour les animations spécifiques */
+@keyframes facebookPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(24, 119, 242, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(24, 119, 242, 0);
+    }
+}
+
+@keyframes whatsappBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes instagramRotate {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(5deg);
+    }
+}
+
+@keyframes linkedinSlide {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(3px);
+    }
+}
+
+@keyframes githubFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes particleFloat {
+    0%, 100% {
+        opacity: 0.3;
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateY(-5px) scale(1.1);
+    }
+}
+
+/* Animation d'entrée séquentielle */
+.footer-social a:nth-child(1) { animation-delay: 0s; }
+.footer-social a:nth-child(2) { animation-delay: 0.5s; }
+.footer-social a:nth-child(3) { animation-delay: 1s; }
+.footer-social a:nth-child(4) { animation-delay: 1.5s; }
+.footer-social a:nth-child(5) { animation-delay: 2s; }
+
+/* Effet de vague sur le survol */
+.footer-social a:hover {
+    animation-play-state: paused;
+}
+
+/* Responsive design pour les animations */
+@media (max-width: 768px) {
+    .footer-social {
+        gap: 1rem;
+    }
+    
+    .footer-social a {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .footer-social i {
+        font-size: 1.3rem;
+    }
+    
+    /* Réduire les animations sur mobile */
+    .footer-social a {
+        animation-duration: 6s;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-social {
+        gap: 0.8rem;
+    }
+    
+    .footer-social a {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .footer-social i {
+        font-size: 1.2rem;
+    }
+}
+
+/* ========================================
+   NAVIGATION ET LOGO ATLASFORECAST
+   ======================================== */
+
+/* Navigation Brand - Logo AtlasForecast */
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: white;
+    font-weight: 900;
+    font-size: 1.8rem;
+    transition: all 0.3s ease;
+}
+
+.nav-brand:hover {
+    transform: translateY(-2px);
+    color: #60a5fa;
+}
+
+.nav-brand i {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.nav-brand:hover i {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+/* Navigation Links */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    background: rgba(96, 165, 250, 0.2);
+    color: #60a5fa;
+}
+
+.nav-link i {
+    font-size: 1.1rem;
+}
+
+/* Navigation Container */
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Navigation complète vers toutes les pages */
+.nav-actions .nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-actions .nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #60a5fa, #8b5cf6);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-actions .nav-link:hover::before,
+.nav-actions .nav-link.active::before {
+    width: 100%;
+}
+
+/* Responsive navigation */
+@media (max-width: 1024px) {
+    .nav-actions {
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .nav-link i {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .nav-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .nav-brand {
+        font-size: 1.5rem;
+    }
+    
+    .nav-brand i {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+

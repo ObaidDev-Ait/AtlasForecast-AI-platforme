@@ -1,0 +1,17 @@
+{
+  "name": "atlasforecast-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "npm@11.5.2",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}

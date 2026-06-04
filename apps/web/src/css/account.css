@@ -1,0 +1,16 @@
+/* ACCOUNT CSS (unused)
+   This file is intentionally minimal and not referenced by any page.
+   Professional base styling is handled by:
+   - css/base.css
+   - css/login.css
+   - css/register.css
+   - css/checkout.css
+   - css/premium-signup.css
+*/
+
+:root {
+  /* Placeholder variables for consistency if ever reused */
+  --unused-var: 0;
+}
+
+/* No active rules */

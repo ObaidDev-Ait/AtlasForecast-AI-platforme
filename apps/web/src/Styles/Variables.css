@@ -1,0 +1,73 @@
+/* ========================================
+   ATLASFORECAST - CSS VARIABLES
+   Design System Tokens
+   ======================================== */
+:root {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-glass: rgba(15, 23, 42, 0.8);
+  --bg-glass-light: rgba(255, 255, 255, 0.1);
+  --bg-glass-dark: rgba(255, 255, 255, 0.05);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+  --accent-primary: #60a5fa;
+  --accent-secondary: #a78bfa;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-info: #06b6d4;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --border-dark: rgba(255, 255, 255, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-dark: rgba(0, 0, 0, 0.5);
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-warm: linear-gradient(135deg, #fa7093 0%, #fee140 100%);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px 0 var(--shadow-light);
+  --shadow-md: 0 4px 6px -1px var(--shadow-light);
+  --shadow-lg: 0 10px 15px -3px var(--shadow-light);
+  --shadow-xl: 0 20px 25px -5px var(--shadow-light);
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal: 1050;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(96, 165, 250, 0.3);
+  --bg-elev-0: rgba(15, 23, 42, 0.6);
+  --bg-elev-1: rgba(30, 41, 59, 0.8);
+  --accent-primary-rgb: 96, 165, 250;
+}
+
+/* Light Theme Override */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --bg-tertiary: #cbd5e1;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-light: rgba(0, 0, 0, 0.05);
+  --bg-glass-dark: rgba(0, 0, 0, 0.03);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #f1f5f9;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-light: rgba(0, 0, 0, 0.05);
+  --border-dark: rgba(0, 0, 0, 0.15);
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-dark: rgba(0, 0, 0, 0.2);
+}

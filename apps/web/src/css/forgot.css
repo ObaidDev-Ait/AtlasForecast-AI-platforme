@@ -1,0 +1,40 @@
+/* ========================================
+   FORGOT PASSWORD - Styles néon & animations
+   ======================================== */
+
+.forgot-container { max-width: 520px; margin: 0 auto; padding: 3rem 2rem; }
+
+.forgot-header { text-align: center; margin-bottom: 2rem; }
+.forgot-header h1 { font-size: 2.4rem; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.forgot-header p { color: var(--text-secondary); }
+
+.forgot-card { position: relative; background: var(--bg-glass-dark); border:1px solid var(--border-color); border-radius: 24px; padding: 2rem; box-shadow: 0 18px 36px var(--shadow-color); overflow:hidden }
+.forgot-card::after { content:""; position:absolute; inset:-25% -15% auto -15%; height:60%; background: radial-gradient(60% 60% at 50% 0%, rgba(59,130,246,.20), transparent 60%), radial-gradient(40% 40% at 80% 30%, rgba(99,102,241,.16), transparent 60%); animation: forgotSheen 12s ease-in-out infinite; pointer-events:none }
+@keyframes forgotSheen{ 0%{ transform: translateY(0) } 50%{ transform: translateY(-8px) } 100%{ transform: translateY(0) } }
+
+.step-title { font-weight: 900; font-size: 1.2rem; margin-bottom: .6rem }
+.step-note { color: var(--text-secondary); margin-bottom: 1rem }
+
+.form-group { margin-bottom: 1rem }
+.form-group label { display:block; margin-bottom:.45rem; font-weight:700 }
+.form-group input { width:100%; padding: .95rem 1.1rem; background: var(--bg-glass); color: var(--text-primary); border:1px solid var(--border-color); border-radius: 14px; backdrop-filter: blur(10px); transition: border-color .2s, box-shadow .2s, transform .2s }
+.form-group input:focus{ outline:none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--shadow-glow); transform: translateY(-1px) }
+
+.form-actions { display:flex; gap:.6rem; align-items:center; }
+.form-submit { padding: 1rem 1.25rem; border:none; border-radius: 14px; background: var(--gradient-primary); color:#fff; font-weight:800; cursor:pointer; transition: transform .2s, box-shadow .2s }
+.form-submit:hover{ transform: translateY(-2px); box-shadow: 0 14px 34px var(--shadow-glow) }
+
+.back-link{ color: var(--accent-primary); text-decoration:none; font-weight:800 }
+.back-link:hover{ text-decoration: underline }
+
+.demo-code { display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .65rem; border-radius:999px; background: var(--bg-glass); border:1px solid var(--border-color); color: var(--text-secondary); font-weight:700; }
+
+.error-msg{ color: var(--accent-error); margin-top:.5rem; font-weight: 700 }
+.success-msg{ color: var(--accent-success); margin-top:.5rem; font-weight: 700 }
+
+/* Mode clair */
+[data-theme="light"] .forgot-card{ background: rgba(255,255,255,.86); border-color: rgba(15,23,42,.12) }
+[data-theme="light"] .form-group input{ background: rgba(255,255,255,.9) }
+[data-theme="light"] .step-note{ color:#334155 }
+
+

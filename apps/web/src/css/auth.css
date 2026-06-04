@@ -1,0 +1,474 @@
+/* CSS pour les pages d'authentification AtlasForecast */
+
+/* Variables CSS personnalisées */
+:root {
+    --auth-primary: #3b82f6;
+    --auth-primary-hover: #2563eb;
+    --auth-secondary: #64748b;
+    --auth-secondary-hover: #475569;
+    --auth-success: #10b981;
+    --auth-error: #ef4444;
+    --auth-warning: #f59e0b;
+    --auth-info: #06b6d4;
+    
+    --auth-bg: rgba(15, 23, 42, 0.95);
+    --auth-card-bg: rgba(30, 41, 59, 0.95);
+    --auth-border: rgba(148, 163, 184, 0.2);
+    --auth-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    --auth-text-primary: #f8fafc;
+    --auth-text-secondary: #cbd5e1;
+    --auth-text-muted: #94a3b8;
+    
+    --auth-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mode clair */
+[data-theme="light"] {
+    --auth-bg: rgba(248, 250, 252, 0.95);
+    --auth-card-bg: rgba(255, 255, 255, 0.95);
+    --auth-border: rgba(148, 163, 184, 0.3);
+    --auth-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    
+    --auth-text-primary: #0f172a;
+    --auth-text-secondary: #334155;
+    --auth-text-muted: #64748b;
+}
+
+/* Conteneur principal d'authentification */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* En-tête d'authentification */
+.auth-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    max-width: 400px;
+}
+
+.auth-header .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--auth-text-primary);
+    text-decoration: none;
+    margin-bottom: 2rem;
+    transition: var(--auth-transition);
+}
+
+.auth-header .brand-link:hover {
+    transform: translateY(-2px);
+    color: var(--auth-primary);
+}
+
+.auth-header .brand-link i {
+    font-size: 2rem;
+    color: var(--auth-primary);
+}
+
+.auth-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--auth-text-primary);
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--auth-primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-header p {
+    font-size: 1.125rem;
+    color: var(--auth-text-secondary);
+    line-height: 1.6;
+}
+
+/* Contenu d'authentification */
+.auth-content {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Carte d'authentification */
+.auth-card {
+    background: var(--auth-card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--auth-border);
+    border-radius: 1.5rem;
+    padding: 3rem 2rem;
+    box-shadow: var(--auth-shadow);
+    transition: var(--auth-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--auth-primary), #8b5cf6, #ec4899);
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.35);
+}
+
+/* Icône d'authentification */
+.auth-icon {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-icon i {
+    font-size: 4rem;
+    color: var(--auth-primary);
+    filter: drop-shadow(0 10px 20px rgba(59, 130, 246, 0.3));
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Informations d'authentification */
+.auth-info {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.auth-info h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--auth-text-primary);
+    margin-bottom: 1rem;
+}
+
+.auth-info p {
+    font-size: 1rem;
+    color: var(--auth-text-secondary);
+    line-height: 1.6;
+}
+
+/* Actions d'authentification */
+.auth-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Boutons d'authentification */
+.auth-actions .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--auth-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-actions .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.auth-actions .btn:hover::before {
+    left: 100%;
+}
+
+/* Bouton principal */
+.auth-actions .btn-primary {
+    background: linear-gradient(135deg, var(--auth-primary), #8b5cf6);
+    color: white;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.auth-actions .btn-primary:hover {
+    background: linear-gradient(135deg, var(--auth-primary-hover), #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+}
+
+/* Bouton secondaire */
+.auth-actions .btn-secondary {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--auth-text-primary);
+    border: 1px solid var(--auth-border);
+}
+
+.auth-actions .btn-secondary:hover {
+    background: rgba(100, 116, 139, 0.2);
+    border-color: var(--auth-primary);
+    transform: translateY(-2px);
+}
+
+/* Boutons spécifiques aux réseaux sociaux */
+.auth-actions .btn-x {
+    background: linear-gradient(135deg, #000000, #1a1a1a);
+    color: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.auth-actions .btn-x:hover {
+    background: linear-gradient(135deg, #1a1a1a, #333333);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.auth-actions .btn-facebook {
+    background: linear-gradient(135deg, #1877f2, #0d6efd);
+    color: white;
+    box-shadow: 0 10px 25px rgba(24, 119, 242, 0.3);
+}
+
+.auth-actions .btn-facebook:hover {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    box-shadow: 0 15px 35px rgba(24, 119, 242, 0.4);
+}
+
+/* Séparateur */
+.auth-divider {
+    text-align: center;
+    position: relative;
+    margin: 1.5rem 0;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--auth-border);
+}
+
+.auth-divider span {
+    background: var(--auth-card-bg);
+    padding: 0 1rem;
+    color: var(--auth-text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Pied de page d'authentification */
+.auth-footer {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid var(--auth-border);
+}
+
+.auth-footer p {
+    font-size: 0.875rem;
+    color: var(--auth-text-muted);
+    line-height: 1.5;
+}
+
+.auth-footer a {
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--auth-transition);
+}
+
+.auth-footer a:hover {
+    color: var(--auth-primary-hover);
+    text-decoration: underline;
+}
+
+/* Conteneur de messages */
+.message-container {
+    margin-top: 1.5rem;
+}
+
+/* Messages */
+.message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message i {
+    font-size: 1.125rem;
+}
+
+/* Types de messages */
+.message-info {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--auth-info);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.message-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--auth-success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.message-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--auth-error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.message-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--auth-warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-header h1 {
+        font-size: 2rem;
+    }
+    
+    .auth-card {
+        padding: 2rem 1.5rem;
+        margin: 0 1rem;
+    }
+    
+    .auth-icon i {
+        font-size: 3rem;
+    }
+    
+    .auth-actions .btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem 1rem;
+        border-radius: 1rem;
+    }
+    
+    .auth-icon i {
+        font-size: 2.5rem;
+    }
+    
+    .auth-actions .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Animations d'entrée */
+.auth-card {
+    animation: cardSlideIn 0.6s ease-out;
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-header {
+    animation: headerSlideIn 0.8s ease-out;
+}
+
+@keyframes headerSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* États de chargement */
+.auth-actions .btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.auth-actions .btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Focus et accessibilité */
+.auth-actions .btn:focus {
+    outline: 2px solid var(--auth-primary);
+    outline-offset: 2px;
+}
+
+.auth-actions .btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Transitions fluides pour tous les éléments interactifs */
+.auth-card *,
+.auth-actions .btn,
+.auth-header .brand-link {
+    transition: var(--auth-transition);
+}

@@ -1,0 +1,319 @@
+/* ======== ANIMATED BACKGROUND ======== */
+.af-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 50%, #2d3748 100%);
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* ===== LIGHT MODE: Marrakech Photo Background ===== */
+[data-theme="light"] .af-background {
+  background: none;
+}
+
+[data-theme="light"] .af-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/marrakech-menara-bg.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  filter: saturate(1.15) brightness(1.05);
+  transform: scale(1.05);
+  animation: af-ken-burns 30s ease-in-out infinite alternate;
+}
+
+/* Readability overlay REMOVED completely to keep background sharp and raw */
+[data-theme="light"] .af-background::after {
+  display: none !important;
+}
+
+/* Ken Burns slow pan animation */
+@keyframes af-ken-burns {
+  0% {
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: scale(1.12) translate3d(-1%, -0.5%, 0);
+  }
+
+  100% {
+    transform: scale(1.08) translate3d(0.5%, -1%, 0);
+  }
+}
+
+/* ===== DARK MODE ELEMENTS ===== */
+.af-stars,
+.af-clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.af-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: af-twinkle 3s ease-in-out infinite;
+}
+
+[data-theme="light"] .af-star {
+  opacity: 0;
+  display: none;
+}
+
+.af-star-1 {
+  top: 10%;
+  left: 15%;
+  animation-delay: 0s
+}
+
+.af-star-2 {
+  top: 20%;
+  right: 25%;
+  animation-delay: 1s
+}
+
+.af-star-3 {
+  top: 35%;
+  left: 45%;
+  animation-delay: 2s
+}
+
+.af-star-4 {
+  top: 25%;
+  right: 60%;
+  animation-delay: .5s
+}
+
+.af-star-5 {
+  top: 45%;
+  left: 75%;
+  animation-delay: 1.5s
+}
+
+.af-star-6 {
+  top: 15%;
+  left: 85%;
+  animation-delay: 2.5s
+}
+
+.af-star-7 {
+  top: 55%;
+  right: 15%;
+  animation-delay: .8s
+}
+
+.af-star-8 {
+  top: 65%;
+  left: 25%;
+  animation-delay: 1.8s
+}
+
+.af-star-9 {
+  top: 75%;
+  right: 45%;
+  animation-delay: .3s
+}
+
+.af-star-10 {
+  top: 85%;
+  left: 65%;
+  animation-delay: 1.3s
+}
+
+.af-star-11 {
+  top: 30%;
+  left: 55%;
+  animation-delay: 2.8s
+}
+
+.af-star-12 {
+  top: 40%;
+  right: 35%;
+  animation-delay: .7s
+}
+
+.af-shooting-star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(90deg, white, transparent);
+  border-radius: 50%;
+  animation: af-shoot 4s linear infinite;
+}
+
+[data-theme="light"] .af-shooting-star {
+  opacity: 0;
+  display: none;
+}
+
+.af-ss1 {
+  top: 20%;
+  left: -10px;
+  animation-delay: 0s;
+  animation-duration: 3s
+}
+
+.af-ss2 {
+  top: 60%;
+  left: -10px;
+  animation-delay: 2s;
+  animation-duration: 4s
+}
+
+.af-ss3 {
+  top: 80%;
+  left: -10px;
+  animation-delay: 4s;
+  animation-duration: 3.5s
+}
+
+.af-cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  opacity: 0.4;
+  filter: blur(1px);
+}
+
+[data-theme="light"] .af-cloud,
+[data-theme="light"] .af-clouds {
+  display: none !important;
+}
+
+.af-cloud-1 {
+  width: 120px;
+  height: 40px;
+  top: 15%;
+  left: 10%;
+  animation: af-float 25s ease-in-out infinite
+}
+
+.af-cloud-2 {
+  width: 80px;
+  height: 30px;
+  top: 25%;
+  right: 20%;
+  animation: af-float 20s ease-in-out infinite reverse
+}
+
+.af-cloud-3 {
+  width: 100px;
+  height: 35px;
+  top: 35%;
+  left: 60%;
+  animation: af-float 30s ease-in-out infinite
+}
+
+.af-cloud-4 {
+  width: 60px;
+  height: 25px;
+  top: 45%;
+  right: 60%;
+  animation: af-float 18s ease-in-out infinite reverse
+}
+
+.af-cloud-5 {
+  width: 90px;
+  height: 32px;
+  top: 55%;
+  left: 30%;
+  animation: af-float 22s ease-in-out infinite
+}
+
+.af-moon {
+  position: absolute;
+  top: 10%;
+  right: 15%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+  animation: af-glow 8s ease-in-out infinite;
+}
+
+/* In light mode, moon becomes a warm sun */
+[data-theme="light"] .af-moon {
+  display: none !important;
+}
+
+@keyframes af-twinkle {
+
+  0%,
+  100% {
+    opacity: .3;
+    transform: scale(1)
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.5)
+  }
+}
+
+@keyframes af-shoot {
+  0% {
+    transform: translateX(0) translateY(0) rotate(45deg);
+    opacity: 1
+  }
+
+  50% {
+    transform: translateX(100px) translateY(50px) rotate(45deg);
+    opacity: .5
+  }
+
+  100% {
+    transform: translateX(200px) translateY(100px) rotate(45deg);
+    opacity: 0
+  }
+}
+
+@keyframes af-float {
+
+  0%,
+  100% {
+    transform: translateX(0) translateY(0);
+    opacity: .4
+  }
+
+  25% {
+    transform: translateX(20px) translateY(-10px);
+    opacity: .6
+  }
+
+  50% {
+    transform: translateX(40px) translateY(0);
+    opacity: .4
+  }
+
+  75% {
+    transform: translateX(20px) translateY(10px);
+    opacity: .6
+  }
+}
+
+@keyframes af-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(251, 191, 36, .3)
+  }
+
+  50% {
+    box-shadow: 0 0 50px rgba(251, 191, 36, .5)
+  }
+}

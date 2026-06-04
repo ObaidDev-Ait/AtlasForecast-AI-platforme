@@ -1,0 +1,51 @@
+/* ========================================
+   SOCIAL AUTH - Pages Continuer avec ...
+   Néon + animations, thème par provider
+   ======================================== */
+
+:root{
+    --google:#4285F4;
+    --facebook:#1877F2;
+    --x:#1D9BF0;
+}
+
+.auth-wrap{ max-width: 520px; margin: 0 auto; padding: 3rem 2rem }
+.auth-header{ text-align:center; margin-bottom: 1.4rem }
+.auth-title{ font-size: 2.2rem; font-weight: 900; margin-bottom:.25rem }
+.auth-sub{ color: var(--text-secondary) }
+
+.auth-card{ position:relative; background: var(--bg-glass-dark); border:1px solid var(--border-color); border-radius: 24px; padding: 2rem; box-shadow: 0 18px 36px var(--shadow-color); overflow:hidden }
+.auth-card::after{ content:""; position:absolute; inset:-30% -20% auto -20%; height:60%; background: radial-gradient(60% 60% at 50% 0%, var(--brandGlow, rgba(59,130,246,.22)), transparent 60%), radial-gradient(40% 40% at 80% 30%, rgba(99,102,241,.16), transparent 60%); animation: cardSheen 12s ease-in-out infinite; pointer-events:none }
+@keyframes cardSheen{ 0%{ transform: translateY(0) } 50%{ transform: translateY(-10px) } 100%{ transform: translateY(0) } }
+
+.brand-chip{ display:inline-flex; align-items:center; gap:.5rem; padding:.45rem .85rem; border-radius:999px; border:1px solid var(--border-color); background: var(--bg-glass); font-weight:800; margin-bottom:.9rem; box-shadow:0 0 0 var(--brandGlow); animation: glowPulse 6s ease-in-out infinite }
+@keyframes glowPulse{ 0%,100%{ box-shadow: 0 0 0 rgba(0,0,0,0) } 50%{ box-shadow: 0 0 28px var(--brandGlow) } }
+
+.form-group{ margin-bottom: 1rem }
+.form-group label{ display:block; margin-bottom:.45rem; font-weight:700 }
+.form-group input{ width:100%; padding:.95rem 1.1rem; background: var(--bg-glass); color: var(--text-primary); border:1px solid var(--border-color); border-radius: 14px; backdrop-filter: blur(10px); transition: border-color .2s, box-shadow .2s, transform .2s }
+.form-group input:focus{ outline:none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--shadow-glow); transform: translateY(-1px) }
+
+.scope-list{ list-style:none; padding:0; margin: .25rem 0 1rem 0; color: var(--text-secondary) }
+.scope-list li{ display:flex; align-items:center; gap:.5rem; margin:.2rem 0 }
+
+.actions{ display:flex; gap:.6rem; align-items:center }
+.btn-continue{ padding: 1rem 1.25rem; border:none; border-radius: 14px; background: var(--gradient-primary); color:#fff; font-weight:800; cursor:pointer; transition: transform .2s, box-shadow .2s }
+.btn-continue:hover{ transform: translateY(-2px); box-shadow: 0 14px 34px var(--shadow-glow) }
+.link-cancel{ color: var(--accent-primary); font-weight:800; text-decoration:none }
+.link-cancel:hover{ text-decoration: underline }
+
+.info-msg{ margin-top:.6rem; color: var(--text-secondary) }
+.error-msg{ color: var(--accent-error); margin-top:.6rem; font-weight:700 }
+
+/* Thèmes provider */
+.provider-google{ --brandGlow: rgba(66,133,244,.45) }
+.provider-facebook{ --brandGlow: rgba(24,119,242,.45) }
+.provider-x{ --brandGlow: rgba(29,155,240,.45) }
+
+/* Mode clair */
+[data-theme="light"] .auth-card{ background: rgba(255,255,255,.86); border-color: rgba(15,23,42,.12) }
+[data-theme="light"] .auth-sub{ color:#334155 }
+[data-theme="light"] .form-group input{ background: rgba(255,255,255,.9) }
+
+
