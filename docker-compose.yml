@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=development
+      - WEATHER_API_KEY=47c1019c93bf4a70c11537bebf481926
+      - SUPABASE_URL=https://fxzqeoaajqqfcurfwtnk.supabase.co
+      - SUPABASE_PUBLISHABLE_KEY=sb_publishable_cK5gEmaT24RCcGYvXvSXsg_G_kAyKyO
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_OWM_API_KEY=47c1019c93bf4a70c11537bebf481926
+      - VITE_SUPABASE_URL=https://fxzqeoaajqqfcurfwtnk.supabase.co
+      - VITE_SUPABASE_ANON_KEY=sb_publishable_cK5gEmaT24RCcGYvXvSXsg_G_kAyKyO
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - api
