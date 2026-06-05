@@ -27,6 +27,7 @@ export default function Navbar({ onMobileMenuOpen }) {
             <div className="af-nav-buttons">
               {user ? (
                 <>
+                  <Link to="/dashboard" className="btn btn-secondary btn-sm" style={{ marginRight: '5px' }}><i className="fas fa-gauge"></i><span className="af-btn-text"> Dashboard</span></Link>
                   <Link to="/profile" className="btn btn-secondary btn-sm"><i className="fas fa-user"></i><span className="af-btn-text"> Profil</span></Link>
                   <button onClick={signOut} className="btn btn-primary btn-sm" style={{ border: 'none', cursor: 'pointer' }}><i className="fas fa-sign-out-alt"></i><span className="af-btn-text"> Déconnexion</span></button>
                 </>

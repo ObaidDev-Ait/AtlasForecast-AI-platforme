@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -84,9 +86,8 @@ const CheckoutPage = () => {
               try {
                 // Simulate payment processing then update Supabase profile directly
                 // (In a real app, a Stripe Webhook would do this, but we simulate it here for now)
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session?.user) {
-                  await supabase.from('profiles').update({ is_premium: true }).eq('id', session.user.id);
+                if (user) {
+                  await supabase.from('profiles').update({ is_premium: true }).eq('id', user.id);
                   // Allow time for AuthContext to pick up the change or just redirect
                   setTimeout(() => {
                     window.location.href = '/premium';

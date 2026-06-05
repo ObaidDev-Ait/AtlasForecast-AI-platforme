@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext();
+
+const API_BASE_URL = 'http://localhost:4000';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -9,80 +10,108 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active sessions and sets the user
+    // Check local session on mount
     const checkUser = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
+        const token = localStorage.getItem('access_token');
+        const storedSession = localStorage.getItem('session');
+        
+        if (token && storedSession) {
+          const sessionObj = JSON.parse(storedSession);
+          setUser(sessionObj.user || sessionObj);
+          await fetchProfile(token);
         } else {
           setUser(null);
           setProfile(null);
         }
       } catch (error) {
-        console.error("Auth session error:", error);
+        console.error("Auth session check error:", error);
       } finally {
         setLoading(false);
       }
     };
 
     checkUser();
-
-    // Listen for changes on auth state (sign in, sign out, etc.)
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
-      } else {
-        setUser(null);
-        setProfile(null);
-      }
-      setLoading(false);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
   }, []);
 
-  const fetchProfile = async (userId) => {
+  const fetchProfile = async (token) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (error) throw error;
-      setProfile(data);
+      const response = await fetch(`${API_BASE_URL}/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const profileData = await response.json();
+        setProfile(profileData);
+      } else {
+        console.warn("Failed to fetch profile, status:", response.status);
+      }
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
   };
 
   const signUp = async (email, password, userData) => {
-    return supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: userData,
-      }
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        first_name: userData?.first_name || '',
+        last_name: userData?.last_name || '',
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Signup failed');
+    }
+
+    const data = await response.json();
+    return { data, error: null };
   };
 
   const signIn = async (email, password) => {
-    return supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
+    }
+
+    const data = await response.json();
+    
+    if (data.session) {
+      localStorage.setItem('access_token', data.session.access_token);
+      localStorage.setItem('session', JSON.stringify(data.session));
+      setUser(data.user);
+      await fetchProfile(data.session.access_token);
+    }
+
+    return { data, error: null };
   };
 
   const signOut = async () => {
-    return supabase.auth.signOut();
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('session');
+    setUser(null);
+    setProfile(null);
+    return { error: null };
   };
 
-  // Provide combined loading state
   const isPremium = profile?.is_premium || false;
 
   const value = {

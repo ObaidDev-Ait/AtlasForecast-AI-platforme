@@ -27,6 +27,7 @@ const PrivacyPage = lazy(() => import('./Components/PrivacyPage'))
 const AuthGooglePage = lazy(() => import('./Components/AuthGooglePage'))
 const AuthFacebookPage = lazy(() => import('./Components/AuthFacebookPage'))
 const AuthXPage = lazy(() => import('./Components/AuthXPage'))
+const DashboardPage = lazy(() => import('./Components/DashboardPage'))
 
 function App() {
    console.log(supabase)
@@ -72,6 +73,7 @@ function App() {
             <Route path="premium" element={<PremiumPage />} />
             <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="premium-signup" element={<PremiumSignupPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="privacy" element={<PrivacyPage />} />
