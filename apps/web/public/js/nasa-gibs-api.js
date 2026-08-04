@@ -261,12 +261,29 @@ class NASAGIBSMap {
         }
         return null;
     }
+    
+    destroy() {
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
+    }
 }
 
 // Initialisation automatique
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-        window.nasaGibsMap = new NASAGIBSMap();
+        const container = document.getElementById('gibsMap');
+        if (container) {
+            if (window.nasaGibsMap) {
+                try {
+                    window.nasaGibsMap.destroy();
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+            window.nasaGibsMap = new NASAGIBSMap();
+        }
     }, 1000);
 });
 

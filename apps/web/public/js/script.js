@@ -1844,38 +1844,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 if (icon){ icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash'); }
             });
         }
-        // Gestion login/register
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm){
-            loginForm.addEventListener('submit', (e)=>{
-                e.preventDefault();
-                const email = document.getElementById('email')?.value || '';
-                const password = document.getElementById('password')?.value || '';
-                if (!/.+@.+\..+/.test(email) || password.length < 6){ alert('Vérifiez vos informations.'); return; }
-                try{ localStorage.setItem('userEmail', email); }catch(_){ }
-                alert('Connexion réussie.');
-                window.location.href = 'index.html';
-            });
-            // Mot de passe oublié
-            const forgot = document.querySelector('.forgot-password');
-            if (forgot){
-                forgot.addEventListener('click', (e)=>{ e.preventDefault(); window.location.href = 'forgot-password.html'; });
-            }
-        }
-
-        const registerForm = document.getElementById('registerForm');
-        if (registerForm){
-            registerForm.addEventListener('submit', (e)=>{
-                e.preventDefault();
-                const email = document.getElementById('email')?.value || '';
-                const pwd1 = document.getElementById('password')?.value || '';
-                const pwd2 = document.getElementById('confirmPassword')?.value || '';
-                if (!/.+@.+\..+/.test(email) || pwd1.length < 6 || pwd1 !== pwd2){ alert('Vérifiez vos informations.'); return; }
-                try{ localStorage.setItem('userEmail', email); }catch(_){ }
-                alert('Inscription réussie.');
-                window.location.href = 'login.html';
-            });
-        }
+        // Gestion login/register removed to allow React authentication to function.
 
         // Connexion/Inscription via réseaux sociaux (simulation OAuth)
         function attachSocialAuth(){

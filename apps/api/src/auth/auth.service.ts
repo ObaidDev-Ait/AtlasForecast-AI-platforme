@@ -32,6 +32,7 @@ export class AuthService {
   }
 
   async login(body: any) {
+    console.log("Backend Login DTO Received:", body);
     const { email, password } = body;
 
     if (!email || !password) {
@@ -45,9 +46,11 @@ export class AuthService {
     });
 
     if (error) {
+      console.error("Supabase Login API Error:", JSON.stringify(error, null, 2));
       throw new HttpException(error.message, error.status || HttpStatus.BAD_REQUEST);
     }
 
+    console.log("Supabase Login Success. User ID:", data.user?.id);
     return data;
   }
 }

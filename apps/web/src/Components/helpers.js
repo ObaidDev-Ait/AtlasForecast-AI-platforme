@@ -21,6 +21,7 @@ export const NAV_LINKS = [
   { to: '/weather', label: 'Météo', icon: 'fas fa-cloud-sun' },
   { to: '/forecast', label: 'Prévisions', icon: 'fas fa-chart-line' },
   { to: '/alerts', label: 'Alertes', icon: 'fas fa-bell' },
+  { to: '/assistant', label: 'Assistant AI', icon: 'fas fa-robot' },
   { to: '/about', label: 'À propos', icon: 'fas fa-info-circle' },
   { to: '/contact', label: 'Contact', icon: 'fas fa-envelope' }
 ]

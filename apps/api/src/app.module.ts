@@ -6,6 +6,9 @@ import { WeatherModule } from './weather/weather.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { SavedCitiesModule } from './saved-cities/saved-cities.module';
+import { AiModule } from './ai/ai.module';
+import { BillingModule } from './billing/billing.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -19,9 +22,13 @@ import { SavedCitiesModule } from './saved-cities/saved-cities.module';
     AuthModule,
     ProfileModule,
     SavedCitiesModule,
+    AiModule,
+    BillingModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
+
 
 
 

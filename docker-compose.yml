@@ -11,8 +11,8 @@ services:
       - PORT=4000
       - NODE_ENV=development
       - WEATHER_API_KEY=47c1019c93bf4a70c11537bebf481926
-      - SUPABASE_URL=https://fxzqeoaajqqfcurfwtnk.supabase.co
-      - SUPABASE_PUBLISHABLE_KEY=sb_publishable_cK5gEmaT24RCcGYvXvSXsg_G_kAyKyO
+      - SUPABASE_URL=https://peozoileiqwujazhzsul.supabase.co
+      - SUPABASE_PUBLISHABLE_KEY=sb_publishable_fTmdw_2NK7aPV6JCDuFdUw_-OKO6_6o
     volumes:
       - .:/app
       - /app/node_modules
@@ -25,8 +25,8 @@ services:
       - "5173:5173"
     environment:
       - VITE_OWM_API_KEY=47c1019c93bf4a70c11537bebf481926
-      - VITE_SUPABASE_URL=https://fxzqeoaajqqfcurfwtnk.supabase.co
-      - VITE_SUPABASE_ANON_KEY=sb_publishable_cK5gEmaT24RCcGYvXvSXsg_G_kAyKyO
+      - VITE_SUPABASE_URL=https://peozoileiqwujazhzsul.supabase.co
+      - VITE_SUPABASE_ANON_KEY=sb_publishable_fTmdw_2NK7aPV6JCDuFdUw_-OKO6_6o
     volumes:
       - .:/app
       - /app/node_modules

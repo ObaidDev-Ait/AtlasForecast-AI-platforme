@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useWeatherAlerts, { ALERT_TYPES, getSeverity, generateAISummary } from './useWeatherAlerts';
 import '../Styles/AlertsPage.css';
 
-const dayNamesFr = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-const monthsFr = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+const dayNamesFr = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const monthsFr = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
 function fmtDate(d) { const dt = new Date(d); return `${dayNamesFr[dt.getDay()]} ${dt.getDate()} ${monthsFr[dt.getMonth()]}`; }
 
 const FILTERS = [
@@ -317,15 +317,15 @@ export default function AlertsPage() {
                   <p>Conditions météorologiques normales détectées.</p>
                 </div>
               )}
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
 
-    {/* Modal */}
-    <AnimatePresence>
-      {modalAlert && <DetailModal alert={modalAlert} onClose={() => setModalAlert(null)} />}
-    </AnimatePresence>
+      {/* Modal */}
+      <AnimatePresence>
+        {modalAlert && <DetailModal alert={modalAlert} onClose={() => setModalAlert(null)} />}
+      </AnimatePresence>
     </>
   );
 }

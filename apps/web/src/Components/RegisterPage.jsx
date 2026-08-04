@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { motion } from 'framer-motion';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
+};
 
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false)
@@ -36,7 +42,7 @@ const RegisterPage = () => {
       }
       
       // Since email confirmation might be disabled in Supabase or auto-sign-in works:
-      navigate('/profile')
+      navigate('/dashboard')
       
     } catch (error) {
       setErrorMsg(error.message)
@@ -57,124 +63,104 @@ const RegisterPage = () => {
   }, [])
 
   return (
-    <>
     <div className="container">
-      <section className="auth-section">
-        <div className="auth-header" style={{"textAlign": "center", "margin": "1.5rem 0 2rem"}}>
-          <h1 className="auth-title" style={{"fontWeight": "900", "fontSize": "clamp(1.8rem,1.2rem+2vw,2.6rem)", "background": "var(--gradient-primary)", "WebkitBackgroundClip": "text", "WebkitTextFillColor": "transparent", "backgroundClip": "text"}}>
+      <section className="af-page">
+        <motion.div className="af-page-header" initial="hidden" animate="visible" variants={fadeUp}>
+          <h1 className="af-page-title">
             <i className="fas fa-user-plus"></i> Créer un compte
           </h1>
-          <p className="auth-subtitle" style={{"color": "var(--text-secondary)", "fontWeight": "600"}}>Rejoignez AtlasForecast pour une expérience météo professionnelle</p>
-        </div>
+          <p className="af-page-subtitle">Rejoignez AtlasForecast pour une expérience météo professionnelle</p>
+        </motion.div>
 
-        <div className="auth-grid responsive-grid responsive-grid-auth">
+        <div className="af-grid af-grid-2" style={{ maxWidth: '1000px', margin: '0 auto' }}>
           {/*  Carte Inscription  */}
-          <div className="auth-card" style={{"position": "relative", "background": "var(--bg-glass-dark)", "border": "1px solid var(--border-color)", "borderRadius": "22px", "padding": "clamp(1.25rem,1rem+1vw,2rem)", "boxShadow": "0 20px 40px var(--shadow-color)", "overflow": "hidden"}}>
-            
+          <motion.div className="af-card" initial="hidden" animate="visible" variants={fadeUp}>
             {errorMsg && (
-              <div style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", padding: "1rem", borderRadius: "14px", marginBottom: "1rem", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
-                <i className="fas fa-exclamation-circle"></i> {errorMsg}
+              <div className="af-notice af-notice-error" style={{ marginBottom: 'var(--sp-5)' }}>
+                <i className="fas fa-exclamation-circle"></i> <span>{errorMsg}</span>
               </div>
             )}
 
-            <form id="registerForm" className="auth-form" onSubmit={handleRegister}>
-              <div className="form-row responsive-grid-row">
-                <div className="form-group">
-                  <label htmlFor="firstName" className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
+            <form id="registerForm" onSubmit={handleRegister}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+                <div className="af-form-group">
+                  <label htmlFor="firstName" className="af-label">
                     <i className="fas fa-user"></i> Prénom
                   </label>
                   <input
                     type="text"
                     id="firstName"
                     name="firstName"
-                    className="form-input"
+                    className="af-input"
                     placeholder="Votre prénom"
                     required
-                    style={{"width": "100%", "padding": ".95rem 1.1rem", "background": "var(--bg-glass)", "color": "var(--text-primary)", "border": "1px solid var(--border-color)", "borderRadius": "14px", "backdropFilter": "blur(10px)"}}
-                   />
+                  />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="lastName" className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
+                <div className="af-form-group">
+                  <label htmlFor="lastName" className="af-label">
                     <i className="fas fa-user"></i> Nom
                   </label>
                   <input
                     type="text"
                     id="lastName"
                     name="lastName"
-                    className="form-input"
+                    className="af-input"
                     placeholder="Votre nom"
                     required
-                    style={{"width": "100%", "padding": ".95rem 1.1rem", "background": "var(--bg-glass)", "color": "var(--text-primary)", "border": "1px solid var(--border-color)", "borderRadius": "14px", "backdropFilter": "blur(10px)"}}
-                   />
+                  />
                 </div>
               </div>
 
-              <div className="form-group" style={{"marginTop": "1rem"}}>
-                <label htmlFor="email" className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
+              <div className="af-form-group">
+                <label htmlFor="email" className="af-label">
                   <i className="fas fa-envelope"></i> Adresse e-mail
                 </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  className="form-input"
+                  className="af-input"
                   placeholder="votre@email.com"
                   required
-                  style={{"width": "100%", "padding": ".95rem 1.1rem", "background": "var(--bg-glass)", "color": "var(--text-primary)", "border": "1px solid var(--border-color)", "borderRadius": "14px", "backdropFilter": "blur(10px)"}}
-                 />
+                />
               </div>
 
-              <div className="form-row responsive-grid-row" style={{"marginTop": "1rem"}}>
-                <div className="form-group">
-                  <label htmlFor="password" className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+                <div className="af-form-group">
+                  <label htmlFor="password" className="af-label">
                     <i className="fas fa-lock"></i> Mot de passe
                   </label>
-                  <div className="password-input" style={{"position": "relative"}}>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      className="form-input"
-                      placeholder="Votre mot de passe"
-                      required
-                      style={{"width": "100%", "padding": ".95rem 2.75rem .95rem 1.1rem", "background": "var(--bg-glass)", "color": "var(--text-primary)", "border": "1px solid var(--border-color)", "borderRadius": "14px", "backdropFilter": "blur(10px)"}}
-                     />
-                    <button type="button" id="passwordToggle" className="password-toggle"
-                      style={{"position": "absolute", "right": ".5rem", "top": "50%", "transform": "translateY(-50%)", "border": "none", "background": "transparent", "color": "var(--text-secondary)", "cursor": "pointer", "padding": ".25rem .5rem"}}>
-                      <i className="fas fa-eye"></i>
-                    </button>
-                  </div>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    className="af-input"
+                    placeholder="Votre mot de passe"
+                    required
+                  />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="confirmPassword" className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
-                    <i className="fas fa-lock"></i> Confirmer le mot de passe
+                <div className="af-form-group">
+                  <label htmlFor="confirmPassword" className="af-label">
+                    <i className="fas fa-lock"></i> Confirmer
                   </label>
-                  <div className="password-input" style={{"position": "relative"}}>
-                    <input
-                      type="password"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      className="form-input"
-                      placeholder="Confirmez le mot de passe"
-                      required
-                      style={{"width": "100%", "padding": ".95rem 2.75rem .95rem 1.1rem", "background": "var(--bg-glass)", "color": "var(--text-primary)", "border": "1px solid var(--border-color)", "borderRadius": "14px", "backdropFilter": "blur(10px)"}}
-                     />
-                    <button type="button" id="confirmPasswordToggle" className="password-toggle"
-                      style={{"position": "absolute", "right": ".5rem", "top": "50%", "transform": "translateY(-50%)", "border": "none", "background": "transparent", "color": "var(--text-secondary)", "cursor": "pointer", "padding": ".25rem .5rem"}}>
-                      <i className="fas fa-eye"></i>
-                    </button>
-                  </div>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    className="af-input"
+                    placeholder="Confirmez"
+                    required
+                  />
                 </div>
               </div>
 
-              <div className="form-row responsive-grid-row" style={{"marginTop": "1rem"}}>
-                <div className="form-group">
-                  <label htmlFor="country" className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+                <div className="af-form-group">
+                  <label htmlFor="country" className="af-label">
                     <i className="fas fa-globe"></i> Pays
                   </label>
-                  <select id="country" name="country" className="form-input form-select" required
-                    style={{"width": "100%", "padding": ".95rem 1.1rem", "background": "var(--bg-glass)", "color": "var(--text-primary)", "border": "1px solid var(--border-color)", "borderRadius": "14px", "backdropFilter": "blur(10px)"}}>
-                    <option value="">Sélectionnez votre pays</option>
+                  <select id="country" name="country" className="af-select" required>
+                    <option value="">Sélectionnez</option>
                     <option value="FR">France</option>
                     <option value="MA">Maroc</option>
                     <option value="DZ">Algérie</option>
@@ -190,86 +176,83 @@ const RegisterPage = () => {
                     <option value="other">Autre</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label className="form-label" style={{"display": "block", "marginBottom": ".45rem", "fontWeight": "800"}}>
+                <div className="af-form-group">
+                  <label className="af-label">
                     <i className="fas fa-bell"></i> Préférences
                   </label>
-                  <label className="checkbox-label" style={{"display": "flex", "gap": ".5rem", "alignItems": "center", "cursor": "pointer", "padding": ".95rem 1.1rem", "border": "1px solid var(--border-color)", "borderRadius": "14px", "background": "var(--bg-glass)"}}>
-                    <input type="checkbox" id="newsletter" name="newsletter" style={{"transform": "scale(1.1)"}} />
-                    <span>Recevoir les actualités météo et offres spéciales</span>
+                  <label className="af-input" style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'center', cursor: 'pointer', height: '44px' }}>
+                    <input type="checkbox" id="newsletter" name="newsletter" style={{ transform: 'scale(1.1)' }} />
+                    <span style={{ fontSize: '11px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Recevoir les actualités</span>
                   </label>
                 </div>
               </div>
 
-              <div className="form-group" style={{"marginTop": "1rem"}}>
-                <label className="checkbox-label" style={{"display": "flex", "gap": ".5rem", "alignItems": "flex-start", "cursor": "pointer"}}>
-                  <input type="checkbox" id="terms" name="terms" required style={{"transform": "scale(1.1)", "marginTop": ".25rem"}} />
-                  <span>J'accepte les <a href="terms.html" className="terms-link" style={{"color": "var(--accent-primary)", "fontWeight": "800", "textDecoration": "none"}}>conditions d'utilisation</a> et la
-                    <a href="/privacy" className="terms-link" style={{"color": "var(--accent-primary)", "fontWeight": "800", "textDecoration": "none"}}>politique de confidentialité</a></span>
+              <div className="af-form-group">
+                <label className="checkbox-label" style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start', cursor: 'pointer' }}>
+                  <input type="checkbox" id="terms" name="terms" required style={{ transform: 'scale(1.1)', marginTop: '3px' }} />
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                    J'accepte les <a href="/terms" style={{ color: 'var(--accent-primary)', fontWeight: '700', textDecoration: 'none' }}>conditions d'utilisation</a> et la <a href="/privacy" style={{ color: 'var(--accent-primary)', fontWeight: '700', textDecoration: 'none' }}>politique de confidentialité</a>
+                  </span>
                 </label>
               </div>
 
-              <button type="submit" disabled={loading} className="btn btn-primary btn-lg" style={{"width": "100%", "padding": "1rem 1.25rem", "border": "none", "borderRadius": "14px", "background": "var(--gradient-primary)", "color": "#fff", "fontWeight": "900", "cursor": loading ? "not-allowed" : "pointer", "opacity": loading ? 0.7 : 1, "marginTop": ".75rem"}}>
+              <button type="submit" disabled={loading} className="af-btn af-btn-primary af-btn-block" style={{ marginTop: 'var(--sp-2)' }}>
                 {loading ? <><i className="fas fa-spinner fa-spin"></i> Création...</> : <><i className="fas fa-user-plus"></i> Créer mon compte</>}
               </button>
 
-              <div className="divider" style={{"display": "flex", "alignItems": "center", "gap": ".75rem", "margin": "1.25rem 0"}}>
-                <div style={{"flex": "1", "height": "1px", "background": "var(--border-color)"}}></div>
-                <span style={{"color": "var(--text-secondary)", "fontWeight": "700"}}>ou</span>
-                <div style={{"flex": "1", "height": "1px", "background": "var(--border-color)"}}></div>
-              </div>
+              <div className="af-divider">ou</div>
 
-              <div className="social-register" style={{"display": "grid", "gap": ".6rem"}}>
-                <button className="btn btn-ghost social-btn google-btn" style={{"padding": ".9rem 1rem", "borderRadius": "12px", "border": "1px solid var(--border-color)", "background": "var(--bg-glass)", "color": "var(--text-primary)", "fontWeight": "800", "cursor": "pointer"}}>
-                  <i className="fab fa-google"></i> S'inscrire avec Google
+              <div style={{ display: 'grid', gap: 'var(--sp-2)' }}>
+                <button type="button" className="af-btn af-btn-secondary af-btn-block">
+                  <i className="fab fa-google"></i> Google
                 </button>
-                <button className="btn btn-ghost social-btn facebook-btn" style={{"padding": ".9rem 1rem", "borderRadius": "12px", "border": "1px solid var(--border-color)", "background": "var(--bg-glass)", "color": "var(--text-primary)", "fontWeight": "800", "cursor": "pointer"}}>
-                  <i className="fab fa-facebook-f"></i> S'inscrire avec Facebook
-                </button>
-                <button className="btn btn-ghost social-btn twitter-btn" style={{"padding": ".9rem 1rem", "borderRadius": "12px", "border": "1px solid var(--border-color)", "background": "var(--bg-glass)", "color": "var(--text-primary)", "fontWeight": "800", "cursor": "pointer"}}>
-                  <i className="fab fa-x-twitter"></i> S'inscrire avec X
+                <button type="button" className="af-btn af-btn-secondary af-btn-block">
+                  <i className="fab fa-facebook-f"></i> Facebook
                 </button>
               </div>
 
-              <div className="auth-footer" style={{"textAlign": "center", "marginTop": "1rem", "color": "var(--text-secondary)"}}>
-                <p>Déjà un compte ?
-                  <a href="/login" style={{"color": "var(--accent-primary)", "fontWeight": "900", "textDecoration": "none"}}>Se connecter</a>
+              <div style={{ textAlign: 'center', marginTop: 'var(--sp-4)' }}>
+                <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--text-sm)' }}>
+                  Déjà un compte ? <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: '700', textDecoration: 'none' }}>Se connecter</Link>
                 </p>
               </div>
             </form>
-          </div>
+          </motion.div>
 
           {/*  Carte Avantages  */}
-          <aside className="auth-benefits" style={{"background": "var(--bg-glass-dark)", "border": "1px solid var(--border-color)", "borderRadius": "22px", "padding": "clamp(1rem,.8rem + 1vw,1.5rem)", "boxShadow": "0 20px 40px var(--shadow-color)"}}>
-            <h3 style={{"fontWeight": "900", "marginBottom": ".75rem"}}><i className="fas fa-star"></i> Avantages de l'inscription</h3>
-            <ul style={{"listStyle": "none", "display": "grid", "gap": ".75rem", "margin": "0", "padding": "0"}}>
-              <li style={{"display": "flex", "gap": ".6rem", "alignItems": "flex-start"}}>
-                <span style={{"color": "#10b981"}}><i className="fas fa-check-circle"></i></span>
-                <span>Prévisions 5 jours, alertes personnalisées et radar en temps réel</span>
-              </li>
-              <li style={{"display": "flex", "gap": ".6rem", "alignItems": "flex-start"}}>
-                <span style={{"color": "#10b981"}}><i className="fas fa-check-circle"></i></span>
-                <span>Expérience Premium sans publicité</span>
-              </li>
-              <li style={{"display": "flex", "gap": ".6rem", "alignItems": "flex-start"}}>
-                <span style={{"color": "#10b981"}}><i className="fas fa-check-circle"></i></span>
-                <span>Synchronisation multi-appareils</span>
-              </li>
-              <li style={{"display": "flex", "gap": ".6rem", "alignItems": "flex-start"}}>
-                <span style={{"color": "#10b981"}}><i className="fas fa-check-circle"></i></span>
-                <span>Accès privilégié aux nouvelles fonctionnalités</span>
-              </li>
-            </ul>
-
-            <div style={{"marginTop": "1.25rem", "padding": "1rem", "borderRadius": "16px", "background": "var(--bg-glass)", "border": "1px solid var(--border-color)"}}>
-              <strong><i className="fas fa-shield-alt"></i> Sécurité</strong>
-              <p style={{"margin": ".35rem 0 0", "color": "var(--text-secondary)"}}>Données chiffrées et conformes aux meilleures pratiques de l’industrie.</p>
+          <motion.aside className="af-card af-card-elevated" initial="hidden" animate="visible" variants={fadeUp} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: '900', color: 'var(--text-primary)', margin: '0 0 var(--sp-4)', display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+                <i className="fas fa-star" style={{ color: 'var(--accent-warning)' }}></i> Avantages
+              </h3>
+              <ul style={{ listStyle: 'none', display: 'grid', gap: 'var(--sp-3)', margin: 0, padding: 0 }}>
+                <li style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)' }}>
+                  <span style={{ color: 'var(--accent-success)' }}><i className="fas fa-check-circle"></i></span>
+                  <span>Prévisions 5 jours, alertes personnalisées et radar en temps réel</span>
+                </li>
+                <li style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)' }}>
+                  <span style={{ color: 'var(--accent-success)' }}><i className="fas fa-check-circle"></i></span>
+                  <span>Expérience Premium sans publicité</span>
+                </li>
+                <li style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)' }}>
+                  <span style={{ color: 'var(--accent-success)' }}><i className="fas fa-check-circle"></i></span>
+                  <span>Synchronisation multi-appareils</span>
+                </li>
+              </ul>
             </div>
-          </aside>
+
+            <div style={{ marginTop: 'var(--sp-6)', padding: 'var(--sp-4)', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)' }}>
+              <strong style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                <i className="fas fa-shield-alt" style={{ color: 'var(--accent-primary)' }}></i> Données sécurisées
+              </strong>
+              <p style={{ margin: 'var(--sp-2) 0 0', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', lineHeight: 1.5 }}>
+                Vos données sont chiffrées de bout en bout et ne sont jamais partagées à des tiers.
+              </p>
+            </div>
+          </motion.aside>
         </div>
       </section>
     </div>
-    </>
   );
 };
 

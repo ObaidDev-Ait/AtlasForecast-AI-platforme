@@ -24,17 +24,17 @@ const CITIES = [
 ];
 
 const ALERT_TYPES = {
-  extremeHeat:   { label: 'Chaleur Extrême', icon: 'fa-temperature-high', color: '#ef4444' },
-  heatWave:      { label: 'Vague de Chaleur', icon: 'fa-sun', color: '#f97316' },
-  heavyRain:     { label: 'Pluie Forte', icon: 'fa-cloud-showers-heavy', color: '#6366f1' },
-  thunderstorm:  { label: 'Orage Violent', icon: 'fa-bolt', color: '#a855f7' },
-  strongWind:    { label: 'Vents Forts', icon: 'fa-wind', color: '#06b6d4' },
-  floodRisk:     { label: 'Risque Inondation', icon: 'fa-water', color: '#3b82f6' },
-  dustStorm:     { label: 'Tempête de Sable', icon: 'fa-smog', color: '#d97706' },
-  frost:         { label: 'Gel / Givre', icon: 'fa-snowflake', color: '#67e8f9' },
-  snow:          { label: 'Chutes de Neige', icon: 'fa-snowflake', color: '#e0e7ff' },
-  coastal:       { label: 'Alerte Côtière', icon: 'fa-water', color: '#0ea5e9' },
-  instability:   { label: 'Instabilité Sévère', icon: 'fa-exclamation-triangle', color: '#fbbf24' },
+  extremeHeat: { label: 'Chaleur Extrême', icon: 'fa-temperature-high', color: '#ef4444' },
+  heatWave: { label: 'Vague de Chaleur', icon: 'fa-sun', color: '#f97316' },
+  heavyRain: { label: 'Pluie Forte', icon: 'fa-cloud-showers-heavy', color: '#6366f1' },
+  thunderstorm: { label: 'Orage Violent', icon: 'fa-bolt', color: '#a855f7' },
+  strongWind: { label: 'Vents Forts', icon: 'fa-wind', color: '#06b6d4' },
+  floodRisk: { label: 'Risque Inondation', icon: 'fa-water', color: '#3b82f6' },
+  dustStorm: { label: 'Tempête de Sable', icon: 'fa-smog', color: '#d97706' },
+  frost: { label: 'Gel / Givre', icon: 'fa-snowflake', color: '#67e8f9' },
+  snow: { label: 'Chutes de Neige', icon: 'fa-snowflake', color: '#e0e7ff' },
+  coastal: { label: 'Alerte Côtière', icon: 'fa-water', color: '#0ea5e9' },
+  instability: { label: 'Instabilité Sévère', icon: 'fa-exclamation-triangle', color: '#fbbf24' },
 };
 
 function getSeverity(score) {
@@ -177,7 +177,7 @@ export default function useWeatherAlerts() {
         setLoading(false);
         return;
       }
-    } catch {}
+    } catch { }
 
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
@@ -199,7 +199,7 @@ export default function useWeatherAlerts() {
             const data = await res.json();
             allAlerts.push(...analyzeCity(city, data.daily));
           }
-        } catch {}
+        } catch { }
         setProgress(Math.round(((i + 1) / CITIES.length) * 100));
         // Delay between requests to respect rate limits
         if (i < CITIES.length - 1) await new Promise(r => setTimeout(r, 350));
@@ -209,7 +209,7 @@ export default function useWeatherAlerts() {
       allAlerts.sort((a, b) => b.score - a.score);
       setAlerts(allAlerts);
       setProgress(100);
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ alerts: allAlerts, ts: Date.now() })); } catch {}
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ alerts: allAlerts, ts: Date.now() })); } catch { }
     } catch (err) {
       if (err.name === 'AbortError') return;
       setError(err.message || 'Erreur de chargement des alertes');

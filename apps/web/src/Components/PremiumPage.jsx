@@ -1,583 +1,823 @@
-import React, { useEffect } from 'react';
-import PremiumForecast14 from './PremiumForecast14';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { authFetch } from '../lib/api';
+import '../css/premium.css';
 
-const PremiumPage = () => {
-  const { isPremium } = useAuth();
+export default function PremiumPage() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('copilot');
+
+  // AI Copilot state
+  const [copilotCategory, setCopilotCategory] = useState('travel');
+  const [copilotCity, setCopilotCity] = useState('Marrakech');
+  const [copilotAdvice, setCopilotAdvice] = useState(null);
+  const [loadingAdvice, setLoadingAdvice] = useState(false);
+
+  // Smart Alerts state
+  const [alerts, setAlerts] = useState({
+    rain: true,
+    storm: true,
+    heatwave: false
+  });
+  const [thresholds, setThresholds] = useState({
+    rain: 60,
+    wind: 45,
+    temp: 36
+  });
+  const [channels, setChannels] = useState({
+    email: true,
+    sms: false,
+    push: true,
+    webhook: false
+  });
+
+  // Historical Analytics state
+  const [analyticMetric, setAnalyticMetric] = useState('temp');
+  const [analyticCity, setAnalyticCity] = useState('Casablanca');
+
+  // API Access state
+  const [apiKey, setApiKey] = useState('at_live_7a3d92e105cb8f9d0c641be2');
+  const [apiKeyVisible, setApiKeyVisible] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
+  const [apiSnippetLang, setApiSnippetLang] = useState('js');
+
+  // Team Workspace state
+  const [teamMembers, setTeamMembers] = useState([
+    { id: 1, name: 'Alice Martin', email: 'alice@company.com', role: 'Admin', status: 'Active' },
+    { id: 2, name: 'Jean Dupont', email: 'jean@company.com', role: 'Developer', status: 'Active' }
+  ]);
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberRole, setNewMemberRole] = useState('Developer');
+
+  // Subscription & Billing state
+  const [subscription, setSubscription] = useState({ isPremium: false, plan: 'free', status: 'none' });
+  const [loadingSubscription, setLoadingSubscription] = useState(true);
+
+  const token = localStorage.getItem('access_token');
+  const API_BASE_URL = 'http://localhost:4000';
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (token) {
+      setLoadingSubscription(true);
+      authFetch(`${API_BASE_URL}/billing/subscription`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.plan) {
+          setSubscription(data);
+        }
+      })
+      .catch(err => console.error("Error fetching subscription status:", err))
+      .finally(() => setLoadingSubscription(false));
+    } else {
+      setLoadingSubscription(false);
+    }
+  }, [token]);
+
+  const handleUpgrade = async (plan) => {
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const response = await authFetch(`${API_BASE_URL}/billing/checkout`, {
+        method: 'POST',
+        body: JSON.stringify({
+          plan,
+          successUrl: window.location.origin + '/premium?success=true&plan=' + plan,
+          cancelUrl: window.location.origin + '/premium'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.url) {
+          window.location.href = data.url;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to upgrade:", err);
+    }
+  };
+
+  // AI Copilot Advisory Database
+  const advices = {
+    travel: {
+      Marrakech: "Sunny days ahead. Perfect weather for exploring the Medina. Keep hydrated in the afternoon as temperatures reach 34°C. High UV index, sunscreen recommended.",
+      Casablanca: "Pleasant coastal breeze with clear skies. Ideal for sight-seeing the Hassan II Mosque. Evening temp drops to 19°C, carrying a light jacket is advised.",
+      Rabat: "Mild and sunny. Excellent conditions for historic tours. Temperatures hover around 24°C with gentle winds. Perfect travel window."
+    },
+    hiking: {
+      Marrakech: "Excellent visibility on High Atlas trails. Morning temperatures are cool (12°C at altitude), warming to 25°C. Wind gusts up to 15km/h. Standard mountain gear recommended.",
+      Casablanca: "Moderate humidity near coastal paths. Clear trails with zero precipitation risk. Low wind speeds make it ideal for light hiking.",
+      Rabat: "Forest trails are dry and stable. Temperature: 22°C. Low humidity and pleasant breeze make it a perfect day for outdoor trail walks."
+    },
+    agriculture: {
+      Marrakech: "High evaporation rates. Evapotranspiration index: 6.2mm/day. Recommend scheduling drip irrigation early morning or post-sunset to conserve water resources.",
+      Casablanca: "Optimal soil moisture level detected (45%). Favorable conditions for cereal crops seeding. Expect moderate morning dew. Soil temp: 18°C.",
+      Rabat: "Stable conditions. Nitrogen absorption rate is high. Apply fertilizers before the minor light showers expected in late evenings."
+    },
+    event: {
+      Marrakech: "Outdoor dinner events are highly favorable. Wind speeds will drop below 10km/h after 19:00. No precipitation risk. Ambient evening temp: 24°C.",
+      Casablanca: "High humidity levels (82%) after sunset may cause light moisture on outdoor fabrics. Canopy or covered tents recommended for open-air venues.",
+      Rabat: "Perfect evening conditions. Low breeze and stable temperature (20°C). Outdoor lighting and sound projection will face minimal atmospheric disturbance."
+    }
+  };
+
+  const handleGenerateAdvice = () => {
+    setLoadingAdvice(true);
     setTimeout(() => {
-      window.document.dispatchEvent(new Event('DOMContentLoaded', {
-        bubbles: true,
-        cancelable: true
-      }));
-    }, 100);
-  }, []);
+      const cityData = advices[copilotCategory][copilotCity] || advices[copilotCategory]['Marrakech'];
+      setCopilotAdvice(cityData);
+      setLoadingAdvice(false);
+    }, 600);
+  };
+
+  const handleAddMember = (e) => {
+    e.preventDefault();
+    if (!newMemberEmail || !newMemberName) return;
+    setTeamMembers([
+      ...teamMembers,
+      {
+        id: Date.now(),
+        name: newMemberName,
+        email: newMemberEmail,
+        role: newMemberRole,
+        status: 'Pending'
+      }
+    ]);
+    setNewMemberEmail('');
+    setNewMemberName('');
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(apiKey);
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2000);
+  };
+
+  // Chart data renderer (SVG lines/areas)
+  const renderChart = () => {
+    if (analyticMetric === 'temp') {
+      return (
+        <svg viewBox="0 0 500 200" className="dashboard-chart-svg">
+          <defs>
+            <linearGradient id="chart-glow-temp" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--accent-secondary)" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="var(--accent-secondary)" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+          {/* Grid lines */}
+          <line x1="50" y1="30" x2="450" y2="30" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="80" x2="450" y2="80" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="130" x2="450" y2="130" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="170" x2="450" y2="170" stroke="var(--border-color)" strokeWidth="1" />
+          
+          {/* Chart Area */}
+          <path d="M 50 130 Q 120 70, 190 90 T 330 40 T 450 60 L 450 170 L 50 170 Z" fill="url(#chart-glow-temp)" />
+          
+          {/* Chart Line */}
+          <path d="M 50 130 Q 120 70, 190 90 T 330 40 T 450 60" fill="none" stroke="var(--accent-secondary)" strokeWidth="3" />
+          
+          {/* Data Points */}
+          <circle cx="50" cy="130" r="4" fill="var(--bg-primary)" stroke="var(--accent-secondary)" strokeWidth="2" />
+          <circle cx="150" cy="80" r="4" fill="var(--bg-primary)" stroke="var(--accent-secondary)" strokeWidth="2" />
+          <circle cx="260" cy="65" r="4" fill="var(--bg-primary)" stroke="var(--accent-secondary)" strokeWidth="2" />
+          <circle cx="370" cy="42" r="4" fill="var(--bg-primary)" stroke="var(--accent-secondary)" strokeWidth="2" />
+          <circle cx="450" cy="60" r="4" fill="var(--bg-primary)" stroke="var(--accent-secondary)" strokeWidth="2" />
+          
+          {/* X Labels */}
+          <text x="50" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Jan</text>
+          <text x="150" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Mar</text>
+          <text x="260" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">May</text>
+          <text x="370" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Jul</text>
+          <text x="450" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Sep</text>
+
+          {/* Y Labels */}
+          <text x="40" y="34" fill="var(--text-muted)" fontSize="9" textAnchor="end">40°C</text>
+          <text x="40" y="84" fill="var(--text-muted)" fontSize="9" textAnchor="end">25°C</text>
+          <text x="40" y="134" fill="var(--text-muted)" fontSize="9" textAnchor="end">10°C</text>
+        </svg>
+      );
+    } else if (analyticMetric === 'rain') {
+      return (
+        <svg viewBox="0 0 500 200" className="dashboard-chart-svg">
+          <defs>
+            <linearGradient id="chart-glow-rain" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+          <line x1="50" y1="30" x2="450" y2="30" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="80" x2="450" y2="80" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="130" x2="450" y2="130" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="170" x2="450" y2="170" stroke="var(--border-color)" strokeWidth="1" />
+          
+          {/* Area Chart */}
+          <path d="M 50 160 C 100 120, 150 150, 200 70 C 250 80, 300 20, 350 140 C 400 120, 420 160, 450 170 L 450 170 L 50 170 Z" fill="url(#chart-glow-rain)" />
+          {/* Path Line */}
+          <path d="M 50 160 C 100 120, 150 150, 200 70 C 250 80, 300 20, 350 140 C 400 120, 420 160, 450 170" fill="none" stroke="var(--accent-primary)" strokeWidth="3" />
+          
+          <text x="50" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Mon</text>
+          <text x="150" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Wed</text>
+          <text x="250" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Fri</text>
+          <text x="350" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Sun</text>
+          
+          <text x="40" y="34" fill="var(--text-muted)" fontSize="9" textAnchor="end">100mm</text>
+          <text x="40" y="84" fill="var(--text-muted)" fontSize="9" textAnchor="end">50mm</text>
+          <text x="40" y="134" fill="var(--text-muted)" fontSize="9" textAnchor="end">10mm</text>
+        </svg>
+      );
+    } else {
+      return (
+        <svg viewBox="0 0 500 200" className="dashboard-chart-svg">
+          <defs>
+            <linearGradient id="chart-glow-humidity" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+          <line x1="50" y1="30" x2="450" y2="30" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="80" x2="450" y2="80" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="130" x2="450" y2="130" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
+          <line x1="50" y1="170" x2="450" y2="170" stroke="var(--border-color)" strokeWidth="1" />
+          
+          {/* Smooth spline curve */}
+          <path d="M 50 110 S 130 90, 180 120 S 300 40, 380 90 S 420 100, 450 110 L 450 170 L 50 170 Z" fill="url(#chart-glow-humidity)" />
+          <path d="M 50 110 S 130 90, 180 120 S 300 40, 380 90 S 420 100, 450 110" fill="none" stroke="#10b981" strokeWidth="3" />
+          
+          <text x="50" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Q1</text>
+          <text x="180" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Q2</text>
+          <text x="310" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Q3</text>
+          <text x="450" y="190" fill="var(--text-muted)" fontSize="9" textAnchor="middle">Q4</text>
+          
+          <text x="40" y="34" fill="var(--text-muted)" fontSize="9" textAnchor="end">100%</text>
+          <text x="40" y="84" fill="var(--text-muted)" fontSize="9" textAnchor="end">50%</text>
+          <text x="40" y="134" fill="var(--text-muted)" fontSize="9" textAnchor="end">20%</text>
+        </svg>
+      );
+    }
+  };
+
+  const codeSnippets = {
+    js: `// Fetch predictions & forecasts using AtlasForecast SDK
+const AtlasForecast = require('@atlasforecast/sdk');
+const client = new AtlasForecast.Client({ apiKey: '${apiKey}' });
+
+client.forecasts.get({
+  city: 'Marrakech',
+  extended: true
+}).then(forecast => {
+  console.log(\`Predicted high: \${forecast.days[0].tempMax}°C\`);
+});`,
+    curl: `curl -X GET "https://api.atlasforecast.com/v1/forecasts?city=Marrakech" \\
+  -H "Authorization: Bearer ${apiKey}" \\
+  -H "Content-Type: application/json"`,
+    python: `# Fetch weather analytics with python
+import atlasforecast
+
+client = atlasforecast.Client(api_key="${apiKey}")
+data = client.analytics.get_trends(
+    city="Marrakech",
+    metric="temperature",
+    years=5
+)
+print(f"Historical trend line: {data.trend_index}")`
+  };
 
   return (
-    <>
-        <div className="container">
-            {/*  En-tête Premium  */}
-            <div className="premium-header">
-                <h1>AtlasForecast Premium</h1>
-                <p>Débloquez le plein potentiel de la météo professionnelle</p>
-                <div className="trial-badge">
-                    <i className="fas fa-gift"></i>
-                    <span>3 jours d'essai gratuit</span>
+    <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
+      {/* Dashboard Top Banner */}
+      <div className="premium-dashboard-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <h1 style={{ fontSize: '2.2rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>Premium Portal</h1>
+            <span className="premium-status-badge" style={{ background: subscription.plan && subscription.plan !== 'free' ? 'var(--gradient-primary)' : 'var(--bg-tertiary)', color: '#fff', fontSize: '0.75rem', fontWeight: 800, padding: '0.25rem 0.6rem', borderRadius: '20px', letterSpacing: '0.5px' }}>
+              {subscription.plan ? subscription.plan.toUpperCase() + ' PLAN' : 'FREE PLAN'}
+            </span>
+          </div>
+          <p style={{ color: 'var(--text-secondary)', margin: '0.4rem 0 0', fontWeight: '500' }}>Manage workspace, configure integrations, and leverage predictions.</p>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <span className="dashboard-last-sync" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', background: 'var(--bg-glass-light)', padding: '0.6rem 1rem', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <i className="fas fa-arrows-spin fa-spin" style={{ color: 'var(--accent-primary)' }} /> Live Data Synced
+          </span>
+        </div>
+      </div>
+
+      {/* Main SaaS Dashboard Container */}
+      <div className="premium-dashboard-layout" style={{ display: 'flex', gap: '2rem', minHeight: '650px' }}>
+        {/* Navigation Sidebar */}
+        <aside className="premium-sidebar" style={{ width: '260px', flexShrink: 0 }}>
+          <div style={{ background: 'var(--bg-glass-dark)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', boxShadow: '0 10px 30px var(--shadow-color)' }}>
+            <button
+              onClick={() => setActiveTab('copilot')}
+              className={`sidebar-tab-btn ${activeTab === 'copilot' ? 'active' : ''}`}
+            >
+              <i className="fas fa-robot"></i> AI Weather Copilot
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('alerts')}
+              className={`sidebar-tab-btn ${activeTab === 'alerts' ? 'active' : ''}`}
+            >
+              <i className="fas fa-bell"></i> Smart Alerts
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`sidebar-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+            >
+              <i className="fas fa-chart-line"></i> Historical Analytics
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('ml')}
+              className={`sidebar-tab-btn ${activeTab === 'ml' ? 'active' : ''}`}
+            >
+              <i className="fas fa-brain"></i> ML Predictions
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('api')}
+              className={`sidebar-tab-btn ${activeTab === 'api' ? 'active' : ''}`}
+            >
+              <i className="fas fa-code"></i> API Access
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('workspace')}
+              className={`sidebar-tab-btn ${activeTab === 'workspace' ? 'active' : ''}`}
+            >
+              <i className="fas fa-users"></i> Team Workspace
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('billing')}
+              className={`sidebar-tab-btn ${activeTab === 'billing' ? 'active' : ''}`}
+            >
+              <i className="fas fa-credit-card"></i> Billing & Plans
+            </button>
+          </div>
+        </aside>
+
+        {/* Content Area */}
+        <main className="premium-main-content" style={{ flex: 1 }}>
+          <div style={{ background: 'var(--bg-glass-dark)', border: '1px solid var(--border-color)', borderRadius: '22px', padding: '2.5rem', minHeight: '100%', boxShadow: '0 15px 35px var(--shadow-color)', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            
+            {/* TAB 1: AI Weather Copilot */}
+            {activeTab === 'copilot' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>🤖 AI Weather Copilot</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Get tailored weather recommendations for travel, agriculture, and outdoor events.</p>
                 </div>
-            </div>
-
-            {/*  🌤️ Module Prévisions 14 Jours Premium  */}
-            {/* Paywall Wrapper */}
-            <div style={{ position: 'relative' }}>
-              {!isPremium && (
-                <div style={{
-                  position: 'absolute', inset: 0, zIndex: 50,
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  background: 'rgba(128, 128, 128, 0.15)',
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'flex-start',
-                  paddingTop: '8rem', borderRadius: '24px'
-                }}>
-                  <div style={{
-                    background: 'var(--bg-card, #ffffff)', padding: '3rem 2rem',
-                    borderRadius: '24px', border: '1px solid var(--border-color)',
-                    textAlign: 'center', maxWidth: '500px', width: '90%',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-                  }}>
-                    <i className="fas fa-lock" style={{ fontSize: '3rem', color: '#6366f1', margin: '0 auto 1.5rem', display: 'block' }}></i>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: '900', marginBottom: '1rem', color: 'var(--text-primary)' }}>Contenu Réservé Premium</h2>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.1rem', lineHeight: '1.6' }}>
-                      Passez à AtlasForecast Premium pour accéder aux prévisions détaillées à 14 jours, au radar HD en direct et à toutes nos fonctionnalités avancées.
-                    </p>
-                    <a href="/premium-signup" className="btn btn-primary btn-lg" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 2rem', borderRadius: '14px', fontWeight: '800', background: 'var(--gradient-primary)', color: '#fff', textDecoration: 'none' }}>
-                      <i className="fas fa-crown"></i> Déverrouiller l'accès
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              <div style={!isPremium ? { pointerEvents: 'none', userSelect: 'none', overflow: 'hidden', maxHeight: '1000px', opacity: '0.5' } : {}}>
-                <PremiumForecast14 />
-
-                {/* 📡 Radar Météo Premium en Direct (RainViewer) */}
-                <div style={{ marginTop: '3rem', marginBottom: '3rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                    <div style={{ width: '50px', height: '50px', borderRadius: '14px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.5rem', boxShadow: '0 8px 20px rgba(99, 102, 241, 0.4)' }}>
-                      <i className="fas fa-satellite-dish"></i>
-                    </div>
-                    <div>
-                      <h2 style={{ fontSize: '1.8rem', fontWeight: '900', margin: 0, color: 'var(--text-primary)' }}>Radar Live HD</h2>
-                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>Suivi des précipitations en temps réel via RainViewer</p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                  <div className="premium-control-group">
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>ADVISORY TYPE</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <button onClick={() => { setCopilotCategory('travel'); setCopilotAdvice(null); }} className={`copilot-cat-btn ${copilotCategory === 'travel' ? 'active' : ''}`}><i className="fas fa-plane"></i> Travel</button>
+                      <button onClick={() => { setCopilotCategory('hiking'); setCopilotAdvice(null); }} className={`copilot-cat-btn ${copilotCategory === 'hiking' ? 'active' : ''}`}><i className="fas fa-hiking"></i> Hiking</button>
+                      <button onClick={() => { setCopilotCategory('agriculture'); setCopilotAdvice(null); }} className={`copilot-cat-btn ${copilotCategory === 'agriculture' ? 'active' : ''}`}><i className="fas fa-wheat-awn"></i> Agri</button>
+                      <button onClick={() => { setCopilotCategory('event'); setCopilotAdvice(null); }} className={`copilot-cat-btn ${copilotCategory === 'event' ? 'active' : ''}`}><i className="fas fa-calendar-check"></i> Event</button>
                     </div>
                   </div>
                   
-                  <div style={{ 
-                    borderRadius: '24px', 
-                    overflow: 'hidden', 
-                    border: '1px solid var(--border-color)',
-                    boxShadow: '0 20px 40px var(--shadow-color)',
-                    background: 'var(--bg-glass-dark)',
-                    position: 'relative'
-                  }}>
-                    <div style={{
-                      position: 'absolute', top: '1rem', left: '1rem', zIndex: 10,
-                      background: 'rgba(239, 68, 68, 0.9)', color: '#fff',
-                      padding: '0.4rem 1rem', borderRadius: '20px', fontWeight: '800',
-                      fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
-                      backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)',
-                      boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)'
-                    }}>
-                      <div style={{ width: '8px', height: '8px', background: '#fff', borderRadius: '50%' }}></div>
-                      DIRECT
-                    </div>
-
-                    <iframe 
-                      src="https://www.rainviewer.com/map.html?loc=31.7917,-7.0926,5&oFa=1&oC=1&oU=0&oCS=1&oF=0&oAP=1&c=3&o=83&lm=0&layer=radar&sm=1&sn=1" 
-                      width="100%" 
-                      height="500px" 
-                      frameBorder="0" 
-                      style={{ border: 0, display: 'block' }} 
-                      allowFullScreen 
-                      title="Radar Météo RainViewer"
-                    ></iframe>
+                  <div className="premium-control-group">
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>LOCATION</label>
+                    <select
+                      value={copilotCity}
+                      onChange={(e) => { setCopilotCity(e.target.value); setCopilotAdvice(null); }}
+                      style={{ width: '100%', padding: '0.8rem 1rem', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontWeight: '700' }}
+                    >
+                      <option value="Marrakech">Marrakech</option>
+                      <option value="Casablanca">Casablanca</option>
+                      <option value="Rabat">Rabat</option>
+                    </select>
                   </div>
                 </div>
 
-            {/*  Fonctionnalités Premium Détaillées  */}
-            <div className="premium-features-detailed">
-                <h2>Fonctionnalités Premium Avancées</h2>
-                <p className="features-subtitle">Découvrez tout ce qu'AtlasForecast Premium vous offre</p>
-                
-                <div className="features-grid">
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-satellite-dish"></i>
-                        </div>
-                        <h3 className="feature-title">Données Satellite HD</h3>
-                        <p className="feature-description">
-                            Images satellite haute résolution avec archives de 10 ans et mises à jour toutes les 15 minutes
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>Résolution 4K</span>
-                        </div>
-                    </div>
+                <button
+                  onClick={handleGenerateAdvice}
+                  className="btn btn-primary"
+                  style={{ width: 'auto', alignSelf: 'flex-start', padding: '0.9rem 2rem', fontWeight: 800 }}
+                  disabled={loadingAdvice}
+                >
+                  {loadingAdvice ? <><i className="fas fa-spinner fa-spin" /> Analyzing conditions...</> : <><i className="fas fa-wand-magic-sparkles" /> Generate Custom Advice</>}
+                </button>
 
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-chart-area"></i>
-                        </div>
-                        <h3 className="feature-title">Prévisions Ultra-Précises</h3>
-                        <p className="feature-description">
-                            Modèles météo multi-ensembles avec prévisions jusqu'à 15 jours et précision de 95%
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>15 jours avancés</span>
-                        </div>
+                {/* Advice Output Panel */}
+                <div style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '1.5rem', minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  {loadingAdvice ? (
+                    <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                      <i className="fas fa-brain fa-spin" style={{ fontSize: '2rem', color: 'var(--accent-secondary)', marginBottom: '0.5rem', display: 'block' }} />
+                      Running atmospheric copilot models...
                     </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-bell"></i>
-                        </div>
-                        <h3 className="feature-title">Alertes Personnalisées</h3>
-                        <p className="feature-description">
-                            Notifications en temps réel pour conditions météo extrêmes et alertes personnalisées
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>Alertes instantanées</span>
-                        </div>
+                  ) : copilotAdvice ? (
+                    <div style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem', color: 'var(--accent-secondary)', fontWeight: 800, fontSize: '0.9rem' }}>
+                        <i className="fas fa-circle-check" /> COPILOT ADVISORY FOR {copilotCity.toUpperCase()}
+                      </div>
+                      <p style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.05rem', lineHeight: '1.6', fontWeight: 500 }}>
+                        {copilotAdvice}
+                      </p>
                     </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-database"></i>
-                        </div>
-                        <h3 className="feature-title">Historique Complet</h3>
-                        <p className="feature-description">
-                            Accès à 50 ans de données climatiques avec analyses statistiques et tendances
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>50 ans d'historique</span>
-                        </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                      Select a category and location to retrieve predictive AI advisory notes.
                     </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3 className="feature-title">Application Mobile</h3>
-                        <p className="feature-description">
-                            Application native iOS et Android avec synchronisation cloud et mode hors ligne prochainement
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>iOS & Android</span>
-                        </div>
-                    </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-headset"></i>
-                        </div>
-                        <h3 className="feature-title">Support Prioritaire</h3>
-                        <p className="feature-description">
-                            Support client 24/7 avec accès direct aux experts météo et assistance technique
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>Support 24/7</span>
-                        </div>
-                    </div>
+                  )}
                 </div>
-            </div>
+              </div>
+            )}
 
-            {/*  Plans d'abonnement  */}
-            <div className="pricing-section">
-                <div className="pricing-grid">
-                    {/*  Plan Mensuel  */}
-                    <div className="pricing-card monthly">
-                        <div className="card-header">
-                            <h3>Plan Mensuel</h3>
-                            <div className="price">
-                                <span className="amount">4.99€</span>
-                                <span className="period">/mois</span>
-                            </div>
-                            <p className="description">Parfait pour tester Premium</p>
-                        </div>
-                        
-                        <div className="card-features">
-                            <ul>
-                                <li><i className="fas fa-check"></i> Toutes les fonctionnalités premium</li>
-                                <li><i className="fas fa-check"></i> Données en temps réel</li>
-                                <li><i className="fas fa-check"></i> Support prioritaire</li>
-                                <li><i className="fas fa-check"></i> Application mobile</li>
-                                <li><i className="fas fa-check"></i> Annulation gratuite</li>
-                                <li><i className="fas fa-check"></i> Prévisions sur 15 jours</li>
-                                <li><i className="fas fa-check"></i> Alertes personnalisées</li>
-                                <li><i className="fas fa-check"></i> Données climatiques historiques</li>
-                                <li><i className="fas fa-check"></i> Graphiques avancés</li>
-                                <li><i className="fas fa-check"></i> Pas de publicités</li>
-                            </ul>
-                        </div>
-                        
-                        <div className="card-actions">
-                            <a href="premium-signup.html?plan=monthly&price=4.99" className="btn btn-primary">
-                                <i className="fas fa-rocket"></i>
-                                Commencer l'Essai Gratuit
-                            </a>
-                            <p className="trial-info">14 jours d'essai gratuit, sans engagement</p>
-                        </div>
-                    </div>
-
-                    {/*  Plan Annuel (Recommandé)  */}
-                    <div className="pricing-card yearly recommended">
-                        <div className="recommended-badge">
-                            <i className="fas fa-star"></i>
-                            Recommandé
-                        </div>
-                        
-                        <div className="card-header">
-                            <h3>Plan Annuel</h3>
-                            <div className="price">
-                                <span className="amount">49.99€</span>
-                                <span className="period">/an</span>
-                            </div>
-                            <div className="savings">
-                                <span className="savings-amount">Économisez 30%</span>
-                                <span className="bonus-info">+ 2 mois offerts</span>
-                            </div>
-                            <p className="description">Meilleur rapport qualité-prix</p>
-                        </div>
-                        
-                        <div className="card-features">
-                            <ul>
-                                <li><i className="fas fa-check"></i> Tout du plan mensuel</li>
-                                <li><i className="fas fa-check"></i> Prévisions sur 15 jours</li>
-                                <li><i className="fas fa-check"></i> Données satellite HD</li>
-                                <li><i className="fas fa-check"></i> Modèles météo multi-ensembles</li>
-                                <li><i className="fas fa-check"></i> Support VIP 24/7</li>
-                                <li><i className="fas fa-check"></i> Accès aux bêta-tests</li>
-                                <li><i className="fas fa-check"></i> Modèles climatiques avancés</li>
-                                <li><i className="fas fa-check"></i> Intégration IoT & capteurs</li>
-                                <li><i className="fas fa-check"></i> Rapports météo automatisés</li>
-                                <li><i className="fas fa-check"></i> Accès aux données satellites</li>
-                            </ul>
-                        </div>
-                        
-                        <div className="card-actions">
-                            <a href="premium-signup.html?plan=yearly&price=49.99" className="btn btn-premium">
-                                <i className="fas fa-crown"></i>
-                                Choisir l'Annuel
-                            </a>
-                            <p className="trial-info">14 jours d'essai gratuit, sans engagement</p>
-                        </div>
-                    </div>
-
-                    {/*  Plan Entreprise  */}
-                    <div className="pricing-card enterprise">
-                        <div className="card-header">
-                            <h3>Plan Entreprise</h3>
-                            <div className="price">
-                                <span className="amount">Sur mesure</span>
-                                <span className="period">/an</span>
-                            </div>
-                            <p className="description">Solutions personnalisées</p>
-                        </div>
-                        
-                        <div className="card-features">
-                            <ul>
-                                <li><i className="fas fa-check"></i> Tout des plans précédents</li>
-                                <li><i className="fas fa-check"></i> Intégration personnalisée</li>
-                                <li><i className="fas fa-check"></i> Données en temps réel</li>
-                                <li><i className="fas fa-check"></i> Support dédié</li>
-                                <li><i className="fas fa-check"></i> Formation des équipes</li>
-                                <li><i className="fas fa-check"></i> SLA garanti</li>
-                                <li><i className="fas fa-check"></i> Infrastructure dédiée</li>
-                                <li><i className="fas fa-check"></i> Conformité RGPD & sécurité</li>
-                                <li><i className="fas fa-check"></i> Développement sur mesure</li>
-                                <li><i className="fas fa-check"></i> Accompagnement stratégique</li>
-                            </ul>
-                        </div>
-                        
-                        <div className="card-actions">
-                            <a href="/contact" className="btn btn-secondary">
-                                <i className="fas fa-phone"></i>
-                                Contactez-nous
-                            </a>
-                        </div>
-                    </div>
+            {/* TAB 2: Smart Alerts */}
+            {activeTab === 'alerts' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>🔔 Smart Alerts Setup</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Configure real-time automated warnings triggered directly by climatic forecasts.</p>
                 </div>
-            </div>
 
-            {/*  Section CTA Finale  */}
-            <div className="premium-cta-final">
-                <div className="cta-content">
-                    <h3>Prêt à Transformer Votre Expérience Météo ?</h3>
-                    <p>Rejoignez des milliers de professionnels qui font confiance à AtlasForecast Premium</p>
-                    <div className="cta-buttons">
-                        <a href="/register" className="btn btn-outline btn-large">
-                            <i className="fas fa-info-circle"></i>
-                            En Savoir Plus
-                        </a>
-                        <a href="/register" className="btn btn-primary btn-large">
-                            <i className="fas fa-crown"></i>
-                            Devenir Premium
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {/*  Comparaison des fonctionnalités  */}
-            <div className="features-comparison">
-                <h2>Comparaison des Plans</h2>
-                <div className="comparison-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fonctionnalité</th>
-                                <th>Gratuit</th>
-                                <th>Premium Mensuel</th>
-                                <th>Premium Annuel</th>
-                                <th>Entreprise</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Prévisions météo</td>
-                                <td>5 jours</td>
-                                <td>15 jours</td>
-                                <td>15 jours</td>
-                                <td>Illimité</td>
-                            </tr>
-                            <tr>
-                                <td>Alertes météo</td>
-                                <td>Basiques</td>
-                                <td>Personnalisées</td>
-                                <td>Avancées</td>
-                                <td>Sur mesure</td>
-                            </tr>
-                            <tr>
-                                <td>Données historiques</td>
-                                <td>7 jours</td>
-                                <td>1 an</td>
-                                <td>5 ans</td>
-                                <td>Complètes</td>
-                            </tr>
-                            <tr>
-                                <td>Graphiques</td>
-                                <td>Basiques</td>
-                                <td>Avancés</td>
-                                <td>Professionnels</td>
-                                <td>Personnalisés</td>
-                            </tr>
-                            <tr>
-                                <td>Support</td>
-                                <td>Email</td>
-                                <td>Prioritaire</td>
-                                <td>VIP 24/7</td>
-                                <td>Dédié</td>
-                            </tr>
-                            <tr>
-                                <td>API</td>
-                                <td>Non</td>
-                                <td>Limite</td>
-                                <td>Complète</td>
-                                <td>Sur mesure</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/*  Fonctionnalités Exclusives Premium  */}
-            <div className="exclusive-features">
-                <h2>Fonctionnalités Exclusives Premium</h2>
-                <div className="features-showcase">
-                    <div className="feature-category">
-                        <div className="category-icon">
-                            <i className="fas fa-satellite"></i>
-                        </div>
-                        <h3>Données Satellite & Radar</h3>
-                        <p>Accédez aux images satellite haute résolution et aux données radar en temps réel pour une précision météorologique exceptionnelle.</p>
-                        <ul className="feature-list">
-                            <li><i className="fas fa-check-circle"></i> Images satellite toutes les 15 minutes</li>
-                            <li><i className="fas fa-check-circle"></i> Radar de précipitations haute résolution</li>
-                            <li><i className="fas fa-check-circle"></i> Détection des orages en temps réel</li>
-                            <li><i className="fas fa-check-circle"></i> Cartes de couverture nuageuse</li>
-                        </ul>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                  {/* Alert Toggles */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--text-primary)' }}>Trigger Types</h3>
+                    
+                    <div className="alert-toggle-row">
+                      <span>Rain Alerts</span>
+                      <button
+                        onClick={() => setAlerts({ ...alerts, rain: !alerts.rain })}
+                        className={`mini-toggle-btn ${alerts.rain ? 'active' : ''}`}
+                      />
                     </div>
                     
-                    <div className="feature-category">
-                        <div className="category-icon">
-                            <i className="fas fa-chart-line"></i>
-                        </div>
-                        <h3>Analyses Avancées</h3>
-                        <p>Profitez d'outils d'analyse météorologique professionnels avec des graphiques interactifs et des modèles prédictifs.</p>
-                        <ul className="feature-list">
-                            <li><i className="fas fa-check-circle"></i> Graphiques 3D interactifs</li>
-                            <li><i className="fas fa-check-circle"></i> Modèles de prévision multiples</li>
-                            <li><i className="fas fa-check-circle"></i> Analyses statistiques avancées</li>
-                            <li><i className="fas fa-check-circle"></i> Rapports automatisés personnalisables</li>
-                        </ul>
+                    <div className="alert-toggle-row">
+                      <span>Storm Warnings</span>
+                      <button
+                        onClick={() => setAlerts({ ...alerts, storm: !alerts.storm })}
+                        className={`mini-toggle-btn ${alerts.storm ? 'active' : ''}`}
+                      />
                     </div>
                     
-                    <div className="feature-category">
-                        <div className="category-icon">
-                            <i className="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3>Expérience Mobile Premium</h3>
-                        <p>Une expérience mobile optimisée avec des fonctionnalités exclusives et une interface personnalisable.</p>
-                        <ul className="feature-list">
-                            <li><i className="fas fa-check-circle"></i> Widgets personnalisables</li>
-                            <li><i className="fas fa-check-circle"></i> Mode hors ligne complet</li>
-                            <li><i className="fas fa-check-circle"></i> Notifications push intelligentes</li>
-                            <li><i className="fas fa-check-circle"></i> Synchronisation multi-appareils</li>
-                        </ul>
+                    <div className="alert-toggle-row">
+                      <span>Heatwave Safeguards</span>
+                      <button
+                        onClick={() => setAlerts({ ...alerts, heatwave: !alerts.heatwave })}
+                        className={`mini-toggle-btn ${alerts.heatwave ? 'active' : ''}`}
+                      />
                     </div>
-                    
-                    <div className="feature-category">
-                        <div className="category-icon">
-                            <i className="fas fa-shield-alt"></i>
-                        </div>
-                        <h3>Sécurité & Conformité</h3>
-                        <p>Vos données sont protégées par les plus hauts standards de sécurité et de conformité réglementaire.</p>
-                        <ul className="feature-list">
-                            <li><i className="fas fa-check-circle"></i> Chiffrement de bout en bout</li>
-                            <li><i className="fas fa-check-circle"></i> Conformité RGPD & ISO 27001</li>
-                            <li><i className="fas fa-check-circle"></i> Sauvegarde automatique sécurisée</li>
-                            <li><i className="fas fa-check-circle"></i> Contrôle d'accès granulaire</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+                  </div>
 
-            {/*  FAQ  */}
-            <div className="faq-section">
-                <h2>Questions Fréquentes</h2>
-                <div className="faq-grid">
-                    <div className="faq-item">
-                        <div className="faq-question">
-                            <h3>Comment fonctionne l'essai gratuit ?</h3>
-                            <i className="fas fa-chevron-down"></i>
-                        </div>
-                        <div className="faq-answer">
-                            <p>Vous bénéficiez de 14 jours d'essai gratuit avec accès à toutes les fonctionnalités Premium. Aucune carte de crédit n'est requise pour commencer.</p>
-                        </div>
+                  {/* Notification Channels */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--text-primary)' }}>Channels</h3>
+                    
+                    <div className="alert-toggle-row">
+                      <span>Email Notifications</span>
+                      <button
+                        onClick={() => setChannels({ ...channels, email: !channels.email })}
+                        className={`mini-toggle-btn ${channels.email ? 'active' : ''}`}
+                      />
                     </div>
                     
-                    <div className="faq-item">
-                        <div className="faq-question">
-                            <h3>Puis-je annuler à tout moment ?</h3>
-                            <i className="fas fa-chevron-down"></i>
-                        </div>
-                        <div className="faq-answer">
-                            <p>Oui, vous pouvez annuler votre abonnement à tout moment depuis votre compte. L'accès Premium restera actif jusqu'à la fin de la période payée.</p>
-                        </div>
+                    <div className="alert-toggle-row">
+                      <span>SMS Broadcasts</span>
+                      <button
+                        onClick={() => setChannels({ ...channels, sms: !channels.sms })}
+                        className={`mini-toggle-btn ${channels.sms ? 'active' : ''}`}
+                      />
                     </div>
-                    
-                    <div className="faq-item">
-                        <div className="faq-question">
-                            <h3>Les données sont-elles sécurisées ?</h3>
-                            <i className="fas fa-chevron-down"></i>
-                        </div>
-                        <div className="faq-answer">
-                            <p>Absolument. Toutes vos données sont cryptées et protégées selon les standards de sécurité les plus élevés de l'industrie.</p>
-                        </div>
-                    </div>
-                    
-                    <div className="faq-item">
-                        <div className="faq-question">
-                            <h3>Y a-t-il des frais cachés ?</h3>
-                            <i className="fas fa-chevron-down"></i>
-                        </div>
-                        <div className="faq-answer">
-                            <p>Non, le prix affiché est le prix final. Aucun frais caché, pas de frais d'activation ou de résiliation.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-                         {/*  Témoignages Premium  */}
-             <div className="premium-testimonials">
-                 <h2>Ce que disent nos utilisateurs</h2>
-                 <div className="testimonials-grid">
-                     <div className="testimonial-card">
-                         <div className="testimonial-content">
-                             <p>"AtlasForecast a révolutionné la façon dont nous planifions nos activités extérieures. La précision est incroyable !"</p>
-                         </div>
-                         <div className="testimonial-author">
-                             <div className="author-avatar">
-                                 <i className="fas fa-user-tie"></i>
-                             </div>
-                             <div className="author-info">
-                                 <h4>Ahmed Benali</h4>
-                                 <span>Directeur Commercial</span>
-                             </div>
-                         </div>
-                     </div>
-                     
-                     <div className="testimonial-card">
-                         <div className="testimonial-content">
-                             <p>"Les alertes en temps réel m'ont sauvé plusieurs fois lors de mes randonnées en montagne."</p>
-                         </div>
-                         <div className="testimonial-author">
-                             <div className="author-avatar">
-                                 <i className="fas fa-hiking"></i>
-                             </div>
-                             <div className="author-info">
-                                 <h4>Fatima Zahra</h4>
-                                 <span>Guide de Montagne</span>
-                             </div>
-                         </div>
-                     </div>
-                     
-                     <div className="testimonial-card">
-                         <div className="testimonial-content">
-                             <p>"Interface intuitive et données fiables. C'est exactement ce dont j'avais besoin pour mon entreprise."</p>
-                         </div>
-                         <div className="testimonial-author">
-                             <div className="author-avatar">
-                                 <i className="fas fa-seedling"></i>
-                             </div>
-                             <div className="author-info">
-                                 <h4>Karim Mansouri</h4>
-                                 <span>Agriculteur</span>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-
-            {/*  Section CTA  */}
-            <div className="cta-section">
-                <div className="cta-content">
-                    <h2>Prêt à Passer Premium ?</h2>
-                    <p>Rejoignez des milliers d'utilisateurs qui font confiance à AtlasForecast Premium</p>
-                    <div className="cta-actions">
-                        <a href="/premium-signup" className="btn btn-premium">
-                            <i className="fas fa-crown"></i>
-                            Commencer l'Essai Gratuit
-                        </a>
-                        <a href="/contact" className="btn btn-secondary">
-                            <i className="fas fa-question-circle"></i>
-                            Besoin d'Aide ?
-                        </a>
+                    <div className="alert-toggle-row">
+                      <span>Webhooks (Slack, Discord)</span>
+                      <button
+                        onClick={() => setChannels({ ...channels, webhook: !channels.webhook })}
+                        className={`mini-toggle-btn ${channels.webhook ? 'active' : ''}`}
+                      />
                     </div>
+                  </div>
                 </div>
-            </div>
-        </div>
-        {/* Close Paywall Wrapper */}
-        </div>
-        </div>
-    </>
+
+                {/* Thresholds Slider Config */}
+                <div style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.2rem', color: 'var(--text-primary)' }}>Threshold Settings</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+                        <span style={{ fontWeight: 700 }}>Rain Trigger Probability</span>
+                        <span style={{ color: 'var(--accent-primary)', fontWeight: 800 }}>{thresholds.rain}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="100"
+                        value={thresholds.rain}
+                        onChange={(e) => setThresholds({ ...thresholds, rain: parseInt(e.target.value) })}
+                        style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
+                      />
+                    </div>
+                    
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+                        <span style={{ fontWeight: 700 }}>Wind Speed Boundary</span>
+                        <span style={{ color: 'var(--accent-secondary)', fontWeight: 800 }}>{thresholds.wind} km/h</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="20"
+                        max="120"
+                        value={thresholds.wind}
+                        onChange={(e) => setThresholds({ ...thresholds, wind: parseInt(e.target.value) })}
+                        style={{ width: '100%', accentColor: 'var(--accent-secondary)' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: Historical Analytics */}
+            {activeTab === 'analytics' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>📊 Climatic Analytics Hub</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Plot temperature, humidity, and rainfall patterns using historical databanks.</p>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={() => setAnalyticMetric('temp')} className={`metric-select-btn ${analyticMetric === 'temp' ? 'active' : ''}`}>Temperature</button>
+                    <button onClick={() => setAnalyticMetric('rain')} className={`metric-select-btn ${analyticMetric === 'rain' ? 'active' : ''}`}>Rainfall</button>
+                    <button onClick={() => setAnalyticMetric('humidity')} className={`metric-select-btn ${analyticMetric === 'humidity' ? 'active' : ''}`}>Humidity</button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-muted)' }}>FILTER CITY:</span>
+                  <select
+                    value={analyticCity}
+                    onChange={(e) => setAnalyticCity(e.target.value)}
+                    style={{ padding: '0.5rem 1rem', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-primary)', fontWeight: '700' }}
+                  >
+                    <option value="Casablanca">Casablanca</option>
+                    <option value="Marrakech">Marrakech</option>
+                    <option value="Rabat">Rabat</option>
+                  </select>
+                </div>
+
+                {/* Analytics Chart Container */}
+                <div style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                      {analyticMetric === 'temp' ? 'Monthly Average Temp (°C)' : analyticMetric === 'rain' ? 'Precipitation Volumes (mm)' : 'Atmospheric Humidity (%)'}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Location: {analyticCity}</span>
+                  </div>
+                  
+                  {/* Render the selected SVG chart */}
+                  {renderChart()}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: ML Predictions */}
+            {activeTab === 'ml' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>🔮 ML Predictions Engine</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Probability factors computed by multi-layered neural models.</p>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+                  {/* Gauge 1 */}
+                  <div className="ml-metric-card">
+                    <span className="ml-card-label">RAIN PROBABILITY</span>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--accent-primary)', margin: '0.5rem 0' }}>84.3%</div>
+                    <div className="ml-progress-bar-bg">
+                      <div className="ml-progress-bar-fill" style={{ width: '84.3%', background: 'var(--accent-primary)' }} />
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Probability of &gt;2mm rain today.</span>
+                  </div>
+                  
+                  {/* Gauge 2 */}
+                  <div className="ml-metric-card">
+                    <span className="ml-card-label">STORM RISK</span>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--accent-secondary)', margin: '0.5rem 0' }}>12.8%</div>
+                    <div className="ml-progress-bar-bg">
+                      <div className="ml-progress-bar-fill" style={{ width: '12.8%', background: 'var(--accent-secondary)' }} />
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Lightning and micro-burst chance.</span>
+                  </div>
+
+                  {/* Gauge 3 */}
+                  <div className="ml-metric-card">
+                    <span className="ml-card-label">HEATWAVE HAZARD</span>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#f59e0b', margin: '0.5rem 0' }}>65.0%</div>
+                    <div className="ml-progress-bar-bg">
+                      <div className="ml-progress-bar-fill" style={{ width: '65%', background: '#f59e0b' }} />
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Risk of temps over 38°C.</span>
+                  </div>
+                </div>
+
+                <div style={{ border: '1px solid var(--border-color)', borderRadius: '14px', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <i className="fas fa-circle-nodes" style={{ color: 'var(--accent-success)' }} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Model Core Version: <strong style={{ color: 'var(--text-primary)' }}>MLP-Core-v4.1.2</strong></span>
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Verification Accuracy: 96.8%</span>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: API Access */}
+            {activeTab === 'api' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>🔑 API Keys & Docs</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Integrate meteorological intelligence directly into your external code structures.</p>
+                </div>
+
+                {/* API Key Box */}
+                <div style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border-color)', borderRadius: '18px', padding: '1.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.6rem' }}>YOUR API SECRET KEY</label>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <input
+                      type={apiKeyVisible ? 'text' : 'password'}
+                      value={apiKey}
+                      readOnly
+                      style={{ flex: 1, padding: '0.8rem 1rem', background: 'var(--bg-glass-dark)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.95rem' }}
+                    />
+                    
+                    <button onClick={() => setApiKeyVisible(!apiKeyVisible)} className="dashboard-action-btn" title="View Key">
+                      <i className={`fas ${apiKeyVisible ? 'fa-eye-slash' : 'fa-eye'}`} />
+                    </button>
+                    
+                    <button onClick={copyToClipboard} className="dashboard-action-btn" title="Copy Key">
+                      <i className={copiedKey ? 'fas fa-check' : 'fas fa-copy'} style={copiedKey ? { color: 'var(--accent-success)' } : {}} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Code Snippets Panel */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.4rem' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>Integration Examples</span>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      <button onClick={() => setApiSnippetLang('js')} className={`lang-tab-btn ${apiSnippetLang === 'js' ? 'active' : ''}`}>NodeJS</button>
+                      <button onClick={() => setApiSnippetLang('curl')} className={`lang-tab-btn ${apiSnippetLang === 'curl' ? 'active' : ''}`}>cURL</button>
+                      <button onClick={() => setApiSnippetLang('python')} className={`lang-tab-btn ${apiSnippetLang === 'python' ? 'active' : ''}`}>Python</button>
+                    </div>
+                  </div>
+
+                  <pre style={{ margin: 0, padding: '1.25rem', background: '#0b0c10', border: '1px solid var(--border-color)', borderRadius: '14px', overflowX: 'auto', color: '#8892b0', fontFamily: 'Courier New, monospace', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                    {codeSnippets[apiSnippetLang]}
+                  </pre>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 6: Team Workspace */}
+            {activeTab === 'workspace' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>👥 Team Workspace</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Invite team developers and administrators to manage key access.</p>
+                </div>
+
+                {/* Invite Form */}
+                <form onSubmit={handleAddMember} style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={newMemberName}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                    required
+                    style={{ flex: 1, minWidth: '150px', padding: '0.75rem 1rem', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-primary)' }}
+                  />
+                  <input
+                    type="email"
+                    placeholder="name@company.com"
+                    value={newMemberEmail}
+                    onChange={(e) => setNewMemberEmail(e.target.value)}
+                    required
+                    style={{ flex: 1, minWidth: '180px', padding: '0.75rem 1rem', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-primary)' }}
+                  />
+                  <select
+                    value={newMemberRole}
+                    onChange={(e) => setNewMemberRole(e.target.value)}
+                    style={{ padding: '0.75rem 1.2rem', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-primary)', fontWeight: '700' }}
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="Developer">Developer</option>
+                    <option value="Viewer">Viewer</option>
+                  </select>
+                  <button type="submit" className="btn btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', fontWeight: 800 }}>Invite</button>
+                </form>
+
+                {/* Members List */}
+                <div style={{ border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
+                        <th style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 800 }}>NAME</th>
+                        <th style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 800 }}>EMAIL</th>
+                        <th style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 800 }}>ROLE</th>
+                        <th style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 800 }}>STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teamMembers.map(m => (
+                        <tr key={m.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                          <td style={{ padding: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.name}</td>
+                          <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{m.email}</td>
+                          <td style={{ padding: '1rem', fontWeight: 700 }}><span style={{ color: m.role === 'Admin' ? 'var(--accent-secondary)' : 'var(--text-primary)' }}>{m.role}</span></td>
+                          <td style={{ padding: '1rem' }}>
+                            <span style={{
+                              padding: '0.2rem 0.5rem',
+                              borderRadius: '20px',
+                              fontSize: '0.75rem',
+                              fontWeight: 800,
+                              background: m.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                              color: m.status === 'Active' ? '#10b981' : '#f59e0b'
+                            }}>{m.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 7: Billing & Plans */}
+            {activeTab === 'billing' && (
+              <div className="tab-view-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>💳 Billing & Plans</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>Manage subscription tier configurations and limits.</p>
+                </div>
+
+                <div className="billing-plans-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1.5rem' }}>
+                  {/* Plan 1 */}
+                  <div className="plan-saas-card" style={subscription.plan === 'free' ? { border: '2px solid var(--accent-primary)' } : {}}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>STANDARD TIER</span>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 900, margin: '0.25rem 0 0.8rem', color: 'var(--text-primary)' }}>Free Plan</h3>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '1rem' }}>$0 <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>/mo</span></div>
+                    <ul className="plan-bullet-list">
+                      <li>5-day standard forecast</li>
+                      <li>Single location alerts</li>
+                      <li>Basic search parameters</li>
+                    </ul>
+                    <button className="btn btn-secondary" style={{ marginTop: 'auto', padding: '0.7rem' }} disabled={subscription.plan === 'free'}>
+                      {subscription.plan === 'free' ? 'Active Plan' : 'Free Tier'}
+                    </button>
+                  </div>
+                  
+                  {/* Plan 2 */}
+                  <div className="plan-saas-card pro recommended" style={{ border: subscription.plan === 'pro' ? '2px solid var(--accent-success)' : '2px solid var(--accent-secondary)' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+                      RECOMMENDED <i className="fas fa-crown" />
+                    </span>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 900, margin: '0.25rem 0 0.8rem', color: 'var(--text-primary)' }}>Pro Plan</h3>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '1rem' }}>$19 <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>/mo</span></div>
+                    <ul className="plan-bullet-list">
+                      <li>14-day premium forecast</li>
+                      <li>ML Predictions Engine</li>
+                      <li>API Access token key</li>
+                      <li>AI Weather Copilot</li>
+                    </ul>
+                    <button onClick={() => handleUpgrade('pro')} className="btn btn-primary" style={{ marginTop: 'auto', padding: '0.7rem' }} disabled={subscription.plan === 'pro'}>
+                      {subscription.plan === 'pro' ? 'Active Plan' : 'Upgrade to Pro'}
+                    </button>
+                  </div>
+
+                  {/* Plan 3 */}
+                  <div className="plan-saas-card" style={subscription.plan === 'enterprise' ? { border: '2px solid var(--accent-success)' } : {}}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>CUSTOM SERVICE</span>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 900, margin: '0.25rem 0 0.8rem', color: 'var(--text-primary)' }}>Enterprise</h3>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '1rem' }}>Custom</div>
+                    <ul className="plan-bullet-list">
+                      <li>Unlimited API requests</li>
+                      <li>SLA priority assistance</li>
+                      <li>Dedicated sub-servers</li>
+                    </ul>
+                    <button onClick={() => handleUpgrade('enterprise')} className="btn btn-secondary" style={{ marginTop: 'auto', padding: '0.7rem' }} disabled={subscription.plan === 'enterprise'}>
+                      {subscription.plan === 'enterprise' ? 'Active Plan' : 'Contact Sales'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </main>
+      </div>
+    </div>
   );
-};
-
-export default PremiumPage;
+}

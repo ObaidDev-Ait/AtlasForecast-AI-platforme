@@ -6,12 +6,13 @@ import LoadingScreen from './LoadingScreen';
 export const ProtectedRoute = ({ children, requirePremium = false }) => {
   const { user, isPremium, loading } = useAuth();
   const location = useLocation();
+  const token = localStorage.getItem('access_token');
 
   if (loading) {
     return <LoadingScreen type="route" />;
   }
 
-  if (!user) {
+  if (!user || !token) {
     // Redirect to login but save the attempted URL
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
