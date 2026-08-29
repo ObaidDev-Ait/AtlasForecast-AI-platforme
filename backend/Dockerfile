@@ -34,9 +34,6 @@ RUN npm install --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/migrations ./migrations
 
-# Ensure both "dist/main.js" and "backend/dist/main.js" resolve regardless of root directory
-RUN mkdir -p /app/backend && ln -s /app/dist /app/backend/dist
-
 # Railway injects PORT dynamically; default to 4001
 ENV PORT=4001
 EXPOSE 4001
