@@ -8,6 +8,28 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
 };
 
+// Pages that must never be a redirect destination (loop prevention)
+const LOOP_GUARD = new Set(['/login', '/register', '/forgot']);
+
+/**
+ * Safely resolves the post-auth destination from the ?redirect= query param.
+ * Falls back to `fallback` when the param is absent, unsafe, or would loop.
+ */
+function resolveRedirect(search, fallback = '/dashboard') {
+  const raw = new URLSearchParams(search).get('redirect');
+  if (!raw) return fallback;
+  try {
+    const decoded = decodeURIComponent(raw);
+    // Must be an absolute-path URL (starts with /) and not a protocol-relative URL (//)
+    // Must not be one of the auth pages (prevents redirect loops)
+    const pathOnly = decoded.split('?')[0].split('#')[0];
+    if (decoded.startsWith('/') && !decoded.startsWith('//') && !LOOP_GUARD.has(pathOnly)) {
+      return decoded;
+    }
+  } catch (_) { /* decodeURIComponent failed — ignore */ }
+  return fallback;
+}
+
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -16,6 +38,14 @@ const LoginPage = () => {
   const location = useLocation();
   const { signIn } = useAuth();
 
+  // The redirect destination we'll use after a successful login or to pass to Register
+  const redirectDestination = resolveRedirect(location.search, '/dashboard');
+
+  // Build the Register URL preserving the redirect destination
+  const registerHref = redirectDestination && redirectDestination !== '/dashboard'
+    ? `/register?redirect=${encodeURIComponent(redirectDestination)}`
+    : '/register';
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -23,14 +53,12 @@ const LoginPage = () => {
 
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log("LoginPage - Email:", email);
-    console.log("LoginPage - Password:", password);
 
     try {
       const { error } = await signIn(email, password);
       if (error) throw error;
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
+
+      navigate(redirectDestination, { replace: true });
     } catch (error) {
       setErrorMsg(error.message);
     } finally {
@@ -41,6 +69,7 @@ const LoginPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
 
   return (
     <div className="container">
@@ -137,7 +166,7 @@ const LoginPage = () => {
 
               <p style={{ textAlign: 'center', marginTop: 'var(--sp-5)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
                 Pas encore de compte ?{' '}
-                <Link to="/register" style={{ fontWeight: 800 }}>Créer un compte</Link>
+                <Link to={registerHref} style={{ fontWeight: 800 }}>Créer un compte</Link>
               </p>
             </form>
           </motion.div>

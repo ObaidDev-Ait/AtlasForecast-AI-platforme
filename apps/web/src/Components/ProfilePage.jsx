@@ -1,648 +1,860 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../contexts/AuthContext'
+import { useUnits } from './Providers'
+import { useTheme } from './Providers'
+import { authFetch, API_BASE_URL } from '../lib/api'
+import '../Styles/ProfilePage.css'
 
-const ProfilePage = () => {
+const fadeUp = (delay = 0) => ({
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+  },
+})
+
+export default function ProfilePage() {
+  const { user, profile, isPremium, role, isAdmin, refreshProfile, signOut } = useAuth()
+  const { units, toggleUnits, unitLabel, windUnit } = useUnits()
+  const { theme, toggleTheme } = useTheme()
+  const navigate = useNavigate()
+
+  // Editing state for Personal Information
+  const [isEditing, setIsEditing] = useState(false)
+  const [fullName, setFullName] = useState('')
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileSuccessMsg, setProfileSuccessMsg] = useState(null)
+  const [profileErrorMsg, setProfileErrorMsg] = useState(null)
+
+  // Password reset state
+  const [sendingReset, setSendingReset] = useState(false)
+  const [resetSuccessMsg, setResetSuccessMsg] = useState(null)
+  const [resetErrorMsg, setResetErrorMsg] = useState(null)
+
+  // Weather notifications toggle in local state & localStorage
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+    return localStorage.getItem('af_pref_notifications') !== 'false'
+  })
+
+  // Saved cities state
+  const [savedCities, setSavedCities] = useState([])
+  const [loadingCities, setLoadingCities] = useState(true)
+  const [cityDeleteMsg, setCityDeleteMsg] = useState(null)
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      window.document.dispatchEvent(new Event('DOMContentLoaded', {
-        bubbles: true,
-        cancelable: true
-      }));
-    }, 100);
-  }, []);
+    window.scrollTo(0, 0)
+  }, [])
+
+  // Synchronize full name when profile loads
+  useEffect(() => {
+    if (profile?.full_name) {
+      setFullName(profile.full_name)
+    } else if (user?.user_metadata?.first_name || user?.user_metadata?.last_name) {
+      const fn = [user.user_metadata.first_name, user.user_metadata.last_name].filter(Boolean).join(' ')
+      setFullName(fn)
+    } else {
+      setFullName('')
+    }
+  }, [profile, user])
+
+  // Fetch real saved cities
+  useEffect(() => {
+    let isMounted = true
+    const fetchCities = async () => {
+      try {
+        const res = await authFetch(`${API_BASE_URL}/cities`)
+        if (res.ok) {
+          const data = await res.json()
+          if (isMounted) setSavedCities(Array.isArray(data) ? data : [])
+        }
+      } catch (err) {
+        console.warn('Could not load saved cities:', err)
+      } finally {
+        if (isMounted) setLoadingCities(false)
+      }
+    }
+    fetchCities()
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  // Format initials
+  const getInitials = () => {
+    const name = fullName || profile?.full_name || user?.email || 'AF'
+    const parts = name.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+
+  // Format member since date
+  const formatMemberDate = () => {
+    const dateStr = profile?.created_at || user?.created_at
+    if (!dateStr) return 'Août 2026'
+    try {
+      const date = new Date(dateStr)
+      return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    } catch {
+      return 'Août 2026'
+    }
+  }
+
+  // Handle personal info update
+  const handleSaveProfile = async (e) => {
+    e.preventDefault()
+    setProfileSuccessMsg(null)
+    setProfileErrorMsg(null)
+
+    if (!fullName.trim()) {
+      setProfileErrorMsg('Le nom complet ne peut pas être vide.')
+      return
+    }
+
+    setSavingProfile(true)
+    try {
+      const res = await authFetch(`${API_BASE_URL}/profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name: fullName.trim() }),
+      })
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.message || 'Échec de la mise à jour du profil.')
+      }
+
+      await refreshProfile()
+      setProfileSuccessMsg('Profil mis à jour avec succès !')
+      setIsEditing(false)
+
+      setTimeout(() => setProfileSuccessMsg(null), 4000)
+    } catch (err) {
+      setProfileErrorMsg(err.message || 'Une erreur est survenue lors de l\'enregistrement.')
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  // Handle password reset email request
+  const handleRequestPasswordReset = async () => {
+    setResetSuccessMsg(null)
+    setResetErrorMsg(null)
+
+    const userEmail = profile?.email || user?.email
+    if (!userEmail) {
+      setResetErrorMsg('Aucune adresse e-mail trouvée pour ce compte.')
+      return
+    }
+
+    setSendingReset(true)
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      })
+
+      if (!res.ok) {
+        throw new Error('Impossible d\'envoyer le lien de réinitialisation.')
+      }
+
+      setResetSuccessMsg(
+        `Un lien de réinitialisation sécurisé a été envoyé à ${userEmail}. Vérifiez votre boîte de réception.`
+      )
+      setTimeout(() => setResetSuccessMsg(null), 8000)
+    } catch (err) {
+      setResetErrorMsg(err.message || 'Erreur lors de l\'envoi du lien. Réessayez plus tard.')
+    } finally {
+      setSendingReset(false)
+    }
+  }
+
+  // Toggle notifications
+  const handleToggleNotifications = () => {
+    const next = !notificationsEnabled
+    setNotificationsEnabled(next)
+    localStorage.setItem('af_pref_notifications', String(next))
+  }
+
+  // Delete saved city
+  const handleDeleteCity = async (id, cityName) => {
+    try {
+      const res = await authFetch(`${API_BASE_URL}/cities/${id}`, {
+        method: 'DELETE',
+      })
+      if (res.ok) {
+        setSavedCities((prev) => prev.filter((c) => c.id !== id))
+        setCityDeleteMsg(`Ville "${cityName}" retirée des favoris.`)
+        setTimeout(() => setCityDeleteMsg(null), 3000)
+      }
+    } catch (err) {
+      console.error('Failed to delete city:', err)
+    }
+  }
+
+  const userEmail = profile?.email || user?.email || 'utilisateur@atlasforecast.ma'
+  const displayName = fullName || profile?.full_name || 'Utilisateur AtlasForecast'
 
   return (
-    <>
-        <div className="container">
-            {/*  En-tête du profil  */}
-            <div className="profile-header">
-                <div className="profile-avatar">
-                    <div className="avatar-container">
-                        <div className="fallback-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '120px', height: '120px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: '50%', color: 'white', fontSize: '60px' }}>
-                            <i className="fas fa-user-circle"></i>
-                        </div>
-                        <div className="status-badge online">
-                            <i className="fas fa-circle"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="profile-info">
-                    <h1>Obaid Ait Mattou</h1>
-                    <p className="profile-title">Développeur Full Stack</p>
-                    <div className="profile-stats">
-                        <div className="stat-item">
-                            <i className="fas fa-calendar-alt"></i>
-                            <span>24 ans</span>
-                        </div>
-                        <div className="stat-item">
-                            <i className="fas fa-graduation-cap"></i>
-                            <span>3ème année</span>
-                        </div>
-                        <div className="stat-item">
-                            <i className="fas fa-university"></i>
-                            <span>Université Privée Marrakech</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="profile-actions">
-                    <button className="btn btn-primary">
-                        <i className="fas fa-edit"></i>
-                        Modifier le Profil
-                    </button>
-                    <button className="btn btn-outline">
-                        <i className="fas fa-share"></i>
-                        Partager
-                    </button>
-                </div>
+    <div className="container">
+      <div className="af-profile-page">
+        {/* ====================================================================
+            1. PROFILE HEADER (SaaS Architecture)
+            ==================================================================== */}
+        <motion.div
+          className="af-profile-hero"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp(0)}
+        >
+          <div className="af-profile-hero-left">
+            <div className="af-profile-avatar-wrap">
+              <div className="af-profile-avatar">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt={displayName} />
+                ) : (
+                  <span>{getInitials()}</span>
+                )}
+              </div>
+              <div
+                className="af-profile-status-dot"
+                title="Compte actif et vérifié"
+              />
             </div>
 
-            {/*  Navigation du profil  */}
-            <div className="profile-nav">
-                <a href="#informations" className="nav-item active">
-                    <i className="fas fa-user"></i>
-                    <span>Informations</span>
-                </a>
-                <a href="#competences" className="nav-item">
-                    <i className="fas fa-code"></i>
-                    <span>Compétences</span>
-                </a>
-                <a href="#projets" className="nav-item">
-                    <i className="fas fa-project-diagram"></i>
-                    <span>Projets</span>
-                </a>
-                <a href="#experience" className="nav-item">
-                    <i className="fas fa-briefcase"></i>
-                    <span>Expérience</span>
-                </a>
-                <a href="#formation" className="nav-item">
-                    <i className="fas fa-graduation-cap"></i>
-                    <span>Formation</span>
-                </a>
-                <a href="#contact" className="nav-item">
-                    <i className="fas fa-envelope"></i>
-                    <span>Contact</span>
-                </a>
+            <div className="af-profile-meta">
+              <div className="af-profile-name-row">
+                <h1 className="af-profile-name">{displayName}</h1>
+                {isAdmin && (
+                  <span className="af-badge af-badge-info" style={{ fontSize: '0.7rem' }}>
+                    <i className="fas fa-shield-alt"></i> Administrateur
+                  </span>
+                )}
+              </div>
+
+              <p className="af-profile-email">
+                <i className="fas fa-envelope" style={{ color: 'var(--accent-primary)' }}></i>
+                {userEmail}
+              </p>
+
+              <div className="af-profile-badges-row">
+                {isPremium ? (
+                  <span className="af-profile-sub-badge pro">
+                    <i className="fas fa-crown"></i> Abonnement Pro Actif
+                  </span>
+                ) : (
+                  <span className="af-profile-sub-badge free">
+                    <i className="fas fa-circle-check"></i> Formule Standard
+                  </span>
+                )}
+
+                <span className="af-profile-country-badge">
+                  <span>🇲🇦</span> Maroc
+                </span>
+
+                <span className="af-profile-country-badge">
+                  <i className="fas fa-calendar-alt"></i> Membre depuis {formatMemberDate()}
+                </span>
+              </div>
             </div>
+          </div>
 
-            {/*  Section Informations Personnelles  */}
-            <section id="informations" className="profile-section">
-                <h2><i className="fas fa-user"></i> Informations Personnelles</h2>
-                <div className="section-content">
-                    <div className="info-grid">
-                        <div className="info-card">
-                            <div className="info-icon">
-                                <i className="fas fa-id-card"></i>
-                            </div>
-                            <div className="info-content">
-                                <h3>Identité</h3>
-                                <div className="info-details">
-                                    <div className="detail-item">
-                                        <span className="label">Nom complet :</span>
-                                        <span className="value">Obaid Ait Mattou</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Âge :</span>
-                                        <span className="value">24 ans</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Nationalité :</span>
-                                        <span className="value">Marocaine</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Ville :</span>
-                                        <span className="value">Marrakech</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="info-card">
-                            <div className="info-icon">
-                                <i className="fas fa-graduation-cap"></i>
-                            </div>
-                            <div className="info-content">
-                                <h3>Formation</h3>
-                                <div className="info-details">
-                                    <div className="detail-item">
-                                        <span className="label">Niveau :</span>
-                                        <span className="value">3ème année</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Spécialité :</span>
-                                        <span className="value">Développeur Logiciel</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Établissement :</span>
-                                        <span className="value">Université Privée Marrakech</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Domaine :</span>
-                                        <span className="value">Full Stack Development</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="info-card">
-                            <div className="info-icon">
-                                <i className="fas fa-code"></i>
-                            </div>
-                            <div className="info-content">
-                                <h3>Compétences Techniques</h3>
-                                <div className="info-details">
-                                    <div className="detail-item">
-                                        <span className="label">Frontend :</span>
-                                        <span className="value">HTML, CSS, JavaScript</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Backend :</span>
-                                        <span className="value">Node.js, PHP, Python</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Base de données :</span>
-                                        <span className="value">MySQL, MongoDB</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="label">Outils :</span>
-                                        <span className="value">Git, VS Code, Docker</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          <div className="af-profile-hero-actions">
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="btn btn-secondary btn-sm"
+            >
+              <i className={isEditing ? 'fas fa-times' : 'fas fa-edit'}></i>
+              <span>{isEditing ? 'Annuler l\'édition' : 'Modifier le profil'}</span>
+            </button>
 
-            {/*  Section Compétences  */}
-            <section id="competences" className="profile-section">
-                <h2><i className="fas fa-code"></i> Compétences Techniques</h2>
-                <div className="section-content">
-                    <div className="skills-categories">
-                        <div className="skill-category">
-                            <h3>Développement Frontend</h3>
-                            <div className="skills-grid">
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-html5"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>HTML5</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="95"></div>
-                                            <span>95%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-css3-alt"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>CSS3</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="90"></div>
-                                            <span>90%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-js-square"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>JavaScript</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="85"></div>
-                                            <span>85%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-react"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>React.js</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="80"></div>
-                                            <span>80%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="skill-category">
-                            <h3>Développement Backend</h3>
-                            <div className="skills-grid">
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-node-js"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>Node.js</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="85"></div>
-                                            <span>85%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-php"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>PHP</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="80"></div>
-                                            <span>80%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-python"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>Python</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="75"></div>
-                                            <span>75%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fas fa-database"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>MySQL</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="85"></div>
-                                            <span>85%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="skill-category">
-                            <h3>Outils et Technologies</h3>
-                            <div className="skills-grid">
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-git-alt"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>Git</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="90"></div>
-                                            <span>90%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-docker"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>Docker</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="70"></div>
-                                            <span>70%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-aws"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>AWS</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="65"></div>
-                                            <span>65%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="skill-item">
-                                    <div className="skill-icon">
-                                        <i className="fab fa-linux"></i>
-                                    </div>
-                                    <div className="skill-info">
-                                        <h4>Linux</h4>
-                                        <div className="skill-level">
-                                            <div className="skill-bar" data-level="80"></div>
-                                            <span>80%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {isPremium ? (
+              <Link to="/premium" className="btn btn-premium btn-sm">
+                <i className="fas fa-crown"></i> Gérer mon offre Pro
+              </Link>
+            ) : (
+              <Link to="/premium" className="btn btn-primary btn-sm">
+                <i className="fas fa-arrow-up-right-from-square"></i> Passer à Premium
+              </Link>
+            )}
+          </div>
+        </motion.div>
 
-            {/*  Section Projets  */}
-            <section id="projets" className="profile-section">
-                <h2><i className="fas fa-project-diagram"></i> Projets Réalisés</h2>
-                <div className="section-content">
-                    <div className="projects-grid">
-                        <div className="project-card">
-                            <div className="project-header">
-                                <div className="project-icon">
-                                    <i className="fas fa-mountain"></i>
-                                </div>
-                                <div className="project-badge">En cours</div>
-                            </div>
-                            <div className="project-content">
-                                <h3>AtlasForecast</h3>
-                                <p>Application météo professionnelle avec prévisions avancées, API intégrées et interface moderne</p>
-                                <div className="project-tech">
-                                    <span className="tech-tag">HTML/CSS</span>
-                                    <span className="tech-tag">JavaScript</span>
-                                    <span className="tech-tag">API Météo</span>
-                                </div>
-                                <div className="project-links">
-                                    <a href="#" className="project-link">
-                                        <i className="fas fa-external-link-alt"></i>
-                                        Voir le projet
-                                    </a>
-                                    <a href="#" className="project-link">
-                                        <i className="fab fa-github"></i>
-                                        Code source
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="project-card">
-                            <div className="project-header">
-                                <div className="project-icon">
-                                    <i className="fas fa-shopping-cart"></i>
-                                </div>
-                                <div className="project-badge">Terminé</div>
-                            </div>
-                            <div className="project-content">
-                                <h3>E-Commerce Platform</h3>
-                                <p>Plateforme de commerce en ligne complète avec gestion des produits, panier et paiements</p>
-                                <div className="project-tech">
-                                    <span className="tech-tag">React.js</span>
-                                    <span className="tech-tag">Node.js</span>
-                                    <span className="tech-tag">MongoDB</span>
-                                </div>
-                                <div className="project-links">
-                                    <a href="#" className="project-link">
-                                        <i className="fas fa-external-link-alt"></i>
-                                        Voir le projet
-                                    </a>
-                                    <a href="#" className="project-link">
-                                        <i className="fab fa-github"></i>
-                                        Code source
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="project-card">
-                            <div className="project-header">
-                                <div className="project-icon">
-                                    <i className="fas fa-tasks"></i>
-                                </div>
-                                <div className="project-badge">Terminé</div>
-                            </div>
-                            <div className="project-content">
-                                <h3>Task Manager</h3>
-                                <p>Application de gestion des tâches avec authentification, CRUD et interface responsive</p>
-                                <div className="project-tech">
-                                    <span className="tech-tag">PHP</span>
-                                    <span className="tech-tag">MySQL</span>
-                                    <span className="tech-tag">Bootstrap</span>
-                                </div>
-                                <div className="project-links">
-                                    <a href="#" className="project-link">
-                                        <i className="fas fa-external-link-alt"></i>
-                                        Voir le projet
-                                    </a>
-                                    <a href="#" className="project-link">
-                                        <i className="fab fa-github"></i>
-                                        Code source
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        {/* ====================================================================
+            2. ACCOUNT OVERVIEW (4-KPI Real Data Cards)
+            ==================================================================== */}
+        <motion.div
+          className="af-profile-kpis"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp(0.05)}
+        >
+          {/* KPI 1: Plan */}
+          <div className="af-profile-kpi-card">
+            <div
+              className="af-profile-kpi-icon"
+              style={{ color: isPremium ? '#fbbf24' : 'var(--accent-primary)' }}
+            >
+              <i className={isPremium ? 'fas fa-crown' : 'fas fa-layer-group'}></i>
+            </div>
+            <div className="af-profile-kpi-body">
+              <span className="af-profile-kpi-label">Formule Actuelle</span>
+              <span className="af-profile-kpi-value">
+                {isPremium ? 'AtlasForecast Pro' : 'AtlasForecast Standard'}
+              </span>
+            </div>
+          </div>
 
-            {/*  Section Expérience  */}
-            <section id="experience" className="profile-section">
-                <h2><i className="fas fa-briefcase"></i> Expérience Professionnelle</h2>
-                <div className="section-content">
-                    <div className="timeline">
-                        <div className="timeline-item">
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                                <div className="timeline-header">
-                                    <h3>Développeur Full Stack Stagiaire</h3>
-                                    <span className="timeline-date">Juin 2025 - Août 2025</span>
-                                </div>
-                                <div className="timeline-company">
-                                    <i className="fas fa-building"></i>
-                                    <span>Tech Solutions Marrakech</span>
-                                </div>
-                                <p>Développement d'applications web avec React.js et Node.js. Gestion de bases de données et intégration d'APIs.</p>
-                                <div className="timeline-skills">
-                                    <span className="skill-tag">React.js</span>
-                                    <span className="skill-tag">Node.js</span>
-                                    <span className="skill-tag">MongoDB</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="timeline-item">
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                                <div className="timeline-header">
-                                    <h3>Développeur Frontend Freelance</h3>
-                                    <span className="timeline-date">Janvier 2025 - Mai 2025</span>
-                                </div>
-                                <div className="timeline-company">
-                                    <i className="fas fa-laptop-code"></i>
-                                    <span>Freelance</span>
-                                </div>
-                                <p>Création de sites web responsifs et d'interfaces utilisateur modernes pour divers clients.</p>
-                                <div className="timeline-skills">
-                                    <span className="skill-tag">HTML/CSS</span>
-                                    <span className="skill-tag">JavaScript</span>
-                                    <span className="skill-tag">Bootstrap</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="timeline-item">
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                                <div className="timeline-header">
-                                    <h3>Projet Académique - AtlasForecast</h3>
-                                    <span className="timeline-date">Avril 2025 - Présent</span>
-                                </div>
-                                <div className="timeline-company">
-                                    <i className="fas fa-university"></i>
-                                    <span>Université Privée Marrakech</span>
-                                </div>
-                                <p>Développement d'une application météo professionnelle comme projet de fin d'études.</p>
-                                <div className="timeline-skills">
-                                    <span className="skill-tag">Full Stack</span>
-                                    <span className="skill-tag">API Integration</span>
-                                    <span className="skill-tag">UI/UX Design</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          {/* KPI 2: Status */}
+          <div className="af-profile-kpi-card">
+            <div className="af-profile-kpi-icon" style={{ color: 'var(--accent-success)' }}>
+              <i className="fas fa-shield-check"></i>
+            </div>
+            <div className="af-profile-kpi-body">
+              <span className="af-profile-kpi-label">Statut du Compte</span>
+              <span className="af-profile-kpi-value" style={{ color: 'var(--accent-success)' }}>
+                Vérifié & Actif
+              </span>
+            </div>
+          </div>
 
-            {/*  Section Formation  */}
-            <section id="formation" className="profile-section">
-                <h2><i className="fas fa-graduation-cap"></i> Formation et Éducation</h2>
-                <div className="section-content">
-                    <div className="education-timeline">
-                        <div className="education-item">
-                            <div className="education-icon">
-                                <i className="fas fa-university"></i>
-                            </div>
-                            <div className="education-content">
-                                <h3>Licence en Développement Logiciel</h3>
-                                <div className="education-details">
-                                    <span className="institution">Université Privée Marrakech</span>
-                                    <span className="period">2023 - 2026</span>
-                                    <span className="level">3ème année en cours</span>
-                                </div>
-                                <p>Formation complète en développement logiciel avec spécialisation en développement web full stack.</p>
-                                <div className="education-subjects">
-                                    <h4>Matières principales :</h4>
-                                    <ul>
-                                        <li>Programmation orientée objet</li>
-                                        <li>Développement web avancé</li>
-                                        <li>Bases de données</li>
-                                        <li>Architecture logicielle</li>
-                                        <li>Gestion de projet</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="education-item">
-                            <div className="education-icon">
-                                <i className="fas fa-certificate"></i>
-                            </div>
-                            <div className="education-content">
-                                <h3>Certifications Professionnelles</h3>
-                                <div className="certifications-grid">
-                                    <div className="certification">
-                                        <i className="fab fa-aws"></i>
-                                        <span>AWS Cloud Practitioner</span>
-                                    </div>
-                                    <div className="certification">
-                                        <i className="fab fa-microsoft"></i>
-                                        <span>Microsoft Azure Fundamentals</span>
-                                    </div>
-                                    <div className="certification">
-                                        <i className="fab fa-google"></i>
-                                        <span>Google Cloud Platform</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          {/* KPI 3: Member since */}
+          <div className="af-profile-kpi-card">
+            <div className="af-profile-kpi-icon" style={{ color: 'var(--accent-cyan)' }}>
+              <i className="fas fa-calendar-check"></i>
+            </div>
+            <div className="af-profile-kpi-body">
+              <span className="af-profile-kpi-label">Membre Depuis</span>
+              <span className="af-profile-kpi-value">{formatMemberDate()}</span>
+            </div>
+          </div>
 
-            {/*  Section Contact  */}
-            <section id="contact" className="profile-section">
-                <h2><i className="fas fa-envelope"></i> Contact et Réseaux</h2>
-                <div className="section-content">
-                    <div className="contact-grid">
-                        <div className="contact-card">
-                            <div className="contact-icon">
-                                <i className="fas fa-envelope"></i>
-                            </div>
-                            <div className="contact-content">
-                                <h3>Email</h3>
-                                <p><a href="mailto:obaid.aitmattou@email.com">obaidaitmattou204@gmail.com</a></p>
-                                <span>Réponse sous 24h</span>
-                            </div>
-                        </div>
-                        
-                        <div className="contact-card">
-                            <div className="contact-icon">
-                                <i className="fas fa-phone"></i>
-                            </div>
-                            <div className="contact-content">
-                                <h3>Téléphone</h3>
-                                <p><a href="tel:+212645508349">+212 645-508349</a></p>
-                                <span>Disponible 9h-18h</span>
-                            </div>
-                        </div>
-                        
-                        <div className="contact-card">
-                            <div className="contact-icon">
-                                <i className="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div className="contact-content">
-                                <h3>Localisation</h3>
-                                <p>Marrakech, Maroc</p>
-                                <span>Disponible pour télétravail</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="social-networks">
-                        <h3>Réseaux Professionnels</h3>
-                        <div className="social-grid">
-                            <a href="https://www.linkedin.com/in/obaid-ait-mattou-2b058130b" target="_blank" rel="noopener" className="social-link linkedin">
-                                <i className="fab fa-linkedin"></i>
-                                <span>LinkedIn</span>
-                            </a>
-                            
-                            <a href="https://github.com/Obaid-dev-rebelesto" target="_blank" rel="noopener" className="social-link github">
-                                <i className="fab fa-github"></i>
-                                <span>GitHub</span>
-                            </a>
-                            
-                            <a href="https://www.facebook.com/profile.php?id=61578902663416" target="_blank" rel="noopener" className="social-link facebook">
-                                <i className="fab fa-facebook"></i>
-                                <span>Facebook</span>
-                            </a>
-                            
-                            <a href="https://www.instagram.com/obaid.sr46/" target="_blank" rel="noopener" className="social-link instagram">
-                                <i className="fab fa-instagram"></i>
-                                <span>Instagram</span>
-                            </a>
-                            
-                            <a href="https://wa.me/212645508349" target="_blank" rel="noopener" className="social-link whatsapp">
-                                <i className="fab fa-whatsapp"></i>
-                                <span>WhatsApp</span>
-                            </a>
-                        </div>
-                    </div>
+          {/* KPI 4: Saved cities */}
+          <div className="af-profile-kpi-card">
+            <div className="af-profile-kpi-icon" style={{ color: '#818cf8' }}>
+              <i className="fas fa-location-dot"></i>
+            </div>
+            <div className="af-profile-kpi-body">
+              <span className="af-profile-kpi-label">Villes Suivies</span>
+              <span className="af-profile-kpi-value">
+                {loadingCities ? '...' : `${savedCities.length} favorite(s)`}
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Global Notifications / Feedback Messages */}
+        {profileSuccessMsg && (
+          <motion.div
+            className="af-notice af-notice-success"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginBottom: 'var(--sp-6)' }}
+          >
+            <i className="fas fa-check-circle"></i>
+            <span>{profileSuccessMsg}</span>
+          </motion.div>
+        )}
+
+        {profileErrorMsg && (
+          <motion.div
+            className="af-notice af-notice-error"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginBottom: 'var(--sp-6)' }}
+          >
+            <i className="fas fa-exclamation-circle"></i>
+            <span>{profileErrorMsg}</span>
+          </motion.div>
+        )}
+
+        {/* ====================================================================
+            3. MAIN CONTENT GRID (Personal Info, Preferences, Security, Plan)
+            ==================================================================== */}
+        <div className="af-profile-sections-grid">
+          {/* LEFT COLUMN: Personal Info & Weather Preferences */}
+          <div className="af-profile-col">
+            {/* --- CARD: Personal Information --- */}
+            <motion.div
+              className="af-account-card"
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp(0.1)}
+            >
+              <div className="af-account-card-header">
+                <div>
+                  <h2 className="af-account-card-title">
+                    <i className="fas fa-id-badge"></i> Informations Personnelles
+                  </h2>
+                  <p className="af-account-card-desc">
+                    Données d'identification associées à votre compte AtlasForecast.
+                  </p>
                 </div>
-            </section>
+
+                {!isEditing && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    <i className="fas fa-pen-to-square"></i> Modifier
+                  </button>
+                )}
+              </div>
+
+              {isEditing ? (
+                <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
+                  <div className="af-form-group" style={{ margin: 0 }}>
+                    <label className="af-label" htmlFor="edit-name">
+                      Nom complet *
+                    </label>
+                    <input
+                      type="text"
+                      id="edit-name"
+                      className="af-input"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Ex: Obaid Ait Mattou"
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="af-form-group" style={{ margin: 0 }}>
+                    <label className="af-label">
+                      Adresse e-mail (liée au compte)
+                    </label>
+                    <input
+                      type="email"
+                      className="af-input"
+                      value={userEmail}
+                      disabled
+                      style={{ opacity: 0.7, cursor: 'not-allowed' }}
+                    />
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+                      L'adresse e-mail est gérée de façon sécurisée par le système d'authentification.
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 'var(--sp-3)', marginTop: 'var(--sp-2)' }}>
+                    <button
+                      type="submit"
+                      disabled={savingProfile}
+                      className="btn btn-primary btn-sm"
+                    >
+                      {savingProfile ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin"></i> Enregistrement...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-check"></i> Enregistrer les modifications
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditing(false)
+                        setFullName(profile?.full_name || '')
+                      }}
+                      className="btn btn-ghost btn-sm"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="af-profile-field-list">
+                  <div className="af-profile-field-item">
+                    <span className="af-profile-field-label">
+                      <i className="fas fa-user"></i> Nom complet
+                    </span>
+                    <div className="af-profile-field-val">
+                      <span>{displayName}</span>
+                    </div>
+                  </div>
+
+                  <div className="af-profile-field-item">
+                    <span className="af-profile-field-label">
+                      <i className="fas fa-envelope"></i> Adresse e-mail
+                    </span>
+                    <div className="af-profile-field-val">
+                      <span>{userEmail}</span>
+                      <span className="af-profile-field-val-sub">
+                        <i className="fas fa-circle-check"></i> Vérifiée
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="af-profile-field-item">
+                    <span className="af-profile-field-label">
+                      <i className="fas fa-earth-africa"></i> Pays / Région
+                    </span>
+                    <div className="af-profile-field-val">
+                      <span>Royaume du Maroc (MA)</span>
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                        Fuseau GMT+1
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+
+            {/* --- CARD: Weather Preferences --- */}
+            <motion.div
+              className="af-account-card"
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp(0.15)}
+            >
+              <div className="af-account-card-header">
+                <div>
+                  <h2 className="af-account-card-title">
+                    <i className="fas fa-sliders"></i> Préférences Météorologiques
+                  </h2>
+                  <p className="af-account-card-desc">
+                    Configurez l'affichage des mesures climatiques et les notifications.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+                {/* Units Setting */}
+                <div className="af-pref-item">
+                  <div className="af-pref-info">
+                    <span className="af-pref-title">
+                      <i className="fas fa-temperature-half" style={{ color: 'var(--accent-primary)' }}></i>
+                      Système d'unités
+                    </span>
+                    <span className="af-pref-desc">
+                      Actuellement réglé sur {unitLabel} et {windUnit}
+                    </span>
+                  </div>
+
+                  <div className="af-pref-control">
+                    <button
+                      onClick={toggleUnits}
+                      className="btn btn-secondary btn-sm"
+                      title="Changer d'unité de mesure"
+                    >
+                      <i className="fas fa-arrow-right-arrow-left"></i>
+                      <span>{units === 'metric' ? 'Métrique (°C, km/h)' : 'Impérial (°F, mph)'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Theme Setting */}
+                <div className="af-pref-item">
+                  <div className="af-pref-info">
+                    <span className="af-pref-title">
+                      <i className="fas fa-palette" style={{ color: '#818cf8' }}></i>
+                      Thème visuel de l'interface
+                    </span>
+                    <span className="af-pref-desc">
+                      Mode {theme === 'dark' ? 'Sombre (Cosmos Saphir)' : 'Clair (Montagnes de l\'Atlas)'}
+                    </span>
+                  </div>
+
+                  <div className="af-pref-control">
+                    <button
+                      onClick={toggleTheme}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      <i className={theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun'}></i>
+                      <span>{theme === 'dark' ? 'Mode Sombre' : 'Mode Clair'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Weather Alerts Notification Switch */}
+                <div className="af-pref-item">
+                  <div className="af-pref-info">
+                    <span className="af-pref-title">
+                      <i className="fas fa-bell" style={{ color: '#fbbf24' }}></i>
+                      Alertes & Vigilance Météo
+                    </span>
+                    <span className="af-pref-desc">
+                      Avertissements pour fortes chaleurs, neige sur l'Atlas et intempéries.
+                    </span>
+                  </div>
+
+                  <div className="af-pref-control">
+                    <button
+                      onClick={handleToggleNotifications}
+                      className={`btn btn-sm ${notificationsEnabled ? 'btn-primary' : 'btn-secondary'}`}
+                    >
+                      <i className={notificationsEnabled ? 'fas fa-check' : 'fas fa-bell-slash'}></i>
+                      <span>{notificationsEnabled ? 'Activées' : 'Désactivées'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Update Frequency */}
+                <div className="af-pref-item">
+                  <div className="af-pref-info">
+                    <span className="af-pref-title">
+                      <i className="fas fa-clock-rotate-left" style={{ color: 'var(--accent-cyan)' }}></i>
+                      Fréquence d'actualisation radar
+                    </span>
+                    <span className="af-pref-desc">
+                      {isPremium ? 'Mise à jour ultra-rapide en continu (Temps réel)' : 'Cycle automatique toutes les 15 minutes'}
+                    </span>
+                  </div>
+
+                  <span className="af-badge af-badge-primary">
+                    {isPremium ? 'Temps Réel' : '15 min'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* --- CARD: Saved Cities --- */}
+            <motion.div
+              className="af-account-card"
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp(0.2)}
+            >
+              <div className="af-account-card-header">
+                <div>
+                  <h2 className="af-account-card-title">
+                    <i className="fas fa-city"></i> Villes & Régions Suivies
+                  </h2>
+                  <p className="af-account-card-desc">
+                    Accès rapide aux bulletins météorologiques de vos localités favorites.
+                  </p>
+                </div>
+
+                <Link to="/weather" className="btn btn-secondary btn-sm">
+                  <i className="fas fa-plus"></i> Explorer
+                </Link>
+              </div>
+
+              {cityDeleteMsg && (
+                <div className="af-notice af-notice-info" style={{ padding: '0.5rem 0.85rem' }}>
+                  <i className="fas fa-info-circle"></i>
+                  <span>{cityDeleteMsg}</span>
+                </div>
+              )}
+
+              {loadingCities ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: 'var(--text-sm)' }}>
+                  <i className="fas fa-spinner fa-spin"></i> Chargement des villes favorites...
+                </div>
+              ) : savedCities.length === 0 ? (
+                <div className="af-profile-city-chip-empty">
+                  Aucune ville favorite pour le moment. Ajoutez vos localités favorites depuis la page Météo ou Dashboard.
+                </div>
+              ) : (
+                <div className="af-profile-cities-list">
+                  {savedCities.map((city) => (
+                    <div key={city.id} className="af-profile-city-chip">
+                      <Link
+                        to={`/weather?city=${encodeURIComponent(city.city_name)}`}
+                        style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                      >
+                        <i className="fas fa-map-pin" style={{ color: 'var(--accent-primary)' }}></i>
+                        <span>{city.city_name}</span>
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteCity(city.id, city.city_name)}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 0.15rem' }}
+                        title={`Retirer ${city.city_name}`}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </div>
+
+          {/* RIGHT COLUMN: Subscription & Security */}
+          <div className="af-profile-col">
+            {/* --- CARD: Subscription Details --- */}
+            <motion.div
+              className="af-account-card"
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp(0.12)}
+            >
+              <div className="af-account-card-header">
+                <div>
+                  <h2 className="af-account-card-title">
+                    <i className="fas fa-crown" style={{ color: isPremium ? '#fbbf24' : 'var(--text-muted)' }}></i> Abonnement & Facturation
+                  </h2>
+                  <p className="af-account-card-desc">
+                    Gestion de votre formule d'accès et des services associés.
+                  </p>
+                </div>
+              </div>
+
+              {isPremium ? (
+                <div className="af-sub-callout pro">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 className="af-sub-plan-title">
+                      <i className="fas fa-gem" style={{ color: '#fbbf24' }}></i>
+                      AtlasForecast Pro
+                    </h3>
+                    <span className="af-badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
+                      ACTIF
+                    </span>
+                  </div>
+
+                  <p className="af-sub-plan-desc">
+                    Vous bénéficiez de l'accès illimité à l'intelligence météorologique avancée,
+                    au Copilot IA et aux radars haute résolution.
+                  </p>
+
+                  <ul className="af-sub-perks-list">
+                    <li className="af-sub-perk-item">
+                      <i className="fas fa-check"></i> Copilot IA 2026 illimité
+                    </li>
+                    <li className="af-sub-perk-item">
+                      <i className="fas fa-check"></i> Prévisions 14 jours haute résolution
+                    </li>
+                    <li className="af-sub-perk-item">
+                      <i className="fas fa-check"></i> Imagerie satellite et radar Doppler direct
+                    </li>
+                    <li className="af-sub-perk-item">
+                      <i className="fas fa-check"></i> Alertes extrêmes prioritaires
+                    </li>
+                  </ul>
+
+                  <div style={{ marginTop: 'var(--sp-2)' }}>
+                    <Link to="/premium" className="btn btn-premium btn-sm" style={{ width: '100%' }}>
+                      <i className="fas fa-sliders"></i> Gérer mon abonnement Paddle
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="af-sub-callout">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 className="af-sub-plan-title">
+                      <i className="fas fa-layer-group" style={{ color: 'var(--accent-primary)' }}></i>
+                      AtlasForecast Standard
+                    </h3>
+                    <span className="af-badge af-badge-primary">GRATUIT</span>
+                  </div>
+
+                  <p className="af-sub-plan-desc">
+                    Accès de base aux prévisions 5 jours et aux bulletins actuels pour le Maroc.
+                  </p>
+
+                  <ul className="af-sub-perks-list">
+                    <li className="af-sub-perk-item">
+                      <i className="fas fa-check"></i> Météo actuelle toutes villes
+                    </li>
+                    <li className="af-sub-perk-item">
+                      <i className="fas fa-check"></i> Prévisions 5 jours standards
+                    </li>
+                    <li className="af-sub-perk-item" style={{ opacity: 0.6 }}>
+                      <i className="fas fa-xmark" style={{ color: 'var(--text-muted)' }}></i> Copilot IA (réservé Pro)
+                    </li>
+                    <li className="af-sub-perk-item" style={{ opacity: 0.6 }}>
+                      <i className="fas fa-xmark" style={{ color: 'var(--text-muted)' }}></i> Radar haute précision (réservé Pro)
+                    </li>
+                  </ul>
+
+                  <div style={{ marginTop: 'var(--sp-2)' }}>
+                    <Link to="/premium" className="btn btn-primary btn-sm" style={{ width: '100%' }}>
+                      <i className="fas fa-crown"></i> Passer à Pro ($5/mois)
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+
+            {/* --- CARD: Security & Password --- */}
+            <motion.div
+              className="af-account-card"
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp(0.18)}
+            >
+              <div className="af-account-card-header">
+                <div>
+                  <h2 className="af-account-card-title">
+                    <i className="fas fa-lock"></i> Sécurité & Connexion
+                  </h2>
+                  <p className="af-account-card-desc">
+                    Gestion du mot de passe et sécurité de votre session.
+                  </p>
+                </div>
+              </div>
+
+              {resetSuccessMsg && (
+                <div className="af-notice af-notice-success">
+                  <i className="fas fa-envelope-circle-check"></i>
+                  <span>{resetSuccessMsg}</span>
+                </div>
+              )}
+
+              {resetErrorMsg && (
+                <div className="af-notice af-notice-error">
+                  <i className="fas fa-exclamation-circle"></i>
+                  <span>{resetErrorMsg}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
+                <div className="af-profile-field-item">
+                  <span className="af-profile-field-label">Mot de passe du compte</span>
+                  <div className="af-profile-field-val">
+                    <span>••••••••••••••••</span>
+                    <button
+                      onClick={handleRequestPasswordReset}
+                      disabled={sendingReset}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      {sendingReset ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin"></i> Envoi...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-key"></i> Réinitialiser
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="af-pref-item">
+                  <div className="af-pref-info">
+                    <span className="af-pref-title">
+                      <i className="fas fa-shield-halved" style={{ color: 'var(--accent-success)' }}></i>
+                      Sécurité de session
+                    </span>
+                    <span className="af-pref-desc">
+                      Session chiffrée SSL / Token JWT avec rotation automatique.
+                    </span>
+                  </div>
+                  <span className="af-badge af-badge-success">Protégée</span>
+                </div>
+
+                <div style={{ paddingTop: 'var(--sp-2)' }}>
+                  <button
+                    onClick={signOut}
+                    className="btn btn-outline btn-sm"
+                    style={{ width: '100%', borderColor: 'rgba(239, 68, 68, 0.4)', color: '#f87171' }}
+                  >
+                    <i className="fas fa-sign-out-alt"></i> Se déconnecter de la session
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
-    </>
-  );
-};
-
-export default ProfilePage;
+      </div>
+    </div>
+  )
+}

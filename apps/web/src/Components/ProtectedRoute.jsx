@@ -3,6 +3,9 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingScreen from './LoadingScreen';
 
+// Pages that must never be used as a redirect destination (would loop)
+const LOOP_GUARD = new Set(['/login', '/register', '/forgot']);
+
 export const ProtectedRoute = ({ children, requirePremium = false }) => {
   const { user, isPremium, loading } = useAuth();
   const location = useLocation();
@@ -13,8 +16,19 @@ export const ProtectedRoute = ({ children, requirePremium = false }) => {
   }
 
   if (!user || !token) {
-    // Redirect to login but save the attempted URL
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Encode the full attempted URL (pathname + search + hash) as the ?redirect= param.
+    // Using the full URL ensures query-strings like ?plan=yearly survive the round-trip.
+    const destination = location.pathname + location.search + location.hash;
+    const isSafe =
+      destination.startsWith('/') &&
+      !destination.startsWith('//') &&
+      !LOOP_GUARD.has(location.pathname);
+
+    const loginUrl = isSafe
+      ? `/login?redirect=${encodeURIComponent(destination)}`
+      : '/login';
+
+    return <Navigate to={loginUrl} replace />;
   }
 
   if (requirePremium && !isPremium) {
@@ -25,3 +39,4 @@ export const ProtectedRoute = ({ children, requirePremium = false }) => {
 };
 
 export default ProtectedRoute;
+

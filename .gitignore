@@ -2,6 +2,7 @@
 node_modules/
 dist/
 .turbo/
+apps/*/package-lock.json
 
 # Environment configurations
 .env
@@ -16,4 +17,7 @@ yarn-error.log*
 
 # Scratch
 scratch/
+
+# Local runtime stores
+*-store.json
 

@@ -1,123 +1,232 @@
-/* ========================================
-   ATLASFORECAST — ANIMATED BACKGROUND
-   Subtle ambient gradient orbs.
-   GPU-accelerated, respects reduced motion.
-   Hidden in light theme.
-   ======================================== */
+/* ==========================================================================
+   ATLASFORECAST — 2026 ATMOSPHERIC BACKGROUND SYSTEM
+   Light: Moroccan Atlas Mountains with frosted glass veil
+   Dark: Deep sapphire cosmos with ambient glowing nebula orbs
+   ========================================================================== */
 
 .af-background {
   position: fixed;
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  background: var(--bg-base);
+  pointer-events: none;
+  background-color: var(--bg-base);
+  transition: background-color 300ms ease;
+}
+
+/* ==========================================================================
+   LIGHT MODE: Moroccan Mountain Landscape Foundation
+   ========================================================================== */
+[data-theme="light"] .af-background {
+  /* High-resolution Moroccan Atlas snow-capped mountain backdrop */
+  background-image: url('/images/Morocco_snow_winter_travel_mountains-768x510.jpg');
+  background-size: cover;
+  background-position: center 25%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  filter: contrast(104%) brightness(101%);
+}
+
+/* Light Mode Transparent Atmospheric Veil:
+   Allows the snow peaks, Marrakech minaret, and deep sky to be vividly visual
+   while providing subtle contrast for glassmorphic cards */
+.af-light-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(240, 246, 255, 0.12) 30%,
+    rgba(235, 244, 255, 0.26) 65%,
+    rgba(228, 238, 250, 0.52) 100%
+  );
   pointer-events: none;
 }
-[data-theme="light"] .af-background {
-  background: var(--bg-base);
+
+[data-theme="light"] .af-light-overlay {
+  display: block;
 }
 
-/* Gradient orbs — large soft blurs */
-.af-background::before,
-.af-background::after {
+/* Light mode subtle natural horizon glow */
+[data-theme="light"] .af-background::after {
   content: "";
   position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 70% 15%,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   DARK MODE: Deep Atmospheric Cosmic Weather Canvas
+   ========================================================================== */
+[data-theme="dark"] .af-background,
+:root:not([data-theme="light"]) .af-background {
+  background: radial-gradient(
+    circle at 50% 0%,
+    #0c1e3d 0%,
+    #071328 35%,
+    #050b18 80%,
+    #03070f 100%
+  );
+}
+
+/* Ambient Glowing Mesh Orbs (Dark Mode Only) */
+.af-dark-orbs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+[data-theme="light"] .af-dark-orbs {
+  display: none;
+}
+
+.af-orb {
+  position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.12;
+  filter: blur(110px);
+  opacity: 0.18;
   will-change: transform;
 }
-.af-background::before {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, transparent 70%);
+
+.af-orb-1 {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 50%, transparent 70%);
   top: -15%;
-  right: -10%;
-  animation: af-orb-drift 25s ease-in-out infinite alternate;
-}
-.af-background::after {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
-  bottom: -10%;
-  left: -8%;
-  animation: af-orb-drift 30s ease-in-out infinite alternate-reverse;
+  right: -8%;
+  animation: af-orb-drift 28s ease-in-out infinite alternate;
 }
 
-[data-theme="light"] .af-background::before,
-[data-theme="light"] .af-background::after {
-  opacity: 0.04;
+.af-orb-2 {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, #6366f1 0%, #4338ca 50%, transparent 70%);
+  bottom: 5%;
+  left: -10%;
+  animation: af-orb-drift 32s ease-in-out infinite alternate-reverse;
 }
 
-/* Stars (small dots) — dark theme only */
+.af-orb-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #06b6d4 0%, #0284c7 50%, transparent 70%);
+  top: 40%;
+  left: 30%;
+  opacity: 0.1;
+  animation: af-orb-pulse 20s ease-in-out infinite alternate;
+}
+
+/* Twinkling Stars (Dark Mode Only) */
 .af-stars {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
+
+[data-theme="light"] .af-stars {
+  display: none;
+}
+
 .af-star {
   position: absolute;
   width: 2px;
   height: 2px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 50%;
   animation: af-twinkle 4s ease-in-out infinite;
 }
-[data-theme="light"] .af-star { display: none; }
 
-.af-star-1  { top: 8%;  left: 12%; animation-delay: 0s; }
-.af-star-2  { top: 15%; left: 78%; animation-delay: 1.2s; }
-.af-star-3  { top: 28%; left: 42%; animation-delay: 0.6s; }
-.af-star-4  { top: 22%; left: 65%; animation-delay: 2.1s; }
-.af-star-5  { top: 38%; left: 88%; animation-delay: 0.9s; }
-.af-star-6  { top: 55%; left: 18%; animation-delay: 1.8s; }
-.af-star-7  { top: 62%; left: 52%; animation-delay: 0.3s; }
-.af-star-8  { top: 72%; left: 35%; animation-delay: 2.5s; }
-.af-star-9  { top: 82%; left: 72%; animation-delay: 1.5s; }
-.af-star-10 { top: 45%; left: 95%; animation-delay: 0.7s; }
-.af-star-11 { top: 18%; left: 28%; animation-delay: 2.8s; }
-.af-star-12 { top: 88%; left: 55%; animation-delay: 1.1s; }
+.af-star-1  { top: 7%;  left: 14%; animation-delay: 0s; }
+.af-star-2  { top: 14%; left: 82%; animation-delay: 1.4s; }
+.af-star-3  { top: 25%; left: 45%; animation-delay: 0.8s; }
+.af-star-4  { top: 19%; left: 68%; animation-delay: 2.2s; }
+.af-star-5  { top: 36%; left: 91%; animation-delay: 1.0s; }
+.af-star-6  { top: 52%; left: 16%; animation-delay: 1.9s; }
+.af-star-7  { top: 60%; left: 54%; animation-delay: 0.4s; }
+.af-star-8  { top: 70%; left: 32%; animation-delay: 2.6s; }
+.af-star-9  { top: 80%; left: 75%; animation-delay: 1.7s; }
+.af-star-10 { top: 42%; left: 96%; animation-delay: 0.6s; }
+.af-star-11 { top: 16%; left: 30%; animation-delay: 2.9s; }
+.af-star-12 { top: 86%; left: 58%; animation-delay: 1.2s; }
 
-/* Shooting stars — hidden in light mode */
+/* Subtle Shooting Stars (Dark Mode Only) */
 .af-shooting-star {
   position: absolute;
-  width: 80px;
+  width: 90px;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.6), transparent);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.75), rgba(96, 165, 250, 0.3), transparent);
   border-radius: 1px;
   opacity: 0;
-  animation: af-shoot 6s linear infinite;
+  animation: af-shoot 8s linear infinite;
 }
-[data-theme="light"] .af-shooting-star { display: none; }
 
-.af-ss1 { top: 18%; left: -80px; animation-delay: 1s; }
-.af-ss2 { top: 50%; left: -80px; animation-delay: 4s; }
-.af-ss3 { top: 75%; left: -80px; animation-delay: 8s; }
+[data-theme="light"] .af-shooting-star {
+  display: none;
+}
 
-/* Clouds / Moon — hidden, replaced by orbs */
-.af-clouds, .af-cloud, .af-moon { display: none; }
+.af-ss1 { top: 15%; left: -100px; animation-delay: 1.5s; }
+.af-ss2 { top: 48%; left: -100px; animation-delay: 5s; }
+.af-ss3 { top: 78%; left: -100px; animation-delay: 9.5s; }
 
-/* ===== Animations ===== */
+/* ==========================================================================
+   KEYFRAME ANIMATIONS
+   ========================================================================== */
 @keyframes af-orb-drift {
   0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(40px, -30px) scale(1.08); }
-  100% { transform: translate(-20px, 20px) scale(0.95); }
-}
-@keyframes af-twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50%      { opacity: 0.9; transform: scale(1.4); }
-}
-@keyframes af-shoot {
-  0%  { transform: translateX(0) rotate(-30deg); opacity: 0; }
-  5%  { opacity: 0.8; }
-  15% { transform: translateX(calc(100vw + 100px)) rotate(-30deg); opacity: 0; }
-  100%{ transform: translateX(calc(100vw + 100px)) rotate(-30deg); opacity: 0; }
+  50%  { transform: translate(45px, -35px) scale(1.06); }
+  100% { transform: translate(-25px, 25px) scale(0.96); }
 }
 
-/* ===== Reduced motion ===== */
+@keyframes af-orb-pulse {
+  0%   { transform: scale(1); opacity: 0.08; }
+  50%  { transform: scale(1.15); opacity: 0.14; }
+  100% { transform: scale(0.92); opacity: 0.06; }
+}
+
+@keyframes af-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50%      { opacity: 0.95; transform: scale(1.4); }
+}
+
+@keyframes af-shoot {
+  0%   { transform: translateX(0) rotate(-28deg); opacity: 0; }
+  4%   { opacity: 0.85; }
+  14%  { transform: translateX(calc(100vw + 120px)) rotate(-28deg); opacity: 0; }
+  100% { transform: translateX(calc(100vw + 120px)) rotate(-28deg); opacity: 0; }
+}
+
+/* ==========================================================================
+   RESPONSIVE OPTIMIZATIONS
+   ========================================================================== */
+@media (max-width: 768px) {
+  [data-theme="light"] .af-background {
+    background-position: center 20%;
+  }
+  [data-theme="light"] .af-light-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(240, 246, 255, 0.18) 35%,
+      rgba(235, 244, 255, 0.35) 70%,
+      rgba(228, 238, 250, 0.60) 100%
+    );
+  }
+  .af-orb-1 { width: 350px; height: 350px; }
+  .af-orb-2 { width: 300px; height: 300px; }
+  .af-orb-3 { display: none; }
+}
+
+/* ==========================================================================
+   REDUCED MOTION SUPPORT
+   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  .af-background::before,
-  .af-background::after,
+  .af-orb,
   .af-star,
   .af-shooting-star {
     animation: none !important;

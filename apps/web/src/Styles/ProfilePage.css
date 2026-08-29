@@ -1,0 +1,555 @@
+/* ==========================================================================
+   ATLASFORECAST — 2026 SAAS ACCOUNT PROFILE STYLES
+   ========================================================================== */
+
+.af-profile-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 2vw, 3rem) 0 var(--sp-12);
+}
+
+/* ===== Profile Header Banner ===== */
+.af-profile-hero {
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  padding: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--sp-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.af-profile-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+.af-profile-hero-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+}
+
+.af-profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.af-profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, #6366f1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.af-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.af-profile-status-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-success);
+  border: 3px solid var(--bg-secondary);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+
+.af-profile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.af-profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.af-profile-name {
+  font-size: clamp(1.4rem, 1.2rem + 1vw, 1.85rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.af-profile-email {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.af-profile-badges-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.af-profile-sub-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.af-profile-sub-badge.pro {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.25));
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.2);
+}
+
+.af-profile-sub-badge.free {
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.af-profile-country-badge {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.af-profile-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+/* ===== 4-KPI Overview Grid ===== */
+.af-profile-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-8);
+}
+
+.af-profile-kpi-card {
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal);
+}
+
+.af-profile-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.af-profile-kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.af-profile-kpi-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.af-profile-kpi-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.af-profile-kpi-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 0.15rem;
+}
+
+/* ===== 2-Column Content Sections Layout ===== */
+.af-profile-sections-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: var(--sp-8);
+  align-items: start;
+}
+
+.af-profile-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+/* ===== Cards & Panels ===== */
+.af-account-card {
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  position: relative;
+}
+
+.af-account-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.af-account-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.af-account-card-title i {
+  color: var(--accent-primary);
+}
+
+.af-account-card-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin: 0.2rem 0 0;
+}
+
+/* ===== Form / Detail Rows ===== */
+.af-profile-field-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.af-profile-field-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.af-profile-field-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.af-profile-field-val {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-glass-light);
+  padding: 0.65rem 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.af-profile-field-val-sub {
+  font-size: var(--text-xs);
+  color: var(--accent-success);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ===== Preferences Controls ===== */
+.af-pref-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.af-pref-item:hover {
+  border-color: var(--border-color);
+}
+
+.af-pref-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.af-pref-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.af-pref-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.af-pref-control {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* ===== Cities in Profile ===== */
+.af-profile-cities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.af-profile-city-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-color);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.af-profile-city-chip:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-hover);
+  background: var(--bg-glass-heavy);
+  transform: translateY(-1px);
+}
+
+.af-profile-city-chip-empty {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--sp-2) 0;
+}
+
+/* ===== Subscription Callout ===== */
+.af-sub-callout {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.af-sub-callout.pro {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.af-sub-plan-title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.af-sub-plan-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.af-sub-perks-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-2) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.af-sub-perk-item {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.af-sub-perk-item i {
+  color: var(--accent-success);
+}
+/* ==========================================================================
+   LIGHT MODE FROSTED GLASS & ATMOSPHERIC VISIBILITY
+   ========================================================================== */
+[data-theme="light"] .af-profile-hero {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.62) 100%);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="light"] .af-profile-kpi-card {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .af-profile-kpi-card:hover {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--accent-primary);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.12);
+}
+
+[data-theme="light"] .af-account-card {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .af-profile-field-val {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+}
+
+[data-theme="light"] .af-pref-item {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+}
+
+[data-theme="light"] .af-pref-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* ===== Responsive Breakpoints ===== */
+@media (max-width: 1024px) {
+  .af-profile-sections-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-6);
+  }
+}
+
+@media (max-width: 768px) {
+  .af-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--sp-5);
+  }
+
+  .af-profile-hero-actions {
+    width: 100%;
+  }
+
+  .af-profile-hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .af-profile-kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .af-profile-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .af-profile-avatar {
+    width: 68px;
+    height: 68px;
+    font-size: 1.6rem;
+  }
+
+  .af-profile-name {
+    font-size: 1.35rem;
+  }
+}

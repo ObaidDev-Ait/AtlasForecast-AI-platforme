@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -8,48 +8,77 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
 };
 
+// Pages that must never be a redirect destination (loop prevention)
+const LOOP_GUARD = new Set(['/login', '/register', '/forgot']);
+
+/**
+ * Safely resolves the post-auth destination from the ?redirect= query param.
+ * Falls back to `fallback` when the param is absent, unsafe, or would loop.
+ */
+function resolveRedirect(search, fallback = '/') {
+  const raw = new URLSearchParams(search).get('redirect');
+  if (!raw) return fallback;
+  try {
+    const decoded = decodeURIComponent(raw);
+    const pathOnly = decoded.split('?')[0].split('#')[0];
+    if (decoded.startsWith('/') && !decoded.startsWith('//') && !LOOP_GUARD.has(pathOnly)) {
+      return decoded;
+    }
+  } catch (_) { /* ignore */ }
+  return fallback;
+}
+
 const RegisterPage = () => {
-  const [loading, setLoading] = useState(false)
-  const [errorMsg, setErrorMsg] = useState(null)
-  const navigate = useNavigate()
-  const { signUp } = useAuth()
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { signUp } = useAuth();
+
+  // Post-registration destination — defaults to '/' (homepage), not /dashboard
+  const redirectDestination = resolveRedirect(location.search, '/');
+
+  // Build the Login URL preserving the redirect destination so the user can
+  // switch to Login without losing the intended page.
+  const loginHref = redirectDestination && redirectDestination !== '/'
+    ? `/login?redirect=${encodeURIComponent(redirectDestination)}`
+    : '/login';
 
   const handleRegister = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setErrorMsg(null)
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg(null);
 
-    const firstName = e.target.firstName.value
-    const lastName = e.target.lastName.value
-    const email = e.target.email.value
-    const password = e.target.password.value
-    const confirmPassword = e.target.confirmPassword.value
+    const firstName = (e.target.firstName.value || '').trim();
+    const lastName = (e.target.lastName.value || '').trim();
+    const email = (e.target.email.value || '').trim();
+    const password = e.target.password.value;
+    const confirmPassword = e.target.confirmPassword.value;
 
     if (password !== confirmPassword) {
-      setErrorMsg("Les mots de passe ne correspondent pas")
-      setLoading(false)
-      return
+      setErrorMsg("Les mots de passe ne correspondent pas");
+      setLoading(false);
+      return;
     }
 
     try {
       const { data, error } = await signUp(email, password, {
         first_name: firstName,
-        last_name: lastName
-      })
+        last_name: lastName,
+      });
 
       if (error) {
-        throw error
+        throw error;
       }
-      
-      // Since email confirmation might be disabled in Supabase or auto-sign-in works:
-      navigate('/dashboard')
-      
+
+      // Navigate to the original destination — never via /dashboard as an intermediate
+      navigate(redirectDestination, { replace: true });
     } catch (error) {
-      setErrorMsg(error.message)
+      setErrorMsg(error.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -213,7 +242,7 @@ const RegisterPage = () => {
 
               <div style={{ textAlign: 'center', marginTop: 'var(--sp-4)' }}>
                 <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--text-sm)' }}>
-                  Déjà un compte ? <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: '700', textDecoration: 'none' }}>Se connecter</Link>
+                  Déjà un compte ? <Link to={loginHref} style={{ color: 'var(--accent-primary)', fontWeight: '700', textDecoration: 'none' }}>Se connecter</Link>
                 </p>
               </div>
             </form>

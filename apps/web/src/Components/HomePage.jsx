@@ -1,729 +1,369 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-const HomePage = () => {
-  const navigate = useNavigate();
+import React, { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { MOROCCO_CITIES, getWeatherIcon } from './helpers'
+import '../Styles/HomePage.css'
+
+export default function HomePage() {
+  const navigate = useNavigate()
+  const [searchCity, setSearchCity] = useState('')
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (!searchCity.trim()) return
+    navigate('/forecast', { state: { initialCity: searchCity.trim() } })
+  }
+
   const handleCityClick = (cityName) => {
-    navigate('/forecast', { state: { initialCity: cityName } });
-  };
+    navigate('/forecast', { state: { initialCity: cityName } })
+  }
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      window.document.dispatchEvent(new Event('DOMContentLoaded', {
-        bubbles: true,
-        cancelable: true
-      }));
-    }, 100);
-  }, []);
+    window.scrollTo(0, 0)
+  }, [])
+
+  // Sample static data for key cities (fast display with real navigation)
+  const popularCities = [
+    { name: 'Casablanca', region: 'Casablanca-Settat', temp: '22°C', cond: 'Ensoleillé', icon: 'fa-sun', humidity: '64%', wind: '18 km/h' },
+    { name: 'Marrakech', region: 'Marrakech-Safi', temp: '26°C', cond: 'Ciel dégagé', icon: 'fa-sun', humidity: '38%', wind: '12 km/h' },
+    { name: 'Rabat', region: 'Rabat-Salé-Kénitra', temp: '21°C', cond: 'Partiellement nuageux', icon: 'fa-cloud-sun', humidity: '72%', wind: '15 km/h' },
+    { name: 'Tanger', region: 'Tanger-Tétouan', temp: '20°C', cond: 'Brise marine', icon: 'fa-wind', humidity: '68%', wind: '24 km/h' },
+    { name: 'Agadir', region: 'Souss-Massa', temp: '24°C', cond: 'Beau temps', icon: 'fa-sun', humidity: '52%', wind: '14 km/h' },
+    { name: 'Ifrane', region: 'Fès-Meknès', temp: '14°C', cond: 'Air frais d\'Atlas', icon: 'fa-snowflake', humidity: '45%', wind: '10 km/h' },
+  ]
 
   return (
-    <>
-        {/*  Hero Section  */}
-        <section className="hero-section">
-            <div className="container">
-                <div className="hero-content">
-                    <div className="hero-text">
-                        <h1 className="hero-title">
-                            <span className="title-line">Météo</span>
-                            <span className="title-line highlight">Professionnelle</span>
-                            <span className="title-line">pour le Maroc</span>
-                        </h1>
-                        <p className="hero-description">
-                            Accédez aux prévisions météorologiques les plus précises et aux alertes en temps réel. 
-                            Planifiez vos activités avec confiance grâce à nos données climatiques avancées.
-                        </p>
-                        <div className="hero-actions">
-                            <a href="/weather" className="btn btn-primary btn-large">
-                                <i className="fas fa-search"></i>
-                                Voir la Météo
-                            </a>
-                            <a href="/forecast" className="btn btn-outline btn-large">
-                                <i className="fas fa-chart-line"></i>
-                                Prévisions 5 Jours
-                            </a>
-                        </div>
-                    </div>
-                    <div className="hero-visual">
-                        <div className="weather-preview">
-                            <div className="weather-card">
-                                <div className="weather-icon">
-                                    <i className="fas fa-sun"></i>
-                                </div>
-                                <div className="weather-info">
-                                    <div className="temperature">24°C</div>
-                                    <div className="location">Rabat, Maroc</div>
-                                    <div className="condition">Ensoleillé</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div className="container">
+      {/* ====================================================================
+          HERO SECTION
+          ==================================================================== */}
+      <section className="af-hero-section">
+        <div className="af-hero-grid">
+          {/* Left: Editorial Hero Content */}
+          <div className="af-hero-content">
+            <div className="af-hero-badge">
+              <i className="fas fa-satellite-dish"></i>
+              <span>INTELLIGENCE CLIMATIQUE MAROC 2026</span>
             </div>
-        </section>
 
-        {/*  Features Section  */}
-        <section className="features-section">
-            <div className="container">
-                <div className="section-header">
-                    <h2 className="section-title">Pourquoi Choisir AtlasForecast ?</h2>
-                    <p className="section-description">
-                        Notre plateforme combine technologie avancée et expertise météorologique 
-                        pour vous offrir les informations les plus fiables
-                    </p>
-                </div>
-                
-                <div className="features-grid">
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-bullseye"></i>
-                        </div>
-                        <h3 className="feature-title">Précision Maximale</h3>
-                        <p className="feature-description">
-                            Prévisions météorologiques avec une précision de 95% grâce à nos modèles climatiques avancés
-                        </p>
-                    </div>
-                    
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-clock"></i>
-                        </div>
-                        <h3 className="feature-title">Temps Réel</h3>
-                        <p className="feature-description">
-                            Données météorologiques mises à jour toutes les 15 minutes pour une information toujours actuelle
-                        </p>
-                    </div>
-                    
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-map-marked-alt"></i>
-                        </div>
-                        <h3 className="feature-title">Couverture Complète</h3>
-                        <p className="feature-description">
-                            Couverture météorologique de tout le Maroc avec plus de 1000 points de mesure
-                        </p>
-                    </div>
-                    
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-shield-alt"></i>
-                        </div>
-                        <h3 className="feature-title">Alertes Intelligentes</h3>
-                        <p className="feature-description">
-                            Système d'alertes automatiques pour les conditions météorologiques dangereuses
-                        </p>
-                    </div>
-                </div>
+            <h1 className="af-hero-title">
+              Météo Professionnelle &{' '}
+              <span className="title-accent">Prévisions Avancées</span> pour le Maroc
+            </h1>
+
+            <p className="af-hero-desc">
+              Accédez aux données météorologiques haute résolution, alertes en temps réel
+              et analyses prédictives propulsées par l'IA sur l'ensemble du territoire marocain.
+            </p>
+
+            {/* Quick Location Search Bar */}
+            <form onSubmit={handleSearch} className="af-hero-search-box">
+              <i className="fas fa-search" style={{ color: 'var(--accent-primary)', marginLeft: '0.5rem' }}></i>
+              <input
+                type="text"
+                className="af-hero-search-input"
+                placeholder="Rechercher une ville au Maroc (ex: Casablanca, Marrakech, Ifrane...)"
+                value={searchCity}
+                onChange={(e) => setSearchCity(e.target.value)}
+              />
+              <button type="submit" className="btn btn-primary btn-sm">
+                Consulter
+              </button>
+            </form>
+
+            {/* Quick City Filter Chips */}
+            <div className="af-hero-quick-chips">
+              <span className="af-chip-label">Suggestions :</span>
+              {['Casablanca', 'Marrakech', 'Rabat', 'Tanger', 'Agadir', 'Ifrane', 'Fès'].map((city) => (
+                <button
+                  key={city}
+                  type="button"
+                  className="af-city-chip"
+                  onClick={() => handleCityClick(city)}
+                >
+                  {city}
+                </button>
+              ))}
             </div>
-        </section>
 
-        {/*  Section Plateformes avec Disposition Horizontale  */}
-        <section className="platforms-section">
-            <div className="horizontal-container">
-                {/*  Colonne de gauche : Informations sur les plateformes  */}
-                <div className="form-column">
-                    <div className="form-header">
-                        <h1>Nos Plateformes</h1>
-                        <p>Accédez à AtlasForecast sur tous vos appareils et plateformes préférées</p>
-                    </div>
-
-                    <div className="form-card">
-                        <div className="platform-info">
-                            <h3><i className="fas fa-globe"></i> Accès Multi-Plateformes</h3>
-                            <p>AtlasForecast est disponible on tous vos appareils : ordinateurs, smartphones, tablettes et plus encore.</p>
-                            
-                            <div className="platform-features">
-                                <div className="platform-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Interface responsive adaptée à tous les écrans</span>
-                                </div>
-                                <div className="platform-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Application web progressive (PWA)</span>
-                                </div>
-                                <div className="platform-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Compatibilité avec tous les navigateurs</span>
-                                </div>
-                                <div className="platform-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Synchronisation en temps réel</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/*  Colonne de droite : Boutons des plateformes  */}
-                <div className="info-column">
-                    <div className="info-card">
-                        <div className="info-header">
-                            <h2>Accès Rapide</h2>
-                            <p>Choisissez votre plateforme préférée</p>
-                        </div>
-
-                        {/*  Boutons des plateformes  */}
-                        <div className="platform-buttons">
-                            <h3><i className="fas fa-desktop"></i> Ordinateur</h3>
-                            <div className="platform-btn-group">
-                                <button className="platform-btn web-btn">
-                                    <i className="fab fa-chrome"></i>
-                                    <span>Chrome</span>
-                                </button>
-                                <button className="platform-btn web-btn">
-                                    <i className="fab fa-firefox"></i>
-                                    <span>Firefox</span>
-                                </button>
-                                <button className="platform-btn web-btn">
-                                    <i className="fab fa-edge"></i>
-                                    <span>Edge</span>
-                                </button>
-                                <button className="platform-btn web-btn">
-                                    <i className="fab fa-safari"></i>
-                                    <span>Safari</span>
-                                </button>
-                            </div>
-
-                            <h3><i className="fas fa-mobile-alt"></i> Mobile</h3>
-                            <div className="platform-btn-group">
-                                <button className="platform-btn mobile-btn">
-                                    <i className="fab fa-android"></i>
-                                    <span>Android</span>
-                                </button>
-                                <button className="platform-btn mobile-btn">
-                                    <i className="fab fa-apple"></i>
-                                    <span>iOS</span>
-                                </button>
-                                <button className="platform-btn mobile-btn">
-                                    <i className="fas fa-mobile-alt"></i>
-                                    <span>PWA</span>
-                                </button>
-                            </div>
-
-                            <h3><i className="fas fa-tablet-alt"></i> Tablette</h3>
-                            <div className="platform-btn-group">
-                                <button className="platform-btn tablet-btn">
-                                    <i className="fab fa-android"></i>
-                                    <span>Android</span>
-                                </button>
-                                <button className="platform-btn tablet-btn">
-                                    <i className="fab fa-apple"></i>
-                                    <span>iPad</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        {/*  Liens rapides  */}
-                        <div className="quick-links">
-                            <h3><i className="fas fa-link"></i> Liens rapides</h3>
-                            <div className="links-grid">
-                                <a href="/weather" className="quick-link">
-                                    <i className="fas fa-cloud-sun"></i>
-                                    <span>Météo</span>
-                                </a>
-                                <a href="/forecast" className="quick-link">
-                                    <i className="fas fa-chart-line"></i>
-                                    <span>Prévisions</span>
-                                </a>
-                                <a href="/alerts" className="quick-link">
-                                    <i className="fas fa-exclamation-triangle"></i>
-                                    <span>Alertes</span>
-                                </a>
-                                <a href="/premium" className="quick-link">
-                                    <i className="fas fa-crown"></i>
-                                    <span>Premium</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Primary Action Buttons */}
+            <div className="af-hero-actions">
+              <Link to="/weather" className="btn btn-primary btn-large">
+                <i className="fas fa-cloud-sun"></i>
+                <span>Explorer la Météo</span>
+              </Link>
+              <Link to="/assistant" className="btn btn-secondary btn-large">
+                <i className="fas fa-robot" style={{ color: 'var(--accent-cyan)' }}></i>
+                <span>Assistant IA Météo</span>
+              </Link>
             </div>
-        </section>
+          </div>
 
-        {/*  Weather Preview Section  */}
-        <section className="weather-preview-section">
-            <div className="container">
-                <div className="section-header">
-                    <h2 className="section-title">Météo Actuelle</h2>
-                    <p className="section-description">
-                        Consultez les conditions météorologiques actuelles dans les principales villes du Maroc et du monde
-                    </p>
+          {/* Right: Live Interactive Weather Card Visual */}
+          <div className="af-hero-visual">
+            <div className="af-hero-weather-card">
+              <div className="af-hw-header">
+                <div className="af-hw-location">
+                  <div className="af-hw-city">
+                    <span>Rabat</span>
+                    <i className="fas fa-location-dot" style={{ fontSize: '0.85rem', color: 'var(--accent-primary)' }}></i>
+                  </div>
+                  <span className="af-hw-region">Capitale — Rabat-Salé-Kénitra</span>
                 </div>
-                
-                <div className="cities-grid">
-                    <div className="city-weather-card" onClick={() => handleCityClick('Rabat')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Rabat</h3>
-                            <span className="city-region">Rabat-Salé-Kénitra</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-sun"></i>
-                            </div>
-                            <div className="temperature">24°C</div>
-                            <div className="condition">Ensoleillé</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">65%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">12 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="city-weather-card" onClick={() => handleCityClick('Casablanca')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Casablanca</h3>
-                            <span className="city-region">Casablanca-Settat</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-cloud-sun"></i>
-                            </div>
-                            <div className="temperature">22°C</div>
-                            <div className="condition">Partiellement nuageux</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">70%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">15 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="city-weather-card" onClick={() => handleCityClick('Marrakech')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Marrakech</h3>
-                            <span className="city-region">Marrakech-Safi</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-sun"></i>
-                            </div>
-                            <div className="temperature">28°C</div>
-                            <div className="condition">Ensoleillé</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">45%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">8 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="city-weather-card" onClick={() => handleCityClick('Fès')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Fès</h3>
-                            <span className="city-region">Fès-Meknès</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-cloud"></i>
-                            </div>
-                            <div className="temperature">20°C</div>
-                            <div className="condition">Nuageux</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">75%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">10 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="city-weather-card" onClick={() => handleCityClick('Agadir')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Agadir</h3>
-                            <span className="city-region">Souss-Massa</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-sun"></i>
-                            </div>
-                            <div className="temperature">25°C</div>
-                            <div className="condition">Ensoleillé</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">60%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">18 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="city-weather-card" onClick={() => handleCityClick('Tanger')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Tanger</h3>
-                            <span className="city-region">Tanger-Tétouan-Al Hoceïma</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-cloud-sun"></i>
-                            </div>
-                            <div className="temperature">21°C</div>
-                            <div className="condition">Partiellement nuageux</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">68%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">22 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="city-weather-card" onClick={() => handleCityClick('Oujda')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Oujda</h3>
-                            <span className="city-region">L'Oriental</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-sun"></i>
-                            </div>
-                            <div className="temperature">23°C</div>
-                            <div className="condition">Ensoleillé</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">55%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">14 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="city-weather-card" onClick={() => handleCityClick('Laâyoune')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Laâyoune</h3>
-                            <span className="city-region">Laâyoune-Sakia El Hamra</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-sun"></i>
-                            </div>
-                            <div className="temperature">27°C</div>
-                            <div className="condition">Ensoleillé</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">40%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">25 km/h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="city-weather-card" onClick={() => handleCityClick('Paris')} style={{ cursor: 'pointer' }}>
-                        <div className="city-header">
-                            <h3 className="city-name">Paris</h3>
-                            <span className="city-region">France</span>
-                        </div>
-                        <div className="weather-display">
-                            <div className="weather-icon">
-                                <i className="fas fa-cloud-sun"></i>
-                            </div>
-                            <div className="temperature">18°C</div>
-                            <div className="condition">Partiellement nuageux</div>
-                        </div>
-                        <div className="weather-details">
-                            <div className="detail-item">
-                                <span className="detail-label">Humidité</span>
-                                <span className="detail-value">60%</span>
-                            </div>
-                            <div className="detail-item">
-                                <span className="detail-label">Vent</span>
-                                <span className="detail-value">10 km/h</span>
-                            </div>
-                        </div>
-                    </div>
+                <div className="af-hw-live-badge">
+                  <span className="af-hw-live-dot"></span>
+                  <span>EN DIRECT</span>
                 </div>
+              </div>
 
-                
-                <div className="view-all-weather">
-                    <a href="/weather" className="btn btn-outline btn-large">
-                        <i className="fas fa-eye"></i>
-                        Voir Toutes les Villes
-                    </a>
+              <div className="af-hw-main">
+                <div className="af-hw-temp-wrap">
+                  <div className="af-hw-temp">24°C</div>
+                  <div className="af-hw-condition">Ensoleillé & Ciel Dégagé</div>
                 </div>
+                <div className="af-hw-icon">
+                  <i className="fas fa-sun"></i>
+                </div>
+              </div>
+
+              <div className="af-hw-metrics">
+                <div className="af-hw-metric-item">
+                  <span className="af-hw-metric-label">Humidité</span>
+                  <span className="af-hw-metric-val">62%</span>
+                </div>
+                <div className="af-hw-metric-item">
+                  <span className="af-hw-metric-label">Vent</span>
+                  <span className="af-hw-metric-val">14 km/h</span>
+                </div>
+                <div className="af-hw-metric-item">
+                  <span className="af-hw-metric-label">Indice UV</span>
+                  <span className="af-hw-metric-val">6 (Élevé)</span>
+                </div>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        {/*  CTA Section  */}
-        <section className="cta-section">
-            <div className="container">
-                <div className="cta-content">
-                    <h2 className="cta-title">Prêt à Planifier Votre Journée ?</h2>
-                    <p className="cta-description">
-                        Accédez à nos prévisions météorologiques détaillées et planifiez vos activités 
-                        avec une précision inégalée
-                    </p>
-                    <div className="cta-actions">
-                        <a href="/forecast" className="btn btn-primary btn-large">
-                            <i className="fas fa-chart-line"></i>
-                            Voir les Prévisions
-                        </a>
-                        <a href="/register" className="btn btn-outline btn-large">
-                            <i className="fas fa-user-plus"></i>
-                            Créer un Compte
-                        </a>
-                    </div>
-                </div>
+      {/* ====================================================================
+          FEATURES VALUE PROPOSITION SECTION
+          ==================================================================== */}
+      <section className="af-section">
+        <div className="af-section-header">
+          <span className="af-section-tag">Plateforme Météo Nouvelle Génération</span>
+          <h2 className="af-section-title">Pourquoi Choisir AtlasForecast ?</h2>
+          <p className="af-section-desc">
+            Une suite technologique complète alliant modèles numériques de prévision,
+            radar Doppler et intelligence artificielle appliquée au climat marocain.
+          </p>
+        </div>
+
+        <div className="af-features-grid">
+          <div className="af-feature-card">
+            <div className="af-feature-icon-wrap">
+              <i className="fas fa-bullseye"></i>
             </div>
-        </section>
+            <h3 className="af-feature-title">Précision Multi-Modèles</h3>
+            <p className="af-feature-desc">
+              Agrégation continue des modèles ECMWF, GFS et ICON pour une fiabilité prédictive jusqu'à 95%.
+            </p>
+            <span className="af-feature-highlight">
+              <i className="fas fa-check-circle"></i> Modèles haute résolution
+            </span>
+          </div>
 
-        {/*  Section Premium  */}
-        <section className="premium-section">
-            <div className="container">
-                <div className="premium-header">
-                    <div className="premium-badge">
-                        <i className="fas fa-crown"></i>
-                        <span>Premium</span>
-                    </div>
-                    <h2 className="premium-title">Débloquez le Potentiel Complet d'AtlasForecast</h2>
-                    <p className="premium-subtitle">
-                        Accédez à des fonctionnalités avancées et des données météorologiques de niveau professionnel
-                    </p>
-                </div>
-
-                <div className="premium-features">
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-satellite-dish"></i>
-                        </div>
-                        <h3 className="feature-title">Données Satellite HD</h3>
-                        <p className="feature-description">
-                            Images satellite haute résolution avec archives de 10 ans et mises à jour toutes les 15 minutes
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>Résolution 4K</span>
-                        </div>
-                    </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-chart-area"></i>
-                        </div>
-                        <h3 className="feature-title">Prévisions Ultra-Précises</h3>
-                        <p className="feature-description">
-                            Modèles météo multi-ensembles avec prévisions jusqu'à 15 jours et précision de 95%
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>15 jours avancés</span>
-                        </div>
-                    </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-bell"></i>
-                        </div>
-                        <h3 className="feature-title">Alertes Personnalisées</h3>
-                        <p className="feature-description">
-                            Notifications en temps réel pour conditions météo extrêmes et alertes personnalisées
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>Alertes instantanées</span>
-                        </div>
-                    </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-database"></i>
-                        </div>
-                        <h3 className="feature-title">Historique Complet</h3>
-                        <p className="feature-description">
-                            Accès à 50 ans de données climatiques avec analyses statistiques et tendances
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>50 ans d'historique</span>
-                        </div>
-                    </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3 className="feature-title">Application Mobile</h3>
-                        <p className="feature-description">
-                            Application native iOS et Android avec synchronisation cloud et mode hors ligne
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>iOS & Android</span>
-                        </div>
-                    </div>
-
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <i className="fas fa-headset"></i>
-                        </div>
-                        <h3 className="feature-title">Support Prioritaire</h3>
-                        <p className="feature-description">
-                            Support client 24/7 avec accès direct aux experts météo et assistance technique
-                        </p>
-                        <div className="feature-highlight">
-                            <i className="fas fa-check"></i>
-                            <span>Support 24/7</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="premium-pricing">
-                    <div className="pricing-cards">
-                        {/*  Plan Mensuel  */}
-                        <div className="pricing-card monthly-card">
-                            <div className="pricing-header">
-                                <h3 className="plan-name">Plan Mensuel</h3>
-                                <div className="price">
-                                    <span className="currency">€</span>
-                                    <span className="amount">4.99</span>
-                                    <span className="period">/mois</span>
-                                </div>
-                                <p className="billing">Facturation mensuelle</p>
-                            </div>
-                            
-                            <div className="pricing-features">
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Toutes les fonctionnalités premium</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Données en temps réel</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Support prioritaire</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Application mobile</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Annulation gratuite</span>
-                                </div>
-                            </div>
-
-                            <div className="pricing-actions">
-                                <a href="/premium" className="btn btn-premium btn-large">
-                                    <i className="fas fa-rocket"></i>
-                                    Commencer l'Essai Gratuit
-                                </a>
-                                <p className="trial-info">14 jours d'essai gratuit, sans engagement</p>
-                            </div>
-                        </div>
-
-                        {/*  Plan Annuel (Recommandé)  */}
-                        <div className="pricing-card annual-card recommended">
-                            <div className="recommended-badge">
-                                <i className="fas fa-star"></i>
-                                <span>Recommandé</span>
-                            </div>
-                            <div className="pricing-header">
-                                <h3 className="plan-name">Plan Annuel</h3>
-                                <div className="price">
-                                    <span className="currency">€</span>
-                                    <span className="amount">49.99</span>
-                                    <span className="period">/an</span>
-                                </div>
-                                <p className="billing">Facturation annuelle</p>
-                                <div className="savings">
-                                    <i className="fas fa-piggy-bank"></i>
-                                    <span>Économisez 30%</span>
-                                </div>
-                            </div>
-                            
-                            <div className="pricing-features">
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Toutes les fonctionnalités premium</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Données en temps réel</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Support prioritaire</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Application mobile</span>
-                                </div>
-                                <div className="pricing-feature">
-                                    <i className="fas fa-check"></i>
-                                    <span>Annulation gratuite</span>
-                                </div>
-                                <div className="pricing-feature bonus">
-                                    <i className="fas fa-gift"></i>
-                                    <span>+ 2 mois offerts</span>
-                                </div>
-                            </div>
-
-                            <div className="pricing-actions">
-                                <a href="/premium" className="btn btn-premium btn-large">
-                                    <i className="fas fa-crown"></i>
-                                    Choisir l'Annuel
-                                </a>
-                                <p className="trial-info">14 jours d'essai gratuit, sans engagement</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="premium-cta">
-                    <div className="cta-content">
-                        <h3>Prêt à Transformer Votre Expérience Météo ?</h3>
-                        <p>Rejoignez des milliers de professionnels qui font confiance à AtlasForecast Premium</p>
-                        <div className="cta-buttons">
-                            <a href="/premium" className="btn btn-outline btn-large">
-                                <i className="fas fa-info-circle"></i>
-                                En Savoir Plus
-                            </a>
-                            <a href="/register" className="btn btn-primary btn-large">
-                                <i className="fas fa-crown"></i>
-                                Devenir Premium
-                            </a>
-                        </div>
-                    </div>
-                </div>
+          <div className="af-feature-card">
+            <div className="af-feature-icon-wrap" style={{ color: 'var(--accent-cyan)' }}>
+              <i className="fas fa-bolt"></i>
             </div>
-        </section>
-    </>
-  );
-};
+            <h3 className="af-feature-title">Alertes Instantanées</h3>
+            <p className="af-feature-desc">
+              Détection automatique des phénomènes extrêmes (chergui, orages d'Atlas, vagues de chaleur et neige).
+            </p>
+            <span className="af-feature-highlight">
+              <i className="fas fa-check-circle"></i> Notification temps réel
+            </span>
+          </div>
 
-export default HomePage;
+          <div className="af-feature-card">
+            <div className="af-feature-icon-wrap" style={{ color: 'var(--accent-tertiary)' }}>
+              <i className="fas fa-robot"></i>
+            </div>
+            <h3 className="af-feature-title">Copilot IA Météo</h3>
+            <p className="af-feature-desc">
+              Recommandations personnalisées pour l'agriculture, le voyage, les chantiers et vos loisirs en plein air.
+            </p>
+            <span className="af-feature-highlight">
+              <i className="fas fa-check-circle"></i> Conseils contextualisés
+            </span>
+          </div>
+
+          <div className="af-feature-card">
+            <div className="af-feature-icon-wrap" style={{ color: '#fbbf24' }}>
+              <i className="fas fa-map-location-dot"></i>
+            </div>
+            <h3 className="af-feature-title">Couverture Totale Maroc</h3>
+            <p className="af-feature-desc">
+              Surveillance météo de Tanger à Lagouira avec plus de 1 000 stations et localités analysées.
+            </p>
+            <span className="af-feature-highlight">
+              <i className="fas fa-check-circle"></i> Données locales fiables
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          POPULAR MOROCCAN CITIES SHOWCASE
+          ==================================================================== */}
+      <section className="af-section">
+        <div className="af-section-header">
+          <span className="af-section-tag">Aperçu Régional</span>
+          <h2 className="af-section-title">Météo des Principales Villes</h2>
+          <p className="af-section-desc">
+            Sélectionnez une ville pour accéder immédiatement au bulletin détaillé et aux prévisions à 14 jours.
+          </p>
+        </div>
+
+        <div className="af-cities-grid">
+          {popularCities.map((city) => (
+            <div
+              key={city.name}
+              className="af-city-card"
+              onClick={() => handleCityClick(city.name)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleCityClick(city.name)}
+            >
+              <div className="af-city-top">
+                <div>
+                  <div className="af-city-name">{city.name}</div>
+                  <div className="af-city-region">{city.region}</div>
+                </div>
+                <i className={`fas ${city.icon} af-city-cond-icon`}></i>
+              </div>
+
+              <div className="af-city-body">
+                <div className="af-city-temp">{city.temp}</div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
+                    {city.cond}
+                  </div>
+                </div>
+              </div>
+
+              <div className="af-city-footer">
+                <span><i className="fas fa-droplet"></i> {city.humidity}</span>
+                <span><i className="fas fa-wind"></i> {city.wind}</span>
+                <span style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>
+                  Voir détails <i className="fas fa-arrow-right"></i>
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ====================================================================
+          SAAS PREMIUM PROMOTION SECTION
+          ==================================================================== */}
+      <section className="af-section">
+        <div className="af-pricing-showcase">
+          <div className="af-section-header" style={{ marginBottom: '2.5rem' }}>
+            <div className="af-badge af-badge-premium" style={{ marginBottom: '1rem' }}>
+              <i className="fas fa-crown"></i>
+              <span>OFFRE ATLASFORECAST PREMIUM</span>
+            </div>
+            <h2 className="af-section-title">Débloquez l'Expérience Météo Complète</h2>
+            <p className="af-section-desc">
+              Accédez à l'Assistant Copilot IA illimité, aux prévisions étendues à 14 jours et aux alertes prioritaires.
+            </p>
+          </div>
+
+          <div className="af-pricing-grid">
+            {/* Monthly Plan Card */}
+            <div className="af-price-card">
+              <div className="af-price-header">
+                <div className="af-price-name">Formule Mensuelle</div>
+                <div className="af-price-desc">Flexibilité totale, sans engagement</div>
+                <div className="af-price-figure">
+                  <span className="af-price-amount">$5</span>
+                  <span className="af-price-period">/ mois</span>
+                </div>
+              </div>
+
+              <ul className="af-price-features">
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Assistant IA Météo illimité</span>
+                </li>
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Prévisions multi-modèles 14 jours</span>
+                </li>
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Alertes climatiques personnalisées</span>
+                </li>
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Radar satellite HD sans publicité</span>
+                </li>
+              </ul>
+
+              <Link
+                to="/premium?plan=monthly"
+                className="btn btn-secondary btn-large"
+                style={{ width: '100%' }}
+              >
+                Choisir le forfait mensuel
+              </Link>
+            </div>
+
+            {/* Yearly Plan Card (Featured) */}
+            <div className="af-price-card featured">
+              <div className="af-price-badge-rec">RECOMMANDE — 2 MOIS OFFERTS</div>
+
+              <div className="af-price-header">
+                <div className="af-price-name">Formule Annuelle</div>
+                <div className="af-price-desc">Meilleur rapport qualité-prix</div>
+                <div className="af-price-figure">
+                  <span className="af-price-amount">$50</span>
+                  <span className="af-price-period">/ an</span>
+                </div>
+                <span className="af-price-savings">Économisez 17% (soit $4.16 /mois)</span>
+              </div>
+
+              <ul className="af-price-features">
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Tout ce qui est inclus dans l'offre mensuelle</span>
+                </li>
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Accès prioritaire aux nouveaux modèles</span>
+                </li>
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Export des rapports historiques</span>
+                </li>
+                <li className="af-price-feature-item">
+                  <i className="fas fa-check-circle"></i>
+                  <span>Support technique prioritaire 7j/7</span>
+                </li>
+              </ul>
+
+              <Link
+                to="/premium?plan=yearly"
+                className="btn btn-premium btn-large"
+                style={{ width: '100%' }}
+              >
+                <i className="fas fa-crown"></i>
+                <span>Passer en Premium Annuel</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}

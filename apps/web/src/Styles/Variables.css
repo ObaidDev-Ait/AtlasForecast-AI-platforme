@@ -1,159 +1,199 @@
-/* ========================================
-   ATLASFORECAST — DESIGN TOKENS
-   Single source of truth for the entire UI.
-   Deep-navy weather intelligence palette.
-   ======================================== */
+/* ==========================================================================
+   ATLASFORECAST — 2026 PREMIUM SAAS DESIGN SYSTEM TOKENS
+   Single source of truth for the entire application.
+   ========================================================================== */
 
-/* ===== DARK THEME (default) ===== */
+/* ===== DARK THEME (Default) ===== */
 :root {
-  /* --- Background elevation scale --- */
-  --bg-base:       #071224;
-  --bg-primary:    #0b1a33;
-  --bg-secondary:  #0f2341;
-  --bg-tertiary:   #142d52;
-  --bg-elevated:   #193661;
+  /* --- Canvas & Elevation Layers --- */
+  --bg-base:        #050b18;
+  --bg-primary:     #081426;
+  --bg-secondary:   #0d1e38;
+  --bg-tertiary:    #12284b;
+  --bg-elevated:    #183460;
+  --bg-hover:       #1e3e70;
 
-  /* --- Glass / frosted presets --- */
-  --bg-glass:       rgba(11, 26, 51, 0.72);
+  /* --- Glassmorphism Surfaces --- */
+  --bg-glass:       rgba(10, 24, 48, 0.72);
+  --bg-glass-heavy: rgba(8, 20, 40, 0.88);
   --bg-glass-light: rgba(255, 255, 255, 0.04);
-  --bg-glass-dark:  rgba(7, 18, 36, 0.88);
-  --glass-border:   rgba(255, 255, 255, 0.08);
-  --glass-blur:     20px;
+  --bg-glass-hover: rgba(255, 255, 255, 0.07);
+  --glass-border:   rgba(255, 255, 255, 0.09);
+  --glass-border-subtle: rgba(255, 255, 255, 0.05);
+  --glass-border-focus:  rgba(59, 130, 246, 0.55);
+  --glass-blur:     24px;
+  --glass-blur-sm:  12px;
 
-  /* --- Text --- */
-  --text-primary:   #f0f4f8;
+  /* --- Typography Colors --- */
+  --text-primary:   #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted:     #64748b;
-  --text-inverse:   #071224;
+  --text-tertiary:  #475569;
+  --text-inverse:   #050b18;
+  --text-accent:    #60a5fa;
 
-  /* --- Accent palette (electric blue core) --- */
+  /* --- Brand & Accent Palette --- */
   --accent-primary:     #3b82f6;
   --accent-primary-rgb: 59, 130, 246;
   --accent-hover:       #60a5fa;
+  --accent-active:      #2563eb;
   --accent-secondary:   #6366f1;
+  --accent-tertiary:    #8b5cf6;
+  --accent-cyan:        #06b6d4;
+  --accent-teal:        #14b8a6;
   --accent-success:     #10b981;
   --accent-warning:     #f59e0b;
   --accent-danger:      #ef4444;
-  --accent-info:        #06b6d4;
-
-  /* --- Borders --- */
-  --border-color:  rgba(255, 255, 255, 0.08);
-  --border-light:  rgba(255, 255, 255, 0.04);
-  --border-dark:   rgba(255, 255, 255, 0.14);
-  --border-focus:  rgba(59, 130, 246, 0.5);
+  --accent-info:        #0ea5e9;
 
   /* --- Gradients --- */
   --gradient-primary:   linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-  --gradient-secondary: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-  --gradient-accent:    linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  --gradient-warm:      linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-  --gradient-surface:   linear-gradient(145deg, #0b1a33 0%, #0f2341 50%, #142d52 100%);
+  --gradient-accent:    linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #6366f1 100%);
+  --gradient-premium:   linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  --gradient-gold:      linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --gradient-aurora:    linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #3b82f6 100%);
+  --gradient-danger:    linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --gradient-surface:   linear-gradient(145deg, rgba(13, 30, 56, 0.9) 0%, rgba(8, 20, 38, 0.9) 100%);
+  --gradient-card:      linear-gradient(160deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  --gradient-glass:     linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
 
-  /* --- Shadows --- */
-  --shadow-color: rgba(0, 0, 0, 0.4);
-  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm:  0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.35);
-  --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.15);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,255,255,0.06);
+  /* --- Borders --- */
+  --border-color:        rgba(255, 255, 255, 0.09);
+  --border-subtle:       rgba(255, 255, 255, 0.05);
+  --border-strong:       rgba(255, 255, 255, 0.16);
+  --border-accent:       rgba(59, 130, 246, 0.4);
+  --border-focus:        rgba(59, 130, 246, 0.7);
 
-  /* --- Spacing (4px base) --- */
-  --sp-1:  0.25rem;  /* 4px */
-  --sp-2:  0.5rem;   /* 8px */
-  --sp-3:  0.75rem;  /* 12px */
-  --sp-4:  1rem;     /* 16px */
-  --sp-5:  1.25rem;  /* 20px */
-  --sp-6:  1.5rem;   /* 24px */
-  --sp-8:  2rem;     /* 32px */
-  --sp-10: 2.5rem;   /* 40px */
-  --sp-12: 3rem;     /* 48px */
-  --sp-16: 4rem;     /* 64px */
-  --sp-20: 5rem;     /* 80px */
+  /* --- Shadows & Glows --- */
+  --shadow-color: rgba(0, 0, 0, 0.45);
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm:  0 2px 6px rgba(0, 0, 0, 0.28);
+  --shadow-md:  0 6px 18px rgba(0, 0, 0, 0.32);
+  --shadow-lg:  0 12px 32px rgba(0, 0, 0, 0.38);
+  --shadow-xl:  0 20px 50px rgba(0, 0, 0, 0.48);
+  --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.22);
+  --shadow-glow-gold: 0 0 30px rgba(245, 158, 11, 0.25);
+  --shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.22);
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
-  /* --- Border radii --- */
-  --radius-sm:   6px;
-  --radius-md:   10px;
-  --radius-lg:   14px;
-  --radius-xl:   18px;
-  --radius-2xl:  22px;
+  /* --- Spacing --- */
+  --sp-1:  0.25rem;   /* 4px */
+  --sp-2:  0.5rem;    /* 8px */
+  --sp-3:  0.75rem;   /* 12px */
+  --sp-4:  1rem;      /* 16px */
+  --sp-5:  1.25rem;   /* 20px */
+  --sp-6:  1.5rem;    /* 24px */
+  --sp-8:  2rem;      /* 32px */
+  --sp-10: 2.5rem;    /* 40px */
+  --sp-12: 3rem;      /* 48px */
+  --sp-16: 4rem;      /* 64px */
+  --sp-20: 5rem;      /* 80px */
+
+  /* --- Radii --- */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
 
   /* --- Typography --- */
-  --font-sans: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --text-xs:  clamp(0.7rem, 0.65rem + 0.2vw, 0.75rem);
-  --text-sm:  clamp(0.8rem, 0.75rem + 0.2vw, 0.875rem);
-  --text-base: clamp(0.9rem, 0.85rem + 0.2vw, 1rem);
-  --text-lg:  clamp(1rem, 0.9rem + 0.3vw, 1.125rem);
-  --text-xl:  clamp(1.15rem, 1rem + 0.4vw, 1.25rem);
-  --text-2xl: clamp(1.35rem, 1.1rem + 0.6vw, 1.5rem);
-  --text-3xl: clamp(1.6rem, 1.2rem + 1vw, 1.875rem);
-  --text-4xl: clamp(1.9rem, 1.3rem + 1.5vw, 2.25rem);
-  --text-5xl: clamp(2.2rem, 1.5rem + 2vw, 3rem);
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg:   1.125rem;  /* 18px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px */
+  --text-3xl:  1.875rem;  /* 30px */
+  --text-4xl:  2.25rem;   /* 36px */
+  --text-5xl:  3rem;      /* 48px */
+  --text-6xl:  3.75rem;   /* 60px */
 
   /* --- Transitions --- */
   --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --dur-fast:   150ms;
-  --dur-normal: 250ms;
-  --dur-slow:   400ms;
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:    150ms;
+  --dur-normal:  250ms;
+  --dur-slow:    400ms;
   --transition-fast:   150ms var(--ease-out);
   --transition-normal: 250ms var(--ease-out);
   --transition-slow:   400ms var(--ease-out);
+  --transition-spring: 350ms var(--ease-spring);
 
-  /* --- Z-index scale --- */
-  --z-base:     1;
-  --z-dropdown: 1000;
-  --z-sticky:   1020;
-  --z-fixed:    1030;
-  --z-overlay:  1040;
-  --z-modal:    1050;
-  --z-toast:    1060;
+  /* --- Layout Constants --- */
+  --header-h:      76px;
+  --container-max: 1320px;
+  --container-pad: clamp(1rem, 0.5rem + 2vw, 2.5rem);
 
-  /* --- Layout --- */
-  --header-h:  72px;
-  --container-max: 1280px;
-  --container-pad: clamp(1rem, 0.5rem + 2vw, 2rem);
+  /* --- Light Theme Mountain Overlay Token (Inactive in Dark) --- */
+  --light-bg-overlay: transparent;
+  --card-bg-solid:   #0d1e38;
 }
 
-/* ===== LIGHT THEME ===== */
+/* ===== LIGHT THEME (Morocco Mountains Foundation) ===== */
 [data-theme="light"] {
-  --bg-base:       #f4f7fb;
-  --bg-primary:    #ffffff;
-  --bg-secondary:  #f1f5f9;
-  --bg-tertiary:   #e8edf4;
-  --bg-elevated:   #ffffff;
+  /* --- Canvas & Elevation Layers --- */
+  --bg-base:        transparent;
+  --bg-primary:     rgba(255, 255, 255, 0.72);
+  --bg-secondary:   rgba(243, 247, 252, 0.76);
+  --bg-tertiary:    rgba(233, 240, 249, 0.82);
+  --bg-elevated:    rgba(255, 255, 255, 0.85);
+  --bg-hover:       rgba(240, 246, 255, 0.85);
 
-  --bg-glass:       rgba(255, 255, 255, 0.82);
-  --bg-glass-light: rgba(0, 0, 0, 0.02);
-  --bg-glass-dark:  rgba(255, 255, 255, 0.94);
-  --glass-border:   rgba(0, 0, 0, 0.08);
+  /* --- Translucent Frosted Glass Surfaces --- */
+  --bg-glass:       rgba(255, 255, 255, 0.65);
+  --bg-glass-heavy: rgba(255, 255, 255, 0.75);
+  --bg-glass-light: rgba(255, 255, 255, 0.48);
+  --bg-glass-hover: rgba(255, 255, 255, 0.88);
+  --glass-border:   rgba(255, 255, 255, 0.75);
+  --glass-border-subtle: rgba(255, 255, 255, 0.50);
+  --glass-border-focus:  rgba(59, 130, 246, 0.65);
+  --glass-blur:     18px;
+  --glass-blur-sm:  10px;
 
-  --text-primary:   #0f172a;
-  --text-secondary: #475569;
-  --text-muted:     #94a3b8;
+  /* --- Typography Colors --- */
+  --text-primary:   #091224;
+  --text-secondary: #1e293b;
+  --text-muted:     #475569;
+  --text-tertiary:  #64748b;
   --text-inverse:   #ffffff;
+  --text-accent:    #1d4ed8;
 
-  --border-color:   rgba(0, 0, 0, 0.08);
-  --border-light:   rgba(0, 0, 0, 0.04);
-  --border-dark:    rgba(0, 0, 0, 0.14);
+  /* --- Borders --- */
+  --border-color:        rgba(255, 255, 255, 0.65);
+  --border-subtle:       rgba(255, 255, 255, 0.45);
+  --border-strong:       rgba(15, 23, 42, 0.18);
+  --border-accent:       rgba(59, 130, 246, 0.55);
+  --border-focus:        rgba(59, 130, 246, 0.75);
 
-  --shadow-color: rgba(0, 0, 0, 0.06);
-  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm:  0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.06);
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  /* --- Shadows & Glows --- */
+  --shadow-color: rgba(15, 23, 42, 0.08);
+  --shadow-xs:  0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-sm:  0 3px 8px rgba(15, 23, 42, 0.07);
+  --shadow-md:  0 8px 22px rgba(15, 23, 42, 0.08);
+  --shadow-lg:  0 14px 36px rgba(15, 23, 42, 0.10);
+  --shadow-xl:  0 22px 50px rgba(15, 23, 42, 0.12);
+  --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.16);
+  --shadow-glow-gold: 0 0 25px rgba(245, 158, 11, 0.18);
+  --shadow-glow-cyan: 0 0 25px rgba(6, 182, 212, 0.14);
+  --shadow-card: 0 8px 30px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
-  --gradient-surface: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 50%, #e8edf4 100%);
+  /* --- Gradients --- */
+  --gradient-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(243, 247, 252, 0.65) 100%);
+  --gradient-card:    linear-gradient(160deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 100%);
+  --gradient-glass:   linear-gradient(135deg, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0.60) 100%);
+
+  /* --- Light Theme Mountain Overlay Token --- */
+  --light-bg-overlay: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(240, 245, 252, 0.25) 40%, rgba(236, 242, 250, 0.55) 100%);
+  --card-bg-solid:   rgba(255, 255, 255, 0.88);
 }
 
-/* ===== Theme transition (on toggle only, not on every element) ===== */
-html[data-theme] {
-  transition: background-color 350ms ease, color 350ms ease;
+/* ===== Smooth theme switching on root ===== */
+html {
+  transition: background-color 300ms ease, color 300ms ease;
 }

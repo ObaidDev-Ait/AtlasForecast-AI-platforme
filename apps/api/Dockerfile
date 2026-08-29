@@ -5,5 +5,5 @@ COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 RUN npm install
 COPY . .
-EXPOSE 4000
+EXPOSE 4001
 CMD ["npm", "run", "dev", "--workspace=api"]

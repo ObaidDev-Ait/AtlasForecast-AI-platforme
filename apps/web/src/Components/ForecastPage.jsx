@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Forecast7Days from './Forecast7Days';
+import { API_BASE_URL } from '../lib/api';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -40,8 +41,6 @@ const ForecastPage = () => {
   const precipChartRef = useRef(null);
   const tempCanvasRef = useRef(null);
   const precipCanvasRef = useRef(null);
-
-  const API_KEY = '47c1019c93bf4a70c11537bebf481926';
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -85,17 +84,16 @@ const ForecastPage = () => {
     };
   }, [location.state]);
 
-  const processForecastData = (list) => {
+  const processForecastData = (forecastList) => {
     const daily = {};
-    list.forEach(item => {
+    forecastList.forEach(item => {
       const date = item.dt_txt.split(' ')[0];
       if (!daily[date]) {
         daily[date] = {
           date,
           temps: [],
+          weather: item.weather[0],
           precip: 0,
-          icon: item.weather[0].icon,
-          description: item.weather[0].description,
           timestamp: item.dt * 1000
         };
       }
@@ -120,11 +118,11 @@ const ForecastPage = () => {
     try {
       let weatherUrl, forecastUrl;
       if (lat && lon) {
-        weatherUrl = `http://localhost:4000/weather/current?city=${lat},${lon}`;
-        forecastUrl = `http://localhost:4000/weather/forecast?city=${lat},${lon}`;
+        weatherUrl = `${API_BASE_URL}/weather/current?lat=${lat}&lon=${lon}&units=${currentUnit}&lang=fr`;
+        forecastUrl = `${API_BASE_URL}/weather/forecast?lat=${lat}&lon=${lon}&units=${currentUnit}&lang=fr`;
       } else {
-        weatherUrl = `http://localhost:4000/weather/current?city=${encodeURIComponent(searchCity)}`;
-        forecastUrl = `http://localhost:4000/weather/forecast?city=${encodeURIComponent(searchCity)}`;
+        weatherUrl = `${API_BASE_URL}/weather/current?city=${encodeURIComponent(searchCity)}&units=${currentUnit}&lang=fr`;
+        forecastUrl = `${API_BASE_URL}/weather/forecast?city=${encodeURIComponent(searchCity)}&units=${currentUnit}&lang=fr`;
       }
 
       const [weatherRes, forecastRes] = await Promise.all([
@@ -134,25 +132,7 @@ const ForecastPage = () => {
 
       if (!weatherRes.ok || !forecastRes.ok) throw new Error("Ville non trouvée");
 
-      const weatherRaw = await weatherRes.json();
-      const weather = {
-        name: weatherRaw.city,
-        coord: { lat: lat || 33.5731, lon: lon || -7.5898 },
-        sys: { country: 'MA', sunrise: 0, sunset: 0 },
-        main: {
-          temp: weatherRaw.temperature,
-          feels_like: weatherRaw.temperature,
-          humidity: 60,
-          pressure: 1015,
-        },
-        weather: [{
-          description: weatherRaw.description,
-          icon: '02d',
-        }],
-        wind: { speed: 12 },
-        visibility: 10000,
-        timezone: 3600,
-      };
+      const weather = await weatherRes.json();
       const forecast = await forecastRes.json();
 
       setWeatherData(weather);
@@ -180,11 +160,11 @@ const ForecastPage = () => {
     setUnit(newUnit);
     if (weatherData && weatherData.name) {
       // Re-fetch with new unit to get correct API conversions
-      searchWeather(weatherData.name, weatherData.coord.lat, weatherData.coord.lon, newUnit);
+      searchWeather(weatherData.name, weatherData.coord?.lat, weatherData.coord?.lon, newUnit);
     }
   };
 
-  // Autocomplete effect
+  // Autocomplete effect via AtlasForecast Backend
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (city.trim().length < 2) {
@@ -193,7 +173,7 @@ const ForecastPage = () => {
         return;
       }
       try {
-        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5&appid=${API_KEY}`;
+        const url = `${API_BASE_URL}/weather/geocoding?q=${encodeURIComponent(city)}&limit=5`;
         const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();

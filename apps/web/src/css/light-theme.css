@@ -7,36 +7,37 @@
 /* ===== COLOR VARIABLES ===== */
 [data-theme="light"] {
   /* Text colors - perfect readability */
-  --text-primary: #1C1C1C;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
+  --text-primary: #091224;
+  --text-secondary: #1e293b;
+  --text-muted: #475569;
   --text-inverse: #FFFFFF;
 
-  /* Surfaces - pure white cards with no blur */
-  --bg-glass: #FFFFFF;
-  --bg-glass-dark: #FFFFFF;
-  --bg-glass-light: #FFFFFF;
+  /* Surfaces - translucent frosted glass */
+  --bg-glass: rgba(255, 255, 255, 0.65);
+  --bg-glass-dark: rgba(255, 255, 255, 0.75);
+  --bg-glass-light: rgba(255, 255, 255, 0.48);
+  --bg-glass-heavy: rgba(255, 255, 255, 0.75);
 
-  /* Borders - subtle warm borders */
-  --border-color: rgba(193, 68, 14, 0.1);
-  --border-light: rgba(193, 68, 14, 0.05);
-  --border-dark: rgba(193, 68, 14, 0.2);
+  /* Borders - subtle glass borders */
+  --border-color: rgba(255, 255, 255, 0.65);
+  --border-light: rgba(255, 255, 255, 0.45);
+  --border-dark: rgba(15, 23, 42, 0.16);
 
   /* Shadows - soft separation from background */
-  --shadow-color: rgba(193, 68, 14, 0.08);
-  --shadow-light: rgba(193, 68, 14, 0.04);
-  --shadow-dark: rgba(193, 68, 14, 0.15);
-  --shadow-glow: rgba(249, 115, 22, 0.2);
+  --shadow-color: rgba(15, 23, 42, 0.08);
+  --shadow-light: rgba(15, 23, 42, 0.04);
+  --shadow-dark: rgba(15, 23, 42, 0.15);
+  --shadow-glow: rgba(59, 130, 246, 0.16);
 
-  /* Accents - Marrakech warm palette */
-  --accent-primary: #F97316;
-  --accent-secondary: #C1440E;
-  --accent-blue: var(--accent-secondary);
+  /* Accents */
+  --accent-primary: #2563eb;
+  --accent-secondary: #1d4ed8;
+  --accent-blue: #3b82f6;
 }
 
 /* ===== BODY & BASE ===== */
 [data-theme="light"] body {
-  background: #F5E6CA;
+  background: transparent;
   color: var(--text-primary);
 }
 
@@ -145,11 +146,13 @@
   background: var(--shadow-glow);
 }
 
-/* Navbar no glass effect */
+/* Navbar frosted glass */
 [data-theme="light"] .af-header,
 [data-theme="light"] header {
-  background: var(--bg-glass) !important;
-  border-bottom: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(18px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
 /* ===== CARDS & GLASS CONTAINERS ===== */
@@ -164,9 +167,10 @@
 [data-theme="light"] .pricing-card,
 [data-theme="light"] .feature-card {
   background: var(--bg-glass);
-  
+  backdrop-filter: blur(var(--glass-blur, 18px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px));
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 24px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  box-shadow: 0 10px 30px var(--shadow-color), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   color: var(--text-primary);
 }
 
@@ -190,8 +194,9 @@
 [data-theme="light"] .nav-link-item,
 [data-theme="light"] .setting-toggle {
   background: var(--bg-glass);
-  
-  border-color: var(--border-color);
+  backdrop-filter: blur(var(--glass-blur, 18px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px));
+  border: 1px solid var(--border-color);
 }
 
 /* Profile, settings, privacy headers and navs */
@@ -200,8 +205,9 @@
 [data-theme="light"] .settings-nav,
 [data-theme="light"] .quick-nav {
   background: var(--bg-glass);
-  
-  border-color: var(--border-color);
+  backdrop-filter: blur(var(--glass-blur, 18px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px));
+  border: 1px solid var(--border-color);
 }
 
 /* Weather cards */
@@ -214,9 +220,10 @@
 [data-theme="light"] .location-banner,
 [data-theme="light"] .morocco-cities-selector {
   background: var(--bg-glass);
-  
-  border-color: var(--border-color);
-  box-shadow: 0 4px 20px var(--shadow-color);
+  backdrop-filter: blur(var(--glass-blur, 18px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px));
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 25px var(--shadow-color);
 }
 
 /* ===== LABELS & FORM INPUTS ===== */
@@ -672,12 +679,13 @@
 /* === ALERTS PAGE NEW MODULE === */
 [data-theme="light"] .alerts-module .alerts-hero,
 [data-theme="light"] .alerts-module .alerts-feed {
-  background: #FFFFFF !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  border-radius: 16px;
+  background: var(--bg-glass) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 18px;
   padding: 1.5rem;
-  backdrop-filter: none !important;
+  backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) !important;
 }
 
 /* ===== VISUAL TEXT — ALL PAGES ===== */
@@ -766,13 +774,17 @@
 
 /* Premium comparison table */
 [data-theme="light"] .comparison-table table {
-  background: #FFFFFF !important;
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
   color: #1e293b !important;
+  border-radius: 16px;
+  overflow: hidden;
 }
 [data-theme="light"] .comparison-table th {
-  color: #1a1a2e !important;
-  background: #f8fafc !important;
-  border-bottom: 2px solid rgba(0,0,0,0.08) !important;
+  color: #091224 !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-bottom: 2px solid rgba(15, 23, 42, 0.08) !important;
 }
 [data-theme="light"] .comparison-table td {
   color: #4a5568 !important;
@@ -1033,10 +1045,12 @@
 [data-theme="light"] .error-state,
 [data-theme="light"] .loading-state,
 [data-theme="light"] .debug-info {
-  background: #FFFFFF !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  border-radius: 16px;
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 18px;
 }
 
 /* Alerts text visibility */
@@ -1047,9 +1061,9 @@
 [data-theme="light"] .connection-error h3,
 [data-theme="light"] .no-alerts h3,
 [data-theme="light"] .error-state h3 {
-  color: #1a1a2e !important;
-  -webkit-text-fill-color: #1a1a2e !important;
-  text-shadow: none !important;
+  color: #091224 !important;
+  -webkit-text-fill-color: #091224 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
 }
 
 [data-theme="light"] .alerts-header p,
@@ -1061,16 +1075,18 @@
 [data-theme="light"] .no-alerts p,
 [data-theme="light"] .error-state p,
 [data-theme="light"] .loading-state p {
-  color: #4a5568 !important;
-  text-shadow: none !important;
+  color: #1e293b !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Stat items */
 [data-theme="light"] .stat-item {
-  background: #FFFFFF !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  border-radius: 12px;
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  border-radius: 14px;
 }
 
 [data-theme="light"] .stat-label {
@@ -1145,10 +1161,12 @@
 [data-theme="light"] .stats-section,
 [data-theme="light"] .specialized-tools,
 [data-theme="light"] .quick-links {
-  background: #FFFFFF !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  border-radius: 16px;
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 18px;
   padding: 1.5rem;
 }
 

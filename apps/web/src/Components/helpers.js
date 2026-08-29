@@ -1,6 +1,7 @@
-// API Configuration
-export const API_KEY = import.meta.env.VITE_OWM_API_KEY || '47c1019c93bf4a70c11537bebf481926'
-export const BASE_URL = 'https://api.openweathermap.org/data/2.5'
+import { API_BASE_URL } from '../lib/api'
+
+// Configuration
+export const BASE_URL = `${API_BASE_URL}/weather`
 export const MOROCCO_CITIES = [
   { name: 'Casablanca', state: 'Casablanca-Settat', lat: 33.5731, lon: -7.5898 },
   { name: 'Rabat', state: 'Rabat-Salé-Kénitra', lat: 34.0209, lon: -6.8416 },
@@ -25,19 +26,19 @@ export const NAV_LINKS = [
   { to: '/about', label: 'À propos', icon: 'fas fa-info-circle' },
   { to: '/contact', label: 'Contact', icon: 'fas fa-envelope' }
 ]
-// Weather API helpers
+// Weather API helpers routed through AtlasForecast Backend
 export async function getWeatherByCoordinates(lat, lon, units = 'metric') {
-  const res = await fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&lang=fr&units=${units}`)
+  const res = await fetch(`${API_BASE_URL}/weather/current?lat=${lat}&lon=${lon}&units=${units}&lang=fr`)
   if (!res.ok) throw new Error('Erreur météo'); 
   return res.json()
 }
 export async function geocodeCity(city) {
-  const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5&appid=${API_KEY}`)
+  const res = await fetch(`${API_BASE_URL}/weather/geocoding?q=${encodeURIComponent(city)}&limit=5`)
   if (!res.ok) throw new Error('Erreur géocodage'); 
   return res.json()
 }
 export async function getForecastByCoordinates(lat, lon, units = 'metric') {
-  const res = await fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&lang=fr&units=${units}`)
+  const res = await fetch(`${API_BASE_URL}/weather/forecast?lat=${lat}&lon=${lon}&units=${units}&lang=fr`)
   if (!res.ok) throw new Error('Erreur prévisions'); 
   return res.json()
 }

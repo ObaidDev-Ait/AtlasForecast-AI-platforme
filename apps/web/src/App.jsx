@@ -1,5 +1,4 @@
 import React, { lazy, Suspense, useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import './Styles/App.css'
@@ -7,6 +6,7 @@ import Layout from './Components/Layout'
 import LoadingScreen from './Components/LoadingScreen'
 import useRouteTransition from './Components/useRouteTransition'
 import ProtectedRoute from './Components/ProtectedRoute'
+import AdminRoute from './Components/AdminRoute'
 
 // Lazy Pages
 const HomePage = lazy(() => import('./Components/HomePage'))
@@ -18,6 +18,7 @@ const ContactPage = lazy(() => import('./Components/ContactPage'))
 const LoginPage = lazy(() => import('./Components/LoginPage'))
 const RegisterPage = lazy(() => import('./Components/RegisterPage'))
 const ForgotPage = lazy(() => import('./Components/ForgotPage'))
+const ResetPasswordPage = lazy(() => import('./Components/ResetPasswordPage'))
 const PremiumPage = lazy(() => import('./Components/PremiumPage'))
 const ProfilePage = lazy(() => import('./Components/ProfilePage'))
 const SettingsPage = lazy(() => import('./Components/SettingsPage'))
@@ -29,9 +30,9 @@ const AuthFacebookPage = lazy(() => import('./Components/AuthFacebookPage'))
 const AuthXPage = lazy(() => import('./Components/AuthXPage'))
 const DashboardPage = lazy(() => import('./Components/DashboardPage'))
 const AiAssistantPage = lazy(() => import('./Components/AiAssistantPage'))
+const AdminPage = lazy(() => import('./Components/AdminPage'))
 
 function App() {
-   console.log(supabase)
   /* ---- Startup splash (shown once on cold start) ---- */
   const [startupDone, setStartupDone] = useState(false)
 
@@ -71,10 +72,11 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot" element={<ForgotPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="premium" element={<PremiumPage />} />
             <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="dashboard" element={<AdminRoute><DashboardPage /></AdminRoute>} />
             <Route path="assistant" element={<AiAssistantPage />} />
             <Route path="premium-signup" element={<PremiumSignupPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
@@ -82,6 +84,14 @@ function App() {
             <Route path="auth-google" element={<AuthGooglePage />} />
             <Route path="auth-facebook" element={<AuthFacebookPage />} />
             <Route path="auth-x" element={<AuthXPage />} />
+            <Route
+              path="admin"
+              element={
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

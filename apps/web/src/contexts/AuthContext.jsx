@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authFetch } from '../lib/api';
+import {
+  authFetch,
+  API_BASE_URL as API_URL,
+  getAccessToken,
+  storeSession,
+  clearSession,
+} from '../lib/api';
 
 const AuthContext = createContext();
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     // Check local session on mount
     const checkUser = async () => {
       try {
-        const token = localStorage.getItem('access_token');
+        const token = getAccessToken();
         const storedUser = localStorage.getItem('user');
         
         if (token && storedUser) {
@@ -36,7 +40,11 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async (token) => {
     try {
-      const response = await authFetch(`${API_URL}/profile`);
+      // Pass the token explicitly so this never depends on localStorage
+      // having already been written by the caller.
+      const response = await authFetch(`${API_URL}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.ok) {
         const profileData = await response.json();
         setProfile(profileData);
@@ -52,31 +60,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signUp = async (email, password, userData) => {
+    const cleanEmail = (email || '').trim();
     const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email,
+        email: cleanEmail,
         password,
-        first_name: userData?.first_name || '',
-        last_name: userData?.last_name || '',
-      })
+        first_name: (userData?.first_name || '').trim(),
+        last_name: (userData?.last_name || '').trim(),
+      }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Signup failed');
+      const errorData = await response.json().catch(() => ({}));
+      const message = Array.isArray(errorData.message)
+        ? errorData.message.join(', ')
+        : errorData.message || "Échec de l'inscription";
+      throw new Error(message);
     }
 
     const data = await response.json();
+    if (data?.session) {
+      storeSession(data.session);
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
     return { data, error: null };
   };
 
   const signIn = async (email, password) => {
     const requestBody = { email, password };
-    console.log("AuthContext - Request Body:", requestBody);
 
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -94,8 +110,9 @@ export const AuthProvider = ({ children }) => {
     const data = await response.json();
     
     if (data.session) {
-      localStorage.setItem('access_token', data.session.access_token);
-      localStorage.setItem('session', JSON.stringify(data.session));
+      // storeSession keeps access_token and the full session (which carries the
+      // rotating refresh_token) in one place.
+      storeSession(data.session);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
       await fetchProfile(data.session.access_token);
@@ -105,23 +122,36 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signOut = async () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('session');
-    localStorage.removeItem('user');
+    clearSession();
     setUser(null);
     setProfile(null);
     return { error: null };
   };
 
+  // Premium is derived only from the server-returned profile. There is
+  // deliberately no client-side path that can set it.
   const isPremium = profile?.is_premium || false;
+
+  // Role is derived server-side and returned by GET /profile.
+  // Defaults to 'user' — never set by the client.
+  const role = profile?.role || 'user';
+  const isAdmin = role === 'admin';
+
+  const refreshProfile = async () => {
+    const token = getAccessToken();
+    if (token) await fetchProfile(token);
+  };
 
   const value = {
     user,
     profile,
     isPremium,
+    role,
+    isAdmin,
     signUp,
     signIn,
     signOut,
+    refreshProfile,
     loading
   };
 

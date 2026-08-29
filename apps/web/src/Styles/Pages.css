@@ -1,23 +1,448 @@
-/* ABOUT, ALERTS, CONTACT, PREMIUM, PRIVACY shared styles */
-.af-page-header{text-align:center;margin-bottom:3rem}.af-page-header h1{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:900;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.af-page-header p{color:var(--text-secondary);max-width:600px;margin:0 auto}
-.af-page-section{background:var(--bg-glass);border:2px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;margin-bottom:2rem}.af-page-section h2{font-size:1.4rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}.af-page-section h2 i{color:var(--accent-primary)}.af-page-section p{color:var(--text-secondary);line-height:1.7}
-.af-page-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
-.af-page-card{background:var(--bg-glass-light);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.25rem;transition:all .3s}.af-page-card:hover{transform:translateY(-3px);border-color:var(--accent-primary)}.af-page-card h3{font-size:1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}.af-page-card h3 i{color:var(--accent-primary)}.af-page-card p{font-size:.9rem;margin:0;color:var(--text-secondary)}
-.af-page-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem}
-/* ALERTS */
-.af-alert-card{display:flex;align-items:flex-start;gap:1rem;background:var(--bg-glass);border:2px solid var(--border-color);border-radius:var(--radius-lg);padding:1.5rem;transition:all .3s}.af-alert-card:hover{transform:translateY(-3px);border-color:var(--accent-warning)}.af-alert-icon{font-size:2rem;flex-shrink:0}.af-alert-card h3{font-size:1.1rem;margin-bottom:.25rem}.af-alert-card p{color:var(--text-secondary);font-size:.9rem;margin:0}
-/* CONTACT */
-.af-contact-grid{display:grid;grid-template-columns:1fr 2fr;gap:2rem;max-width:900px;margin:0 auto}
-.af-contact-info{display:flex;flex-direction:column;gap:1rem}
-.af-contact-info-card{display:flex;align-items:flex-start;gap:1rem;background:var(--bg-glass);border:2px solid var(--border-color);border-radius:var(--radius-md);padding:1.25rem}.af-contact-info-card i{font-size:1.3rem;color:var(--accent-primary);margin-top:.2rem}.af-contact-info-card h3{font-size:1rem;margin-bottom:.15rem}.af-contact-info-card p{color:var(--text-secondary);font-size:.9rem;margin:0}
-.af-contact-form{background:var(--bg-glass);border:2px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;display:flex;flex-direction:column;gap:1.25rem}
-.af-contact-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.af-contact-field{display:flex;flex-direction:column;gap:.35rem}.af-contact-field label{font-size:.85rem;font-weight:600;color:var(--text-secondary)}.af-contact-field input,.af-contact-field textarea{padding:.8rem 1rem;background:var(--bg-primary);color:var(--text-primary);border:2px solid var(--border-color);border-radius:var(--radius-sm);font-size:1rem;font-family:inherit;outline:none;transition:border-color .2s;resize:vertical}.af-contact-field input:focus,.af-contact-field textarea:focus{border-color:var(--accent-primary)}
-.af-contact-success{text-align:center;background:var(--bg-glass);border:2px solid var(--accent-success);border-radius:var(--radius-xl);padding:3rem}.af-contact-success i{font-size:3rem;color:var(--accent-success);margin-bottom:1rem}.af-contact-success h3{margin-bottom:.5rem}.af-contact-success p{color:var(--text-secondary)}
-/* PREMIUM */
-.af-prem-badge{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:.5rem 1.25rem;border-radius:var(--radius-full);font-weight:700;margin-bottom:1rem;font-size:.9rem}
-.af-prem-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:3rem}
-.af-prem-pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;max-width:700px;margin:0 auto}
-.af-prem-plan{background:var(--bg-glass);border:2px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;text-align:center;position:relative;transition:all .3s}.af-prem-plan:hover{transform:translateY(-5px)}.af-prem-plan.recommended{border-color:#f59e0b;box-shadow:0 10px 40px rgba(245,158,11,.15)}.af-prem-rec-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:.35rem 1rem;border-radius:var(--radius-full);font-size:.8rem;font-weight:700;white-space:nowrap}
-.af-prem-plan h3{font-size:1.3rem;margin-bottom:.5rem}.af-prem-plan ul{list-style:none;padding:1rem 0;text-align:left}.af-prem-plan li{padding:.4rem 0;color:var(--text-secondary);display:flex;align-items:center;gap:.5rem}.af-prem-plan li i{color:var(--accent-success);font-size:.9rem}
-@media(max-width:768px){.af-contact-grid{grid-template-columns:1fr}.af-contact-row{grid-template-columns:1fr}}
+/* ==========================================================================
+   ATLASFORECAST — 2026 GENERAL PAGES & COMMON LAYOUTS
+   (About, Contact, Privacy, Premium Shared, Profile)
+   ========================================================================== */
+
+/* ===== Universal Page Headers ===== */
+.af-page-header,
+.about-header,
+.contact-header,
+.privacy-header,
+.profile-header-main {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto clamp(2rem, 1.5rem + 2vw, 3.5rem);
+}
+
+.af-page-header h1,
+.af-page-title,
+.about-header h1,
+.contact-header h1,
+.privacy-header h1 {
+  font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-3);
+}
+
+.af-page-header p,
+.af-page-subtitle,
+.about-header p,
+.contact-header p,
+.privacy-header p {
+  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.1rem);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Sections & Panels ===== */
+.af-page-section,
+.about-section,
+.privacy-section {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  margin-bottom: var(--sp-6);
+  box-shadow: var(--shadow-card);
+}
+
+.af-page-section h2,
+.about-section h2,
+.privacy-section h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-primary);
+}
+
+.af-page-section h2 i,
+.about-section h2 i,
+.privacy-section h2 i {
+  color: var(--accent-primary);
+}
+
+.af-page-section p,
+.about-section p,
+.privacy-section p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ===== About Services Grid ===== */
+.services-grid,
+.af-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
+}
+
+.service-item,
+.af-page-card,
+.coverage-item {
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  transition: all var(--transition-normal);
+}
+
+.service-item:hover,
+.af-page-card:hover,
+.coverage-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.service-item h3,
+.af-page-card h3,
+.coverage-item h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: var(--sp-2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.service-item h3 i,
+.af-page-card h3 i,
+.coverage-item h4 i {
+  color: var(--accent-primary);
+}
+
+.service-item p,
+.af-page-card p,
+.coverage-item p {
+  font-size: var(--text-sm);
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.coverage-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-5);
+}
+
+/* ===== Contact Page ===== */
+.af-contact-grid,
+.contact-container {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: var(--sp-8);
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.af-contact-info,
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.af-contact-info-card,
+.info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  transition: all var(--transition-fast);
+}
+
+.af-contact-info-card:hover,
+.info-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+.af-contact-info-card i,
+.info-card i {
+  font-size: 1.4rem;
+  color: var(--accent-primary);
+  margin-top: 0.15rem;
+}
+
+.af-contact-info-card h3,
+.info-card h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.af-contact-info-card p,
+.info-card p {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.af-contact-form,
+.contact-form {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.af-contact-row,
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+.af-contact-field,
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.af-contact-field label,
+.form-group label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.af-contact-field input,
+.af-contact-field textarea,
+.form-group input,
+.form-group textarea {
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-family: inherit;
+  outline: none;
+  transition: all var(--transition-fast);
+  resize: vertical;
+}
+
+.af-contact-field input:focus,
+.af-contact-field textarea:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.af-contact-success,
+.contact-success {
+  text-align: center;
+  background: var(--bg-glass);
+  border: 1px solid var(--accent-success);
+  border-radius: var(--radius-xl);
+  padding: 3rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.af-contact-success i,
+.contact-success i {
+  font-size: 3rem;
+  color: var(--accent-success);
+  margin-bottom: 1rem;
+}
+
+/* ===== Plan Selector Chips (Premium Page) ===== */
+.af-chip {
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  outline: none;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.af-chip.active {
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35);
+  background: var(--gradient-primary);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* ===== Developer Profile Page Specifics ===== */
+.profile-header {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  position: relative;
+}
+
+.profile-info h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.profile-title {
+  color: var(--accent-primary);
+  font-weight: 700;
+  margin-bottom: var(--sp-3);
+}
+
+.profile-stats {
+  display: flex;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.profile-actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.profile-nav {
+  display: flex;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-6);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--sp-2);
+  overflow-x: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass-light);
+}
+
+.nav-item.active {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
+}
+
+.profile-section {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  margin-bottom: var(--sp-6);
+}
+
+.profile-section h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.profile-section h2 i {
+  color: var(--accent-primary);
+}
+/* ==========================================================================
+   LIGHT MODE FROSTED GLASS & ATMOSPHERIC VISIBILITY
+   ========================================================================== */
+[data-theme="light"] .af-page-section,
+[data-theme="light"] .about-section,
+[data-theme="light"] .privacy-section,
+[data-theme="light"] .profile-section,
+[data-theme="light"] .contact-card {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .service-card,
+[data-theme="light"] .feature-item {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .af-contact-grid,
+  .contact-container {
+    grid-template-columns: 1fr;
+  }
+  .af-contact-row,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .profile-stats {
+    justify-content: center;
+  }
+  .profile-actions {
+    margin: 0 auto;
+  }
+}

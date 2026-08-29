@@ -1,21 +1,278 @@
-/* AUTH PAGES (Login, Register, Forgot, Profile, Settings, Auth providers) */
-.af-auth-page{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 80px);padding:2rem}
-.af-auth-container{width:100%;max-width:440px}
-.af-auth-card{background:var(--bg-glass);backdrop-filter:blur(20px);border:2px solid var(--border-color);border-radius:var(--radius-xl);padding:2.5rem}
-.af-auth-header{text-align:center;margin-bottom:2rem}
-.af-auth-icon{width:60px;height:60px;background:var(--gradient-primary);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;margin:0 auto 1rem;box-shadow:var(--shadow-lg)}
-.af-auth-header h1{font-size:1.8rem;margin-bottom:.25rem}.af-auth-header p{color:var(--text-secondary);font-size:.95rem;margin:0}
-.af-auth-form{display:flex;flex-direction:column;gap:1.25rem}
-.af-auth-field{display:flex;flex-direction:column;gap:.35rem}.af-auth-field label{font-size:.85rem;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:.4rem}.af-auth-field label i{font-size:.8rem}
-.af-auth-field input{padding:.8rem 1rem;background:var(--bg-primary);color:var(--text-primary);border:2px solid var(--border-color);border-radius:var(--radius-sm);font-size:1rem;outline:none;transition:border-color .2s}.af-auth-field input:focus{border-color:var(--accent-primary)}
-.af-auth-options{display:flex;justify-content:space-between;align-items:center;font-size:.85rem}
-.af-auth-remember{display:flex;align-items:center;gap:.4rem;color:var(--text-secondary);cursor:pointer}.af-auth-remember input{accent-color:var(--accent-primary)}
-.af-auth-forgot{color:var(--accent-primary);font-weight:500}
-.af-auth-divider{text-align:center;margin:1.5rem 0;position:relative}.af-auth-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border-color)}.af-auth-divider span{background:var(--bg-glass);padding:0 1rem;color:var(--text-muted);font-size:.85rem;position:relative}
-.af-auth-social{display:flex;gap:.75rem}
-.af-social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem;border-radius:var(--radius-sm);font-weight:600;font-size:.85rem;text-decoration:none;transition:all .2s;border:1px solid var(--border-color);color:var(--text-primary);background:var(--bg-primary)}
-.af-social-btn:hover{transform:translateY(-2px)}.af-social-btn.google:hover{border-color:#ea4335;color:#ea4335}.af-social-btn.facebook:hover{border-color:#1877f2;color:#1877f2}.af-social-btn.twitter:hover{border-color:#1da1f2;color:#1da1f2}
-.af-auth-footer{text-align:center;margin-top:1.5rem;color:var(--text-secondary);font-size:.9rem}.af-auth-footer a{color:var(--accent-primary);font-weight:600}
-/* SETTINGS ROW */
-.af-settings-row{display:flex;justify-content:space-between;align-items:center;background:var(--bg-primary);padding:1rem;border-radius:var(--radius-md);border:1px solid var(--border-color)}
-.af-settings-row strong{display:block;margin-bottom:.25rem}.af-settings-row span{color:var(--text-secondary);font-size:.9rem}
+/* ==========================================================================
+   ATLASFORECAST — 2026 AUTHENTICATION & ACCOUNT STYLES
+   (Login, Register, Forgot Password, OAuth, Account Settings)
+   ========================================================================== */
+
+.af-auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-h, 76px) - 80px);
+  padding: var(--sp-6) 0 var(--sp-12);
+}
+
+.af-auth-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.af-auth-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  padding: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
+  box-shadow: var(--shadow-xl), var(--shadow-card);
+}
+
+.af-auth-header {
+  text-align: center;
+  margin-bottom: var(--sp-6);
+}
+
+.af-auth-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(99, 102, 241, 0.25));
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-hover);
+  font-size: 1.4rem;
+  margin: 0 auto var(--sp-4);
+  box-shadow: var(--shadow-glow);
+}
+
+.af-auth-header h1 {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  margin-bottom: var(--sp-1);
+}
+
+.af-auth-header p {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.af-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.af-auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.af-auth-field label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.af-auth-field input,
+.af-auth-field select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-family: inherit;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.af-auth-field input:focus,
+.af-auth-field select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.af-auth-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  margin: 0.25rem 0;
+}
+
+.af-auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.af-auth-remember input {
+  accent-color: var(--accent-primary);
+  width: 16px;
+  height: 16px;
+}
+
+.af-auth-forgot {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.af-auth-forgot:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.af-auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: var(--sp-4) 0;
+}
+
+.af-auth-divider::before,
+.af-auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.af-auth-divider:not(:empty)::before {
+  margin-right: 1rem;
+}
+
+.af-auth-divider:not(:empty)::after {
+  margin-left: 1rem;
+}
+
+.af-auth-social {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.af-social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: var(--text-xs);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  background: var(--bg-glass-light);
+}
+
+.af-social-btn:hover {
+  transform: translateY(-2px);
+  background: var(--bg-glass-hover);
+  border-color: var(--accent-primary);
+}
+
+.af-auth-footer {
+  text-align: center;
+  margin-top: var(--sp-6);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.af-auth-footer a {
+  color: var(--accent-primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.af-auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Settings Rows */
+.af-settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-glass-light);
+  padding: 1.1rem var(--sp-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--sp-3);
+  transition: all var(--transition-fast);
+}
+
+.af-settings-row:hover {
+  border-color: var(--glass-border-focus);
+}
+
+.af-settings-row strong {
+  display: block;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  margin-bottom: 0.2rem;
+}
+
+.af-settings-row span {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+/* ==========================================================================
+   LIGHT MODE FROSTED GLASS & ATMOSPHERIC VISIBILITY
+   ========================================================================== */
+[data-theme="light"] .af-auth-card {
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 24px 64px -12px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+}
+
+[data-theme="light"] .af-auth-input {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: #091224;
+}
+
+[data-theme="light"] .af-auth-input:focus {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="light"] .af-social-btn {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .af-social-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="light"] .af-settings-row {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}

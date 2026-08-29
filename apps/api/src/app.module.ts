@@ -9,12 +9,14 @@ import { SavedCitiesModule } from './saved-cities/saved-cities.module';
 import { AiModule } from './ai/ai.module';
 import { BillingModule } from './billing/billing.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AdminModule } from './admin/admin.module';
+import { MigrationModule } from './migration/migration.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['apps/api/.env', '.env', '../.env'],
     }),
     HealthModule,
     SupabaseModule,
@@ -25,6 +27,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     AiModule,
     BillingModule,
     NotificationsModule,
+    AdminModule,
+    MigrationModule,
   ],
 })
 export class AppModule {}
