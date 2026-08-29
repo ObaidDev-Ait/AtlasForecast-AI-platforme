@@ -57,19 +57,52 @@ export class WeatherService {
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   constructor(private readonly configService: ConfigService) {
-    this.apiKey =
-      this.configService.get<string>('OPENWEATHER_API_KEY') ||
-      this.configService.get<string>('WEATHER_API_KEY') ||
-      '';
-    this.baseUrl =
-      this.configService.get<string>('OPENWEATHER_BASE_URL') ||
-      'https://api.openweathermap.org';
-
-    if (!this.apiKey) {
+    const key = this.getApiKey();
+    if (!key) {
       this.logger.warn(
         'OPENWEATHER_API_KEY is not configured. Weather API calls will fail until configured.',
       );
     }
+  }
+
+  private cleanValue(val: any): string | undefined {
+    if (typeof val !== 'string') return undefined;
+    let trimmed = val.trim();
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      trimmed = trimmed.slice(1, -1).trim();
+    }
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  private resolveEnv(keys: string[]): string | undefined {
+    for (const key of keys) {
+      const fromProcess = this.cleanValue(process.env[key]);
+      if (fromProcess) return fromProcess;
+
+      const fromConfig = this.cleanValue(this.configService.get<string>(key));
+      if (fromConfig) return fromConfig;
+    }
+    return undefined;
+  }
+
+  getApiKey(): string {
+    return (
+      this.resolveEnv([
+        'OPENWEATHER_API_KEY',
+        'WEATHER_API_KEY',
+        'OPEN_WEATHER_API_KEY',
+      ]) || ''
+    );
+  }
+
+  getBaseUrl(): string {
+    return (
+      this.resolveEnv(['OPENWEATHER_BASE_URL']) ||
+      'https://api.openweathermap.org'
+    );
   }
 
   private getFromCache<T>(key: string): T | null {
@@ -93,17 +126,19 @@ export class WeatherService {
     return {
       service: 'weather',
       status: 'ok',
-      configured: Boolean(this.apiKey),
+      configured: Boolean(this.getApiKey()),
     };
   }
 
-  private checkApiKey() {
-    if (!this.apiKey) {
+  private checkApiKey(): string {
+    const key = this.getApiKey();
+    if (!key) {
       throw new HttpException(
         'Weather service is not configured on the server (missing API key).',
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     }
+    return key;
   }
 
   private parseCoordinates(cityOrCoords?: string): { lat?: number; lon?: number; query?: string } {
@@ -117,7 +152,8 @@ export class WeatherService {
   }
 
   async getCurrentWeather(optsOrCity: WeatherQueryOptions | string): Promise<NormalizedWeatherData> {
-    this.checkApiKey();
+    const apiKey = this.checkApiKey();
+    const baseUrl = this.getBaseUrl();
 
     const opts: WeatherQueryOptions =
       typeof optsOrCity === 'string' ? { city: optsOrCity } : optsOrCity || {};
@@ -151,9 +187,9 @@ export class WeatherService {
     try {
       let endpoint: string;
       if (lat !== undefined && lon !== undefined) {
-        endpoint = `${this.baseUrl}/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&lang=${lang}&appid=${this.apiKey}`;
+        endpoint = `${baseUrl}/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&lang=${lang}&appid=${apiKey}`;
       } else {
-        endpoint = `${this.baseUrl}/data/2.5/weather?q=${encodeURIComponent(queryCity!)}&units=${units}&lang=${lang}&appid=${this.apiKey}`;
+        endpoint = `${baseUrl}/data/2.5/weather?q=${encodeURIComponent(queryCity!)}&units=${units}&lang=${lang}&appid=${apiKey}`;
       }
 
       const response = await fetch(endpoint);
@@ -222,7 +258,8 @@ export class WeatherService {
   }
 
   async getForecast(optsOrCity: WeatherQueryOptions | string) {
-    this.checkApiKey();
+    const apiKey = this.checkApiKey();
+    const baseUrl = this.getBaseUrl();
 
     const opts: WeatherQueryOptions =
       typeof optsOrCity === 'string' ? { city: optsOrCity } : optsOrCity || {};
@@ -256,9 +293,9 @@ export class WeatherService {
     try {
       let endpoint: string;
       if (lat !== undefined && lon !== undefined) {
-        endpoint = `${this.baseUrl}/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${units}&lang=${lang}&appid=${this.apiKey}`;
+        endpoint = `${baseUrl}/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${units}&lang=${lang}&appid=${apiKey}`;
       } else {
-        endpoint = `${this.baseUrl}/data/2.5/forecast?q=${encodeURIComponent(queryCity!)}&units=${units}&lang=${lang}&appid=${this.apiKey}`;
+        endpoint = `${baseUrl}/data/2.5/forecast?q=${encodeURIComponent(queryCity!)}&units=${units}&lang=${lang}&appid=${apiKey}`;
       }
 
       const response = await fetch(endpoint);
@@ -284,7 +321,8 @@ export class WeatherService {
   }
 
   async searchGeocoding(query: string, limit = 5): Promise<GeocodingResult[]> {
-    this.checkApiKey();
+    const apiKey = this.checkApiKey();
+    const baseUrl = this.getBaseUrl();
 
     if (!query || query.trim().length < 2) {
       return [];
@@ -296,9 +334,9 @@ export class WeatherService {
     if (cached) return cached;
 
     try {
-      const endpoint = `${this.baseUrl}/geo/1.0/direct?q=${encodeURIComponent(
+      const endpoint = `${baseUrl}/geo/1.0/direct?q=${encodeURIComponent(
         query.trim(),
-      )}&limit=${limit}&appid=${this.apiKey}`;
+      )}&limit=${limit}&appid=${apiKey}`;
       const response = await fetch(endpoint);
 
       if (!response.ok) {
