@@ -1,6 +1,6 @@
 {
-  "framework": "vite",
-  "outputDirectory": "dist",
+  "buildCommand": "npm run build --workspace=web",
+  "outputDirectory": "apps/web/dist",
   "rewrites": [
     {
       "source": "/(.*)",
