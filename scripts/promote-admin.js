@@ -20,9 +20,9 @@ if (!emailToPromote) {
 
 const targetRole = action === 'demote' ? 'user' : 'admin';
 
-const envPath = path.join(__dirname, '..', 'apps', 'api', '.env');
+const envPath = path.join(__dirname, '..', 'backend', '.env');
 if (!fs.existsSync(envPath)) {
-  console.error('Error: apps/api/.env file not found.');
+  console.error('Error: backend/.env file not found.');
   process.exit(1);
 }
 
@@ -31,7 +31,7 @@ const urlMatch = envContent.match(/^SUPABASE_URL=(.+)$/m);
 const keyMatch = envContent.match(/^SUPABASE_SERVICE_ROLE_KEY=(.+)$/m);
 
 if (!urlMatch || !keyMatch) {
-  console.error('Error: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing in apps/api/.env.');
+  console.error('Error: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing in backend/.env.');
   process.exit(1);
 }
 

@@ -1,5 +1,5 @@
 // Single source of truth for the AtlasForecast API base URL.
-// Override with VITE_API_URL in apps/web/.env.local — never hardcode the port elsewhere.
+// Override with VITE_API_URL in frontend/.env.local — never hardcode the port elsewhere.
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4001";
 
 const ACCESS_TOKEN_KEY = "access_token";

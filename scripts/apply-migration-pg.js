@@ -5,9 +5,9 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { Pool } = require('../apps/api/node_modules/pg');
+const { Pool } = require('../backend/node_modules/pg');
 
-const envPath = path.join(__dirname, '..', 'apps', 'api', '.env');
+const envPath = path.join(__dirname, '..', 'backend', '.env');
 const envContent = fs.readFileSync(envPath, 'utf8');
 const urlMatch = envContent.match(/^SUPABASE_URL=(.+)$/m);
 const keyMatch = envContent.match(/^SUPABASE_SERVICE_ROLE_KEY=(.+)$/m);

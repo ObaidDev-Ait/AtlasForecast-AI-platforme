@@ -86,7 +86,7 @@ export class AuthService {
       }
       if (msg.includes('rate limit')) {
         throw new HttpException(
-          "Limite d'envoi d'e-mails atteinte par le service Supabase. Configurez SUPABASE_SERVICE_ROLE_KEY dans apps/api/.env pour activer la création directe de comptes sans limitation d'email.",
+          "Limite d'envoi d'e-mails atteinte par le service Supabase. Configurez SUPABASE_SERVICE_ROLE_KEY dans backend/.env pour activer la création directe de comptes sans limitation d'email.",
           HttpStatus.TOO_MANY_REQUESTS,
         );
       }

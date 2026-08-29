@@ -2,10 +2,10 @@
 .github
 .claude
 node_modules
-apps/web/node_modules
-apps/api/node_modules
-apps/web/dist
-apps/api/dist
+frontend/node_modules
+backend/node_modules
+frontend/dist
+backend/dist
 dist
 .turbo
 *.log

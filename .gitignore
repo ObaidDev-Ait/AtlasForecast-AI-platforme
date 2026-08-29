@@ -2,7 +2,7 @@
 node_modules/
 dist/
 .turbo/
-apps/*/package-lock.json
+*/package-lock.json
 
 # Environment configurations
 .env

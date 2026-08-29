@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build --workspace=web",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "npm run build --workspace=frontend",
+  "outputDirectory": "frontend/dist",
   "rewrites": [
     {
       "source": "/(.*)",
