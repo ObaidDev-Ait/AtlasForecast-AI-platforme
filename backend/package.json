@@ -9,6 +9,7 @@
     "start:prod": "node dist/main.js"
   },
   "dependencies": {
+    "@nestjs/cli": "^10.0.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.0.0",
@@ -20,14 +21,13 @@
     "resend": "^6.12.4",
     "rxjs": "^7.8.1",
     "stripe": "^22.2.0",
+    "typescript": "^5.0.0",
     "ws": "^8.21.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@types/node": "^20.0.0",
     "@types/ws": "^8.18.1",
-    "pg": "^8.23.0",
-    "typescript": "^5.0.0"
+    "pg": "^8.23.0"
   }
 }

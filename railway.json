@@ -5,7 +5,7 @@
     "dockerfilePath": "backend/Dockerfile"
   },
   "deploy": {
-    "startCommand": "node backend/dist/main.js",
+    "startCommand": "node -e \"require('fs').existsSync('dist/main.js') ? require('./dist/main.js') : require('./backend/dist/main.js')\"",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
