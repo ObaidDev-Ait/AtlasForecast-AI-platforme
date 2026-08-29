@@ -30,6 +30,87 @@ function resolveRedirect(search, fallback = '/dashboard') {
   return fallback;
 }
 
+/**
+ * Maps authentication errors to user-friendly messages.
+ * Only credential errors are mapped to "L’adresse e-mail ou le mot de passe est incorrect."
+ * Technical and other errors (network, rate limiting, validation) remain distinct and meaningful.
+ */
+function formatLoginError(error) {
+  if (!error) return null;
+
+  const rawMessage = typeof error === 'string' ? error : (error.message || '');
+  const normalized = rawMessage.toLowerCase().trim();
+  const status = error.status;
+
+  // 1. Wrong credentials / authentication failure
+  if (
+    status === 401 ||
+    normalized.includes('invalid login credentials') ||
+    normalized.includes('invalid credentials') ||
+    normalized.includes('password incorrect') ||
+    normalized.includes('wrong password') ||
+    normalized.includes('user not found') ||
+    normalized.includes('email not confirmed') ||
+    normalized.includes('invalid email or password') ||
+    normalized.includes('bad credentials') ||
+    normalized === 'l’adresse e-mail ou le mot de passe est incorrect.'
+  ) {
+    return 'L’adresse e-mail ou le mot de passe est incorrect.';
+  }
+
+  // 2. Rate limiting
+  if (
+    status === 429 ||
+    normalized.includes('rate limit') ||
+    normalized.includes('too many requests') ||
+    normalized.includes('trop de tentatives')
+  ) {
+    return 'Trop de tentatives de connexion. Veuillez patienter avant de réessayer.';
+  }
+
+  // 3. Network / Backend availability
+  if (
+    status === 502 ||
+    status === 503 ||
+    status === 504 ||
+    normalized.includes('failed to fetch') ||
+    normalized.includes('networkerror') ||
+    normalized.includes('network error') ||
+    normalized.includes('temporarily unavailable') ||
+    normalized.includes('err_connection') ||
+    normalized.includes('service unavailable')
+  ) {
+    return 'Le service est temporairement indisponible. Veuillez vérifier votre connexion ou réessayer dans quelques instants.';
+  }
+
+  // 4. Validation errors
+  if (
+    normalized.includes('valid email address is required') ||
+    normalized.includes('email must be an email') ||
+    normalized.includes('adresse e-mail valide')
+  ) {
+    return 'Veuillez saisir une adresse e-mail valide.';
+  }
+  if (
+    normalized.includes('password is required') ||
+    normalized.includes('mot de passe est requis')
+  ) {
+    return 'Veuillez saisir votre mot de passe.';
+  }
+
+  // 5. Clean custom French messages
+  if (/^[A-ZÀ-Ÿ].*[.!?]$/.test(rawMessage) && !normalized.includes('error') && !normalized.includes('exception')) {
+    return rawMessage;
+  }
+
+  // 6. Generic server error
+  if (status && status >= 500) {
+    return 'Le service est temporairement indisponible. Veuillez réessayer plus tard.';
+  }
+
+  return 'L’adresse e-mail ou le mot de passe est incorrect.';
+}
+
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -60,7 +141,7 @@ const LoginPage = () => {
 
       navigate(redirectDestination, { replace: true });
     } catch (error) {
-      setErrorMsg(error.message);
+      setErrorMsg(formatLoginError(error));
     } finally {
       setLoading(false);
     }

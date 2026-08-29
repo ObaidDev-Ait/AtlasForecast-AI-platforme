@@ -103,8 +103,20 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
+      let errorMessage = 'Échec de la connexion';
+      try {
+        const errorData = await response.json();
+        errorMessage = Array.isArray(errorData.message)
+          ? errorData.message.join(', ')
+          : errorData.message || errorMessage;
+      } catch (_) {
+        if (response.status >= 500) {
+          errorMessage = 'Le service est temporairement indisponible. Veuillez réessayer plus tard.';
+        }
+      }
+      const err = new Error(errorMessage);
+      err.status = response.status;
+      throw err;
     }
 
     const data = await response.json();

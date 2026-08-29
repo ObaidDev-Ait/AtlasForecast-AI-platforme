@@ -89,30 +89,21 @@ export default function ContactPage() {
         {/* ====================================================================
             2-COLUMN CONTACT GRID
             ==================================================================== */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '0.85fr 1.15fr',
-            gap: 'var(--sp-8)',
-            maxWidth: '1100px',
-            margin: '0 auto var(--sp-12)',
-          }}
-          className="af-contact-main-grid"
-        >
+        <div className="af-contact-main-grid">
           {/* Left Column: Direct Communication Channels & Information */}
           <motion.div
-            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', minWidth: 0, width: '100%' }}
             initial="hidden"
             animate="visible"
             variants={fadeUp(1)}
           >
             {/* Email Card */}
-            <div className="af-card" style={{ padding: 'var(--sp-5)' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
+            <div className="af-card af-contact-card">
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--sp-4)', minWidth: 0, width: '100%' }}>
                 <div
                   style={{
-                    width: '46px',
-                    height: '46px',
+                    width: '44px',
+                    height: '44px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(59, 130, 246, 0.15)',
                     border: '1px solid rgba(59, 130, 246, 0.3)',
@@ -120,14 +111,14 @@ export default function ContactPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: 'var(--accent-primary)',
-                    fontSize: '1.25rem',
+                    fontSize: '1.2rem',
                     flexShrink: 0,
                   }}
                 >
                   <i className="fas fa-envelope"></i>
                 </div>
-                <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0 0 0.2rem', color: 'var(--text-primary)' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 0.2rem', color: 'var(--text-primary)' }}>
                     Courrier Électronique
                   </h3>
                   <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0 }}>
@@ -141,6 +132,8 @@ export default function ContactPage() {
                       fontWeight: 700,
                       fontSize: 'var(--text-sm)',
                       color: 'var(--accent-primary)',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     contact@atlasforecast.ma
@@ -150,12 +143,12 @@ export default function ContactPage() {
             </div>
 
             {/* Direct Phone Card */}
-            <div className="af-card" style={{ padding: 'var(--sp-5)' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
+            <div className="af-card af-contact-card">
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--sp-4)', minWidth: 0, width: '100%' }}>
                 <div
                   style={{
-                    width: '46px',
-                    height: '46px',
+                    width: '44px',
+                    height: '44px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(16, 185, 129, 0.15)',
                     border: '1px solid rgba(16, 185, 129, 0.3)',
@@ -163,14 +156,14 @@ export default function ContactPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: 'var(--accent-success)',
-                    fontSize: '1.25rem',
+                    fontSize: '1.2rem',
                     flexShrink: 0,
                   }}
                 >
                   <i className="fas fa-phone"></i>
                 </div>
-                <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0 0 0.2rem', color: 'var(--text-primary)' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 0.2rem', color: 'var(--text-primary)' }}>
                     Assistance Téléphonique
                   </h3>
                   <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0 }}>
@@ -184,6 +177,7 @@ export default function ContactPage() {
                       fontWeight: 700,
                       fontSize: 'var(--text-sm)',
                       color: 'var(--accent-success)',
+                      wordBreak: 'break-word',
                     }}
                   >
                     +212 645508349
@@ -193,12 +187,12 @@ export default function ContactPage() {
             </div>
 
             {/* Headquarters Card */}
-            <div className="af-card" style={{ padding: 'var(--sp-5)' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
+            <div className="af-card af-contact-card">
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--sp-4)', minWidth: 0, width: '100%' }}>
                 <div
                   style={{
-                    width: '46px',
-                    height: '46px',
+                    width: '44px',
+                    height: '44px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(245, 158, 11, 0.15)',
                     border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -206,17 +200,17 @@ export default function ContactPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fbbf24',
-                    fontSize: '1.25rem',
+                    fontSize: '1.2rem',
                     flexShrink: 0,
                   }}
                 >
                   <i className="fas fa-location-dot"></i>
                 </div>
-                <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0 0 0.2rem', color: 'var(--text-primary)' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 0.2rem', color: 'var(--text-primary)' }}>
                     Localisation
                   </h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0, wordBreak: 'break-word' }}>
                     Rue Mohammed EL Bekall, Marrakech, Maroc
                   </p>
                   <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', display: 'block', marginTop: '0.2rem' }}>
@@ -232,20 +226,22 @@ export default function ContactPage() {
                 background: 'rgba(59, 130, 246, 0.08)',
                 border: '1px solid rgba(59, 130, 246, 0.2)',
                 borderRadius: 'var(--radius-lg)',
-                padding: 'var(--sp-4)',
+                padding: 'clamp(0.75rem, 2vw, var(--sp-4))',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--sp-3)',
+                boxSizing: 'border-box',
+                maxWidth: '100%',
               }}
             >
-              <i className="fas fa-bolt" style={{ color: 'var(--accent-primary)', fontSize: '1.2rem' }}></i>
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              <i className="fas fa-bolt" style={{ color: 'var(--accent-primary)', fontSize: '1.2rem', flexShrink: 0 }}></i>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: 1.5, minWidth: 0 }}>
                 <strong style={{ color: 'var(--text-primary)' }}>Engagement SLA :</strong> Temps de réponse moyen constaté de <strong>45 minutes</strong> en période ouvrée.
               </span>
             </div>
 
             {/* Social Network Links */}
-            <div className="af-card" style={{ padding: 'var(--sp-5)' }}>
+            <div className="af-card af-contact-card">
               <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 RÉSEAUX PROFESSIONNELS
               </span>
@@ -269,11 +265,10 @@ export default function ContactPage() {
 
           {/* Right Column: Contact Form */}
           <motion.div
-            className="af-card"
+            className="af-card af-contact-form-card"
             initial="hidden"
             animate="visible"
             variants={fadeUp(2)}
-            style={{ padding: 'clamp(1.5rem, 1rem + 2vw, 2.5rem)' }}
           >
             <AnimatePresence mode="wait">
               {submitted ? (
@@ -315,7 +310,7 @@ export default function ContactPage() {
                 <motion.form
                   key="form"
                   onSubmit={handleSubmit}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', width: '100%', minWidth: 0 }}
                 >
                   <div style={{ marginBottom: 'var(--sp-2)' }}>
                     <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
@@ -333,8 +328,8 @@ export default function ContactPage() {
                     </div>
                   )}
 
-                  {/* Name and Email in 2 columns */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }} className="af-contact-row">
+                  {/* Name and Email in responsive row */}
+                  <div className="af-contact-row">
                     <div className="af-form-group" style={{ margin: 0 }}>
                       <label className="af-label" htmlFor="contact-name">
                         <i className="fas fa-user"></i> Nom complet *
@@ -368,8 +363,8 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  {/* Subject and Priority */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }} className="af-contact-row">
+                  {/* Subject and Priority in responsive row */}
+                  <div className="af-contact-row">
                     <div className="af-form-group" style={{ margin: 0 }}>
                       <label className="af-label" htmlFor="contact-subject">
                         <i className="fas fa-tag"></i> Motif *

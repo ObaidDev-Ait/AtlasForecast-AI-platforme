@@ -136,13 +136,38 @@
 }
 
 /* ===== Contact Page ===== */
+.af-contact-main-grid,
 .af-contact-grid,
 .contact-container {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  grid-template-columns: 0.85fr 1.15fr;
   gap: var(--sp-8);
-  max-width: 980px;
+  max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.af-contact-main-grid > *,
+.af-contact-grid > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.af-contact-card {
+  padding: var(--sp-5);
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.af-contact-form-card {
+  padding: clamp(1.25rem, 0.75rem + 2vw, 2.5rem);
+  box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .af-contact-info,
@@ -213,6 +238,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-4);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.af-contact-row > *,
+.form-row > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .af-contact-field,
@@ -426,7 +460,17 @@
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+  .af-contact-main-grid,
+  .af-contact-grid,
+  .contact-container {
+    grid-template-columns: 1fr;
+    gap: var(--sp-6);
+  }
+}
+
 @media (max-width: 768px) {
+  .af-contact-main-grid,
   .af-contact-grid,
   .contact-container {
     grid-template-columns: 1fr;
@@ -444,5 +488,28 @@
   }
   .profile-actions {
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .af-contact-main-grid,
+  .af-contact-grid,
+  .contact-container {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+
+  .af-contact-row,
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+  }
+
+  .af-contact-card {
+    padding: clamp(0.75rem, 2.5vw, 1rem);
+  }
+
+  .af-contact-form-card {
+    padding: clamp(1rem, 3vw, 1.25rem);
   }
 }

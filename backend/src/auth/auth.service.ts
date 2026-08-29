@@ -105,6 +105,25 @@ export class AuthService {
     if (error) {
       // Reason only — never the credentials or the full Supabase payload.
       this.logger.warn(`Login failed: ${error.message}`);
+      const raw = error.message?.toLowerCase() || '';
+      if (
+        raw.includes('invalid login credentials') ||
+        raw.includes('invalid credentials') ||
+        raw.includes('password') ||
+        raw.includes('email not confirmed') ||
+        error.status === 400
+      ) {
+        throw new HttpException(
+          'L’adresse e-mail ou le mot de passe est incorrect.',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      if (raw.includes('rate limit') || error.status === 429) {
+        throw new HttpException(
+          'Trop de tentatives de connexion. Veuillez patienter avant de réessayer.',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
       throw new HttpException(error.message, error.status || HttpStatus.BAD_REQUEST);
     }
 
