@@ -3,25 +3,32 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 
-// Origins always allowed so local development keeps working without any
-// extra configuration. Production origins come from CORS_ORIGINS.
-const DEV_ORIGINS = [
+// Essential origins that must always be allowed in all environments
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://atlas-forecast-ai-platforme-api-gules.vercel.app',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:4173',
+  'http://127.0.0.1:4173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
 ];
 
 function resolveCorsOrigins(configService: ConfigService): string[] {
-  const configured = (configService.get<string>('CORS_ORIGINS') || '')
-    .split(',')
-    .map((origin) => origin.trim())
+  const envSources = [
+    process.env.CORS_ORIGINS,
+    configService.get<string>('CORS_ORIGINS'),
+    process.env.FRONTEND_URL,
+    configService.get<string>('FRONTEND_URL'),
+  ];
+
+  const configured = envSources
+    .filter((val): val is string => typeof val === 'string' && val.trim().length > 0)
+    .flatMap((val) => val.split(','))
+    .map((origin) => origin.trim().replace(/\/+$/, ''))
     .filter(Boolean);
 
-  const isProduction = configService.get<string>('NODE_ENV') === 'production';
-
-  // In production the allowlist is exactly what was configured. In development
-  // the local Vite origins are always included.
-  return isProduction ? configured : [...new Set([...DEV_ORIGINS, ...configured])];
+  return Array.from(new Set([...DEFAULT_ALLOWED_ORIGINS, ...configured]));
 }
 
 async function bootstrap() {
@@ -30,7 +37,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   const configService = app.get(ConfigService);
-  const isProduction = configService.get<string>('NODE_ENV') === 'production';
 
   // Safe environment diagnostic: Reports presence (true/false) only; NEVER prints secret values.
   const hasVal = (keys: string[]) =>
@@ -51,33 +57,71 @@ async function bootstrap() {
 
   const allowedOrigins = resolveCorsOrigins(configService);
 
-  if (isProduction && allowedOrigins.length === 0) {
-    console.warn(
-      'WARNING: CORS_ORIGINS is not set in production. Defaulting to allow Vercel domains (*.vercel.app). Configure CORS_ORIGINS in production environment variables.',
-    );
-    allowedOrigins.push('https://*.vercel.app');
-  }
+  console.log('[CORS Configuration]');
+  console.log(`- Allowed Origins (${allowedOrigins.length}): ${allowedOrigins.join(', ')}`);
+  console.log('- Dynamic Wildcards: *.vercel.app, localhost:*');
+  console.log('- Allowed Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD');
+  console.log('- Allowed Headers: Authorization, Content-Type, Accept, Origin, X-Requested-With, apikey, x-client-info');
+  console.log('- Credentials: true');
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // Requests with no Origin header (curl, server-to-server, Stripe
-      // webhooks) are not browser cross-origin requests, so CORS does not
-      // apply to them.
+      // Allow requests with no Origin header (curl, mobile apps, server-to-server)
       if (!origin) {
         return callback(null, true);
       }
-      const isAllowed = allowedOrigins.some((allowed) => {
-        if (allowed === origin) return true;
-        if (allowed.includes('*')) {
-          const pattern = '^' + allowed.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
-          return new RegExp(pattern).test(origin);
-        }
-        return false;
+
+      const normalized = origin.trim().replace(/\/+$/, '');
+
+      // 1. Direct or case-insensitive match against allowedOrigins
+      const isExplicitlyAllowed = allowedOrigins.some(
+        (allowed) => allowed.toLowerCase() === normalized.toLowerCase(),
+      );
+      if (isExplicitlyAllowed) {
+        return callback(null, true);
+      }
+
+      // 2. Allow any valid Vercel deployment (*.vercel.app)
+      const isVercel = /^https:\/\/[a-zA-Z0-9-.]+\.vercel\.app$/i.test(normalized);
+      if (isVercel) {
+        return callback(null, true);
+      }
+
+      // 3. Allow local dev on any port (localhost / 127.0.0.1)
+      const isLocal = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalized);
+      if (isLocal) {
+        return callback(null, true);
+      }
+
+      // 4. Wildcard matching for any configured origins containing *
+      const isWildcardMatch = allowedOrigins.some((allowed) => {
+        if (!allowed.includes('*')) return false;
+        const pattern = '^' + allowed.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+        return new RegExp(pattern, 'i').test(normalized);
       });
-      return callback(null, isAllowed);
+      if (isWildcardMatch) {
+        return callback(null, true);
+      }
+
+      console.warn(`[CORS Blocked] Origin: ${origin}`);
+      return callback(null, false);
     },
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Authorization', 'Content-Type'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: [
+      'Origin',
+      'X-Requested-With',
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'X-Client-Info',
+      'apikey',
+      'baggage',
+      'sentry-trace',
+    ],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
     maxAge: 86400,
   });
 
@@ -94,6 +138,5 @@ async function bootstrap() {
 
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://0.0.0.0:${port}`);
-  console.log(`CORS allowlist: ${allowedOrigins.join(', ') || '(none)'}`);
 }
 bootstrap();
