@@ -21,3 +21,6 @@ scratch/
 # Local runtime stores
 *-store.json
 
+# Local agent caches
+.claude/
+
