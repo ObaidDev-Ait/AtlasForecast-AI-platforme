@@ -130,7 +130,15 @@ const ForecastPage = () => {
         fetch(forecastUrl)
       ]);
 
-      if (!weatherRes.ok || !forecastRes.ok) throw new Error("Ville non trouvée");
+      if (!weatherRes.ok || !forecastRes.ok) {
+        let errMsg = 'Ville non trouvée ou service météo indisponible.';
+        try {
+          const failedRes = !weatherRes.ok ? weatherRes : forecastRes;
+          const errData = await failedRes.json();
+          if (errData.message) errMsg = errData.message;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
 
       const weather = await weatherRes.json();
       const forecast = await forecastRes.json();

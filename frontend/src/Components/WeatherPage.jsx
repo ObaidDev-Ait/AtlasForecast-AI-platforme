@@ -56,7 +56,14 @@ const WeatherPage = () => {
       }
 
       const res = await fetch(url);
-      if (!res.ok) throw new Error('Ville non trouvée ou service temporairement indisponible.');
+      if (!res.ok) {
+        let errMsg = 'Ville non trouvée ou service météo temporairement indisponible.';
+        try {
+          const errData = await res.json();
+          if (errData.message) errMsg = errData.message;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
       const data = await res.json();
 
       setWeatherData(data);
