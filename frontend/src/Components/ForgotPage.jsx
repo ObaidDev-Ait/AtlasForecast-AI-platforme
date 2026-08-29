@@ -26,6 +26,7 @@ export default function ForgotPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (loading) return
     setErrorMsg(null)
 
     const trimmedEmail = email.trim()
@@ -46,16 +47,16 @@ export default function ForgotPage() {
       })
 
       if (error) {
-        // If frontend Supabase client errors (e.g. mock or network), try backend as fallback
-        const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: trimmedEmail }),
-        })
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.message || error.message || 'Une erreur est survenue.')
+        const raw = (error.message || '').toLowerCase();
+        if (
+          error.status === 429 ||
+          raw.includes('rate limit') ||
+          raw.includes('60 seconds') ||
+          raw.includes('too many requests')
+        ) {
+          throw new Error('Trop de tentatives. Pour des raisons de sécurité, veuillez patienter 60 secondes avant de réessayer.');
         }
+        throw new Error(error.message || 'Impossible d’envoyer le lien de réinitialisation.');
       }
 
       setSent(true)
