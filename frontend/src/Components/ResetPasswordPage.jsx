@@ -21,6 +21,7 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -28,7 +29,7 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     let mounted = true;
 
-    // Check if Supabase sent error in URL query/hash (e.g. link expired)
+    // Check if Supabase passed an error directly in URL query/hash
     const hash = window.location.hash || '';
     const search = window.location.search || '';
     const params = new URLSearchParams(search || hash.replace(/^#/, '?'));
@@ -40,12 +41,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    const hasRecoveryClues =
-      hash.includes('type=recovery') ||
-      hash.includes('access_token=') ||
-      search.includes('code=');
-
-    // 1. Listen for Supabase auth events (specifically PASSWORD_RECOVERY)
+    // 1. Listen for Supabase PASSWORD_RECOVERY event
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -55,16 +51,31 @@ export default function ResetPasswordPage() {
         setHasRecoverySession(true);
         setReady(true);
         setErrorMsg(null);
-      } else if (event === 'SIGNED_IN' && (hasRecoveryClues || session)) {
+      } else if (session && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
         setHasRecoverySession(true);
         setReady(true);
-        setErrorMsg(null);
       }
     });
 
-    // 2. Check existing session immediately or after short delay for URL hash exchange
-    const verifySession = async () => {
+    // 2. Handle PKCE code exchange or legacy hash recovery
+    const checkRecoveryFlow = async () => {
       try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get('code');
+
+        if (code) {
+          // PKCE flow: exchange code for session
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (!mounted) return;
+
+          if (!error && data?.session) {
+            setHasRecoverySession(true);
+            setReady(true);
+            return;
+          }
+        }
+
+        // Check active session (detectSessionInUrl handles hash token automatically)
         const { data, error } = await supabase.auth.getSession();
         if (!mounted) return;
 
@@ -74,11 +85,16 @@ export default function ResetPasswordPage() {
           return;
         }
 
+        const isRecoveryTokenPresent =
+          hash.includes('type=recovery') ||
+          hash.includes('access_token=') ||
+          Boolean(code);
+
         if (data?.session) {
           setHasRecoverySession(true);
           setReady(true);
-        } else if (!hasRecoveryClues) {
-          // No recovery tokens in URL and no active session
+        } else if (!isRecoveryTokenPresent) {
+          // If no recovery token is in the URL and no active session exists
           setErrorMsg('Aucun jeton de réinitialisation trouvé dans l\'URL.');
           setReady(true);
         }
@@ -90,12 +106,12 @@ export default function ResetPasswordPage() {
       }
     };
 
-    verifySession();
+    checkRecoveryFlow();
 
-    // Fallback: If after 3 seconds Supabase hasn't exchanged token, finish loading
+    // Fallback: If after 2.5 seconds Supabase hasn't signaled session, mark ready
     const timer = setTimeout(() => {
       if (mounted) setReady(true);
-    }, 3000);
+    }, 2500);
 
     return () => {
       mounted = false;
@@ -108,12 +124,20 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setErrorMsg(null);
 
+    if (!password) {
+      setErrorMsg('Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
     if (password.length < 8) {
       setErrorMsg('Le mot de passe doit contenir au moins 8 caractères.');
       return;
     }
+    if (!confirmPassword) {
+      setErrorMsg('Les mots de passe ne correspondent pas.');
+      return;
+    }
     if (password !== confirmPassword) {
-      setErrorMsg('Les deux mots de passe ne correspondent pas.');
+      setErrorMsg('Les mots de passe ne correspondent pas.');
       return;
     }
 
@@ -127,7 +151,7 @@ export default function ResetPasswordPage() {
 
       setSuccess(true);
 
-      // Sign out the recovery session so user lands on login cleanly with their new password
+      // Sign out temporary recovery session so user begins a fresh session on login
       try {
         await supabase.auth.signOut();
       } catch (_) {}
@@ -135,9 +159,9 @@ export default function ResetPasswordPage() {
       setTimeout(() => {
         navigate('/login', {
           replace: true,
-          state: { message: 'Mot de passe réinitialisé avec succès. Veuillez vous connecter.' },
+          state: { message: 'Mot de passe mis à jour avec succès.' },
         });
-      }, 2200);
+      }, 2000);
     } catch (err) {
       setErrorMsg(err?.message || 'Une erreur est survenue.');
     } finally {
@@ -163,11 +187,11 @@ export default function ResetPasswordPage() {
           variants={fadeUp}
         >
           <div className="af-badge af-badge-info" style={{ marginBottom: 'var(--sp-2)' }}>
-            <i className="fas fa-key"></i> NOUVEAU MOT DE PASSE
+            <i className="fas fa-key"></i> SÉCURITÉ
           </div>
-          <h1 className="af-page-title">Définir un nouveau mot de passe</h1>
+          <h1 className="af-page-title">Réinitialiser le mot de passe</h1>
           <p className="af-page-subtitle">
-            Choisissez un nouveau mot de passe sécurisé pour votre compte AtlasForecast.
+            Choisissez un nouveau mot de passe sécurisé pour votre compte.
           </p>
         </motion.div>
 
@@ -176,7 +200,7 @@ export default function ResetPasswordPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          style={{ maxWidth: '480px', width: '100%' }}
+          style={{ maxWidth: '460px', width: '100%' }}
         >
           <AnimatePresence mode="wait">
             {!ready ? (
@@ -212,10 +236,10 @@ export default function ResetPasswordPage() {
                   <i className="fas fa-check-circle"></i>
                 </div>
                 <h2 style={{ fontSize: '1.3rem', fontWeight: 900, marginBottom: 'var(--sp-2)' }}>
-                  Mot de passe mis à jour !
+                  Mot de passe mis à jour avec succès.
                 </h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
-                  Votre mot de passe a été mis à jour avec succès. Redirection vers la connexion...
+                  Redirection vers la page de connexion...
                 </p>
               </motion.div>
             ) : !hasRecoverySession ? (
@@ -288,6 +312,7 @@ export default function ResetPasswordPage() {
                   </div>
                 )}
 
+                {/* Field 1: Nouveau mot de passe */}
                 <div className="af-form-group" style={{ margin: 0 }}>
                   <label className="af-label" htmlFor="new-password">
                     <i className="fas fa-lock"></i> Nouveau mot de passe
@@ -327,22 +352,46 @@ export default function ResetPasswordPage() {
                   </div>
                 </div>
 
+                {/* Field 2: Confirmer le mot de passe */}
                 <div className="af-form-group" style={{ margin: 0 }}>
                   <label className="af-label" htmlFor="confirm-new-password">
                     <i className="fas fa-lock"></i> Confirmer le mot de passe
                   </label>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="confirm-new-password"
-                    className="af-input"
-                    placeholder="Confirmez le mot de passe"
-                    required
-                    minLength={8}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      id="confirm-new-password"
+                      className="af-input"
+                      placeholder="Confirmez le mot de passe"
+                      required
+                      minLength={8}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      style={{ paddingRight: '2.5rem' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.75rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        padding: '0.25rem',
+                      }}
+                      tabIndex={-1}
+                      aria-label={showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                    >
+                      <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </button>
+                  </div>
                 </div>
 
+                {/* Main button: Confirmer le mot de passe */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -356,8 +405,8 @@ export default function ResetPasswordPage() {
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-shield-halved"></i>
-                      <span>Mettre à jour le mot de passe</span>
+                      <i className="fas fa-check"></i>
+                      <span>Confirmer le mot de passe</span>
                     </>
                   )}
                 </button>

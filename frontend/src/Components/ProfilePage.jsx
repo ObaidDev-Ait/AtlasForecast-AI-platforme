@@ -154,7 +154,10 @@ export default function ProfilePage() {
 
     setSendingReset(true)
     try {
-      const redirectUrl = `${window.location.origin}/reset-password`
+      const redirectUrl = import.meta.env.PROD
+        ? 'https://atlas-forecast-ai-platforme-api-gules.vercel.app/reset-password'
+        : `${window.location.origin}/reset-password`;
+
       const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
         redirectTo: redirectUrl,
       })
