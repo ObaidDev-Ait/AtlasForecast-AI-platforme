@@ -1,7 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const rawUrl = import.meta.env.VITE_SUPABASE_URL;
+const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const cleanValue = (val) => {
+  if (typeof val !== 'string') return undefined;
+  let trimmed = val.trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    trimmed = trimmed.slice(1, -1).trim();
+  }
+  return trimmed.replace(/\/+$/, '');
+};
+
+const SUPABASE_URL = cleanValue(rawUrl);
+const SUPABASE_ANON_KEY = cleanValue(rawKey);
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   // Do not crash the app — log only. Auth flows that depend on Supabase
