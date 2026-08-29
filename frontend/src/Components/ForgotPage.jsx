@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '../lib/supabaseClient'
 import { API_BASE_URL } from '../lib/api'
 import '../Styles/Auth.css'
 
@@ -27,7 +28,8 @@ export default function ForgotPage() {
     e.preventDefault()
     setErrorMsg(null)
 
-    if (!email.trim() || !email.includes('@')) {
+    const trimmedEmail = email.trim()
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
       setErrorMsg('Veuillez saisir une adresse e-mail valide.')
       return
     }
@@ -35,16 +37,22 @@ export default function ForgotPage() {
     setLoading(true)
 
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+      const redirectUrl = `${window.location.origin}/reset-password`
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+        redirectTo: redirectUrl,
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Une erreur est survenue.')
+      if (error) {
+        // If frontend Supabase client errors (e.g. mock or network), try backend as fallback
+        const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: trimmedEmail }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data.message || error.message || 'Une erreur est survenue.')
+        }
       }
 
       setSent(true)

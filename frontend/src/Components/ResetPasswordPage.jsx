@@ -20,30 +20,87 @@ export default function ResetPasswordPage() {
   const [hasRecoverySession, setHasRecoverySession] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  // Detect a Supabase recovery session — Supabase redirects here with #access_token=...&type=recovery
-  // and detectSessionInUrl exchanges it for a session automatically.
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
+    let mounted = true;
+
+    // Check if Supabase sent error in URL query/hash (e.g. link expired)
+    const hash = window.location.hash || '';
+    const search = window.location.search || '';
+    const params = new URLSearchParams(search || hash.replace(/^#/, '?'));
+    const urlError = params.get('error_description') || params.get('error');
+
+    if (urlError) {
+      setErrorMsg(decodeURIComponent(urlError.replace(/\+/g, ' ')));
+      setReady(true);
+      return;
+    }
+
+    const hasRecoveryClues =
+      hash.includes('type=recovery') ||
+      hash.includes('access_token=') ||
+      search.includes('code=');
+
+    // 1. Listen for Supabase auth events (specifically PASSWORD_RECOVERY)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setHasRecoverySession(true);
+        setReady(true);
+        setErrorMsg(null);
+      } else if (event === 'SIGNED_IN' && (hasRecoveryClues || session)) {
+        setHasRecoverySession(true);
+        setReady(true);
+        setErrorMsg(null);
+      }
+    });
+
+    // 2. Check existing session immediately or after short delay for URL hash exchange
+    const verifySession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
-        if (cancelled) return;
+        if (!mounted) return;
+
         if (error) {
           setErrorMsg('Le lien de réinitialisation est invalide ou a expiré.');
+          setReady(true);
+          return;
         }
-        setHasRecoverySession(Boolean(data?.session));
+
+        if (data?.session) {
+          setHasRecoverySession(true);
+          setReady(true);
+        } else if (!hasRecoveryClues) {
+          // No recovery tokens in URL and no active session
+          setErrorMsg('Aucun jeton de réinitialisation trouvé dans l\'URL.');
+          setReady(true);
+        }
       } catch (_) {
-        if (!cancelled) setErrorMsg('Impossible de vérifier le lien de réinitialisation.');
-      } finally {
-        if (!cancelled) setReady(true);
+        if (mounted) {
+          setErrorMsg('Impossible de vérifier le lien de réinitialisation.');
+          setReady(true);
+        }
       }
-    })();
+    };
+
+    verifySession();
+
+    // Fallback: If after 3 seconds Supabase hasn't exchanged token, finish loading
+    const timer = setTimeout(() => {
+      if (mounted) setReady(true);
+    }, 3000);
+
     return () => {
-      cancelled = true;
+      mounted = false;
+      subscription?.unsubscribe();
+      clearTimeout(timer);
     };
   }, []);
 
@@ -67,12 +124,20 @@ export default function ResetPasswordPage() {
         setErrorMsg(error.message || 'Impossible de mettre à jour le mot de passe.');
         return;
       }
+
       setSuccess(true);
-      // Sign out the recovery session so the user lands on /login cleanly.
+
+      // Sign out the recovery session so user lands on login cleanly with their new password
       try {
         await supabase.auth.signOut();
       } catch (_) {}
-      setTimeout(() => navigate('/login', { replace: true }), 2500);
+
+      setTimeout(() => {
+        navigate('/login', {
+          replace: true,
+          state: { message: 'Mot de passe réinitialisé avec succès. Veuillez vous connecter.' },
+        });
+      }, 2200);
     } catch (err) {
       setErrorMsg(err?.message || 'Une erreur est survenue.');
     } finally {
@@ -150,7 +215,7 @@ export default function ResetPasswordPage() {
                   Mot de passe mis à jour !
                 </h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
-                  Vous allez être redirigé vers la page de connexion...
+                  Votre mot de passe a été mis à jour avec succès. Redirection vers la connexion...
                 </p>
               </motion.div>
             ) : !hasRecoverySession ? (
@@ -227,17 +292,39 @@ export default function ResetPasswordPage() {
                   <label className="af-label" htmlFor="new-password">
                     <i className="fas fa-lock"></i> Nouveau mot de passe
                   </label>
-                  <input
-                    type="password"
-                    id="new-password"
-                    className="af-input"
-                    placeholder="Minimum 8 caractères"
-                    required
-                    minLength={8}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoFocus
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="new-password"
+                      className="af-input"
+                      placeholder="Minimum 8 caractères"
+                      required
+                      minLength={8}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      style={{ paddingRight: '2.5rem' }}
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.75rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        padding: '0.25rem',
+                      }}
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                    >
+                      <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="af-form-group" style={{ margin: 0 }}>
@@ -245,7 +332,7 @@ export default function ResetPasswordPage() {
                     <i className="fas fa-lock"></i> Confirmer le mot de passe
                   </label>
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     id="confirm-new-password"
                     className="af-input"
                     placeholder="Confirmez le mot de passe"

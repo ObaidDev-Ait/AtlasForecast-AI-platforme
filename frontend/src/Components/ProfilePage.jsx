@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useUnits } from './Providers'
 import { useTheme } from './Providers'
 import { authFetch, API_BASE_URL } from '../lib/api'
+import { supabase } from '../lib/supabaseClient'
 import '../Styles/ProfilePage.css'
 
 const fadeUp = (delay = 0) => ({
@@ -153,14 +154,21 @@ export default function ProfilePage() {
 
     setSendingReset(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail }),
+      const redirectUrl = `${window.location.origin}/reset-password`
+      const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+        redirectTo: redirectUrl,
       })
 
-      if (!res.ok) {
-        throw new Error('Impossible d\'envoyer le lien de réinitialisation.')
+      if (error) {
+        const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail }),
+        })
+
+        if (!res.ok) {
+          throw new Error('Impossible d\'envoyer le lien de réinitialisation.')
+        }
       }
 
       setResetSuccessMsg(
