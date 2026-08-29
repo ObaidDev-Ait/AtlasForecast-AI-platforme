@@ -9,6 +9,10 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "build:api": "npm run build --workspace=api",
+    "build:web": "npm run build --workspace=web",
+    "start": "node apps/api/dist/main.js",
+    "start:api": "node apps/api/dist/main.js",
     "lint": "turbo run lint"
   },
   "devDependencies": {

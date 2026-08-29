@@ -34,9 +34,10 @@ async function bootstrap() {
   const allowedOrigins = resolveCorsOrigins(configService);
 
   if (isProduction && allowedOrigins.length === 0) {
-    throw new Error(
-      'CORS_ORIGINS must be set in production. Refusing to start with an empty allowlist.',
+    console.warn(
+      'WARNING: CORS_ORIGINS is not set in production. Defaulting to allow Vercel domains (*.vercel.app). Configure CORS_ORIGINS in production environment variables.',
     );
+    allowedOrigins.push('https://*.vercel.app');
   }
 
   app.enableCors({
@@ -47,7 +48,15 @@ async function bootstrap() {
       if (!origin) {
         return callback(null, true);
       }
-      return callback(null, allowedOrigins.includes(origin));
+      const isAllowed = allowedOrigins.some((allowed) => {
+        if (allowed === origin) return true;
+        if (allowed.includes('*')) {
+          const pattern = '^' + allowed.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+          return new RegExp(pattern).test(origin);
+        }
+        return false;
+      });
+      return callback(null, isAllowed);
     },
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type'],
@@ -62,10 +71,11 @@ async function bootstrap() {
     }),
   );
 
-  const port = configService.get<number>('PORT') || 4001;
+  const rawPort = process.env.PORT || configService.get<string | number>('PORT') || 4001;
+  const port = typeof rawPort === 'string' ? parseInt(rawPort, 10) : rawPort;
 
-  await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on: http://0.0.0.0:${port}`);
   console.log(`CORS allowlist: ${allowedOrigins.join(', ') || '(none)'}`);
 }
 bootstrap();
