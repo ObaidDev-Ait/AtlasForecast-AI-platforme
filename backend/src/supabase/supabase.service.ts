@@ -13,9 +13,58 @@ export class SupabaseService implements OnModuleInit {
 
   constructor(private readonly configService: ConfigService) {}
 
+  private cleanValue(val: any): string | undefined {
+    if (typeof val !== 'string') return undefined;
+    let trimmed = val.trim();
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      trimmed = trimmed.slice(1, -1).trim();
+    }
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  private resolveEnv(keys: string[]): string | undefined {
+    for (const key of keys) {
+      const fromProcess = this.cleanValue(process.env[key]);
+      if (fromProcess) return fromProcess;
+
+      const fromConfig = this.cleanValue(this.configService.get<string>(key));
+      if (fromConfig) return fromConfig;
+    }
+    return undefined;
+  }
+
+  getSupabaseUrl(): string | undefined {
+    return this.resolveEnv(['SUPABASE_URL', 'VITE_SUPABASE_URL']);
+  }
+
+  getSupabasePublishableKey(): string | undefined {
+    return this.resolveEnv([
+      'SUPABASE_PUBLISHABLE_KEY',
+      'SUPABASE_ANON_KEY',
+      'SUPABASE_KEY',
+      'VITE_SUPABASE_ANON_KEY',
+      'VITE_SUPABASE_PUBLISHABLE_KEY',
+    ]);
+  }
+
+  getSupabaseServiceRoleKey(): string | undefined {
+    return this.resolveEnv([
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'SUPABASE_SERVICE_KEY',
+      'SERVICE_ROLE_KEY',
+    ]);
+  }
+
+  isConfigured(): boolean {
+    return Boolean(this.getSupabaseUrl() && this.getSupabasePublishableKey());
+  }
+
   onModuleInit() {
-    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
+    const supabaseUrl = this.getSupabaseUrl();
+    const supabaseKey = this.getSupabasePublishableKey();
 
     if (!supabaseUrl || !supabaseKey) {
       this.logger.error('Supabase URL or Key is missing.');
@@ -26,9 +75,9 @@ export class SupabaseService implements OnModuleInit {
       auth: { persistSession: false },
     });
 
-    const serviceRoleKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
-    if (serviceRoleKey && serviceRoleKey.trim().length > 0 && !serviceRoleKey.startsWith('<')) {
-      this.supabaseAdminClient = createClient(supabaseUrl, serviceRoleKey.trim(), {
+    const serviceRoleKey = this.getSupabaseServiceRoleKey();
+    if (serviceRoleKey && !serviceRoleKey.startsWith('<')) {
+      this.supabaseAdminClient = createClient(supabaseUrl, serviceRoleKey, {
         auth: { persistSession: false },
       });
       this.logger.log('Service-role client initialized; entitlement writes are privileged.');

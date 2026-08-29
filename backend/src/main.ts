@@ -31,6 +31,24 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
+  // Safe environment diagnostic: Reports presence (true/false) only; NEVER prints secret values.
+  const hasVal = (keys: string[]) =>
+    keys.some((k) => {
+      const v = process.env[k] || configService.get<string>(k);
+      return typeof v === 'string' && v.trim().length > 0;
+    });
+
+  console.log('[Environment Diagnostic]');
+  console.log(`- SUPABASE_URL: ${hasVal(['SUPABASE_URL', 'VITE_SUPABASE_URL'])}`);
+  console.log(`- SUPABASE_PUBLISHABLE_KEY: ${hasVal(['SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_ANON_KEY', 'SUPABASE_KEY', 'VITE_SUPABASE_ANON_KEY'])}`);
+  console.log(`- SUPABASE_SERVICE_ROLE_KEY: ${hasVal(['SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_SERVICE_KEY', 'SERVICE_ROLE_KEY'])}`);
+  console.log(`- WEATHER_API_KEY: ${hasVal(['WEATHER_API_KEY', 'OPENWEATHER_API_KEY'])}`);
+  console.log(`- PADDLE_API_KEY: ${hasVal(['PADDLE_API_KEY'])}`);
+  console.log(`- PADDLE_WEBHOOK_SECRET: ${hasVal(['PADDLE_WEBHOOK_SECRET'])}`);
+  console.log(`- PORT: ${process.env.PORT || configService.get('PORT') || 4001}`);
+  console.log(`- NODE_ENV: ${process.env.NODE_ENV || configService.get('NODE_ENV') || 'development'}`);
+
   const allowedOrigins = resolveCorsOrigins(configService);
 
   if (isProduction && allowedOrigins.length === 0) {

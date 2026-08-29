@@ -16,7 +16,7 @@ import { MigrationModule } from './migration/migration.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['backend/.env', '.env', '../.env'],
+      envFilePath: ['.env', 'backend/.env', '../.env'],
     }),
     HealthModule,
     SupabaseModule,

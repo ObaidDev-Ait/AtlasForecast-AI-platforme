@@ -30,6 +30,29 @@ export class HealthService {
     private readonly configService: ConfigService,
   ) {}
 
+  private cleanValue(val: any): string | undefined {
+    if (typeof val !== 'string') return undefined;
+    let trimmed = val.trim();
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      trimmed = trimmed.slice(1, -1).trim();
+    }
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  private hasEnv(keys: string[]): boolean {
+    for (const key of keys) {
+      const fromProcess = this.cleanValue(process.env[key]);
+      if (fromProcess) return true;
+
+      const fromConfig = this.cleanValue(this.configService.get<string>(key));
+      if (fromConfig) return true;
+    }
+    return false;
+  }
+
   private async withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
     let timer: NodeJS.Timeout;
     const timeout = new Promise<T>((resolve) => {
@@ -51,9 +74,7 @@ export class HealthService {
     const checks: DependencyCheck[] = [];
 
     // --- Required: Supabase configuration present ---
-    const hasSupabaseConfig =
-      !!this.configService.get<string>('SUPABASE_URL') &&
-      !!this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
+    const hasSupabaseConfig = this.supabaseService.isConfigured();
 
     checks.push({
       name: 'supabase_config',
@@ -84,18 +105,26 @@ export class HealthService {
       });
     }
 
+    // --- Supabase Service Role Key ---
+    checks.push({
+      name: 'supabase_service_role_key',
+      status: this.supabaseService.hasAdminClient() ? 'ok' : 'not_configured',
+      required: false,
+    });
+
     // --- Optional: things whose absence degrades but does not break the API ---
-    const optional: Array<[string, string]> = [
-      ['weather_api_key', 'WEATHER_API_KEY'],
-      ['stripe_secret_key', 'STRIPE_SECRET_KEY'],
-      ['stripe_webhook_secret', 'STRIPE_WEBHOOK_SECRET'],
-      ['supabase_service_role_key', 'SUPABASE_SERVICE_ROLE_KEY'],
+    const optional: Array<[string, string[]]> = [
+      ['weather_api_key', ['WEATHER_API_KEY', 'OPENWEATHER_API_KEY']],
+      ['stripe_secret_key', ['STRIPE_SECRET_KEY']],
+      ['stripe_webhook_secret', ['STRIPE_WEBHOOK_SECRET']],
+      ['paddle_api_key', ['PADDLE_API_KEY']],
+      ['paddle_webhook_secret', ['PADDLE_WEBHOOK_SECRET']],
     ];
 
-    for (const [name, envVar] of optional) {
+    for (const [name, keys] of optional) {
       checks.push({
         name,
-        status: this.configService.get<string>(envVar) ? 'ok' : 'not_configured',
+        status: this.hasEnv(keys) ? 'ok' : 'not_configured',
         required: false,
       });
     }
