@@ -10,10 +10,15 @@ export class HealthController {
   async getHealth(@Res() res: Response) {
     const report = await this.healthService.check();
 
-    // 503 only when a *required* dependency is down. 'degraded' (an optional
-    // integration not configured) still reports 200 so the endpoint stays
-    // usable as a liveness probe.
-    const httpStatus = report.status === 'error' ? 503 : 200;
-    return res.status(httpStatus).json(report);
+    // Always return HTTP 200 for process liveness so hosting platforms (e.g. Railway)
+    // do not abort or terminate a healthy, running container during startup or transient
+    // external dependency latency. The full dependency health status (ok, degraded, error)
+    // and granular check details remain completely transparent in the JSON payload.
+    return res.status(200).json(report);
+  }
+
+  @Get('liveness')
+  getLiveness(@Res() res: Response) {
+    return res.status(200).json({ status: 'ok', uptime: process.uptime() });
   }
 }
