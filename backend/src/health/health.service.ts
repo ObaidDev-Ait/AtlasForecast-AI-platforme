@@ -114,7 +114,7 @@ export class HealthService {
 
     // --- Optional: things whose absence degrades but does not break the API ---
     const optional: Array<[string, string[]]> = [
-      ['weather_api_key', ['WEATHER_API_KEY', 'OPENWEATHER_API_KEY']],
+      ['weather_api_key', ['OPENWEATHER_API_KEY', 'WEATHER_API_KEY', 'OPEN_WEATHER_API_KEY']],
       ['stripe_secret_key', ['STRIPE_SECRET_KEY']],
       ['stripe_webhook_secret', ['STRIPE_WEBHOOK_SECRET']],
       ['paddle_api_key', ['PADDLE_API_KEY']],

@@ -51,8 +51,6 @@ export interface GeocodingResult {
 @Injectable()
 export class WeatherService {
   private readonly logger = new Logger(WeatherService.name);
-  private readonly apiKey: string;
-  private readonly baseUrl: string;
   private readonly cache = new Map<string, { expiresAt: number; data: any }>();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
